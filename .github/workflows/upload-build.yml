@@ -5,6 +5,7 @@
 name: Upload build to App Store Connect
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop
