@@ -36,7 +36,7 @@ jobs:
                              -sdk iphoneos \
                              -configuration Release \
                              -archivePath azooKey.xcarchive \
-                             CODE_SIGNING_ALLOWED=YES
+                             CODE_SIGNING_ALLOWED=NO
 
       - name: Create ExportOptions.plist
         run: |
