@@ -84,7 +84,7 @@ fileprivate extension CustardInterface {
 }
 
 fileprivate extension CustardKeyDesign.ColorType {
-    var FlickKeyBackgroundStyle: FlickKeyBackgroundStyle {
+    var flickKeyBackgroundStyle: FlickKeyBackgroundStyle {
         switch self {
         case .normal:
             return .normal
@@ -168,7 +168,7 @@ extension CustardInterfaceKey {
                 longPressActions: value.longpress_actions.longpressActionType,
                 flickKeys: flickKeyModels,
                 needSuggestView: value.longpress_actions == .none && !value.variations.isEmpty,
-                keycolorType: value.design.color.FlickKeyBackgroundStyle
+                keycolorType: value.design.color.flickKeyBackgroundStyle
             )
         }
     }
