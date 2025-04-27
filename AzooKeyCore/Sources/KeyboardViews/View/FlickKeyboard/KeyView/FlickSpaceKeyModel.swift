@@ -43,12 +43,12 @@ struct FlickSpaceKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: 
         .init(start: [.setCursorBar(.toggle)])
     }
 
-    func label(width: CGFloat, states: VariableStates) -> KeyLabel<Extension> {
+    func label<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(width: CGFloat, theme: ThemeData<ThemeExtension>, states: VariableStates) -> KeyLabel<Extension> {
         KeyLabel(.text("空白"), width: width)
     }
 
-    func backGroundColorWhenUnpressed(states: VariableStates, theme: ThemeData<some ApplicationSpecificTheme>) -> Color {
-        theme.specialKeyFillColor.color
+    func backgroundStyleWhenUnpressed(states: VariableStates, theme: ThemeData<some ApplicationSpecificTheme>) -> FlickKeyBackgroundStyleValue {
+        theme.specialKeyFillColor.flickKeyBackgroundStyle
     }
 
     func feedback(variableStates: VariableStates) {

@@ -66,7 +66,7 @@ public struct FlickKeyView<Extension: ApplicationSpecificKeyboardViewExtension>:
     }
 
     private func label(width: CGFloat) -> KeyLabel<Extension> {
-        self.model.label(width: width, states: variableStates)
+        self.model.label(width: width, theme: theme, states: variableStates)
     }
 
     /// 長押しとみなすまでの時間
@@ -222,11 +222,11 @@ public struct FlickKeyView<Extension: ApplicationSpecificKeyboardViewExtension>:
             }
     }
 
-    private var keyFillColor: Color {
+    private var keyBackgroundStyle: FlickKeyBackgroundStyleValue {
         if pressState.isActive() {
-            return model.backGroundColorWhenPressed(theme: theme)
+            return model.backgroundStyleWhenPressed(theme: theme)
         } else {
-            return model.backGroundColorWhenUnpressed(states: variableStates, theme: theme)
+            return model.backgroundStyleWhenUnpressed(states: variableStates, theme: theme)
         }
     }
 
@@ -234,14 +234,25 @@ public struct FlickKeyView<Extension: ApplicationSpecificKeyboardViewExtension>:
         theme.borderColor.color
     }
 
+    private var keyShadow: ShadowStyle {
+        .drop(
+            color: theme.keyShadow?.color.color ?? .clear,
+            radius: theme.keyShadow?.radius ?? 0.0,
+            x: theme.keyShadow?.x ?? 0,
+            y: theme.keyShadow?.y ?? 0
+        )
+    }
+
     public var body: some View {
         let keySize = (width: size.width, height: size.height)
         RoundedRectangle(cornerRadius: 6)
-            .strokeAndFill(fillContent: keyFillColor, strokeContent: keyBorderColor, lineWidth: theme.borderWidth)
+            .strokeAndFill(
+                fillContent: keyBackgroundStyle.color.shadow(keyShadow).blendMode(keyBackgroundStyle.blendMode),
+                strokeContent: keyBorderColor,
+                lineWidth: theme.borderWidth
+            )
             .frame(width: keySize.width, height: keySize.height)
             .gesture(gesture)
-            .compositingGroup()
-            .shadow(color: theme.keyShadow?.color.color ?? .clear, radius: theme.keyShadow?.radius ?? 0, x: theme.keyShadow?.x ?? 0, y: theme.keyShadow?.y ?? 0)
             .overlay {
                 self.label(width: keySize.width)
             }

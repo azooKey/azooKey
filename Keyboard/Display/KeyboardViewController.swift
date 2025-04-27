@@ -77,6 +77,12 @@ final class KeyboardViewController: UIInputViewController {
         }
     }
 
+    override func loadView() {
+        super.loadView()
+        // これをやることで背景が透け透けになり、OSネイティブに近い表示になる
+        self.view.backgroundColor = .clear
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         SemiStaticStates.shared.setup()
@@ -104,6 +110,9 @@ final class KeyboardViewController: UIInputViewController {
         host.setNeedsUpdateOfScreenEdgesDeferringSystemGestures()
 
         host.view.translatesAutoresizingMaskIntoConstraints = false
+        // 背景をOSネイティブにするのに必要
+        host.view.backgroundColor = .clear
+
         self.addChild(host)
         self.view.addSubview(host.view)
         host.didMove(toParent: self)

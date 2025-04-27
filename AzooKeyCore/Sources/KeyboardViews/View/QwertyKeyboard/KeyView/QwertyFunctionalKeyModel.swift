@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftUI
+import KeyboardThemes
 
 struct QwertyFunctionalKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: QwertyKeyModelProtocol {
     static var delete: Self { QwertyFunctionalKeyModel(labelType: .image("delete.left"), rowInfo: (normal: 7, functional: 2, space: 0, enter: 0), pressActions: [.delete(1)], longPressActions: .init(repeat: [.delete(1)])) }
@@ -20,7 +21,7 @@ struct QwertyFunctionalKeyModel<Extension: ApplicationSpecificKeyboardViewExtens
     let labelType: KeyLabelType
     let needSuggestView: Bool
     let keySizeType: QwertyKeySizeType
-    let unpressedKeyColorType: QwertyUnpressedKeyColorType = .special
+    let unpressedKeyBackground: QwertyUnpressedKeyBackground = .special
 
     init(labelType: KeyLabelType, rowInfo: (normal: Int, functional: Int, space: Int, enter: Int), pressActions: [ActionType], longPressActions: LongpressActionType = .none, needSuggestView: Bool = false) {
         self.labelType = labelType
@@ -38,7 +39,7 @@ struct QwertyFunctionalKeyModel<Extension: ApplicationSpecificKeyboardViewExtens
         self.longPressActions
     }
 
-    func label(width: CGFloat, states: VariableStates, color: Color?) -> KeyLabel<Extension> {
+    func label<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(width: CGFloat, theme: ThemeData<ThemeExtension>, states: VariableStates, color: Color?) -> KeyLabel<Extension> {
         KeyLabel(self.labelType, width: width, textColor: color)
     }
 

@@ -41,13 +41,16 @@ public struct SimpleKeyView<Extension: ApplicationSpecificKeyboardViewExtension>
     private var longpressDuration: TimeInterval {
         0.4
     }
+    private var keyBackground: SimpleKeyBackgroundStyleValue {
+        isPressed ? model.backgroundStyleWhenPressed(theme: theme) : model.unpressedKeyColorType.color(states: variableStates, theme: theme)
+    }
 
     public var body: some View {
         label(width: keyViewWidth)
             .background {
                 RoundedRectangle(cornerRadius: 6)
                     .strokeAndFill(
-                        fillContent: isPressed ? model.backGroundColorWhenPressed(theme: theme) : model.unpressedKeyColorType.color(states: variableStates, theme: theme),
+                        fillContent: keyBackground.color.blendMode(keyBackground.blendMode),
                         strokeContent: theme.borderColor.color,
                         lineWidth: theme.borderWidth
                     )

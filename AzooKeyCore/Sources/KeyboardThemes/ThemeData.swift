@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftUI
+import SwiftUIUtils
 
 public struct ThemeData<ApplicationExtension: ApplicationSpecificTheme>: Codable, Equatable, Sendable {
     public typealias ColorData = ThemeColor<ApplicationExtension.ApplicationColor>
@@ -82,6 +83,28 @@ public struct ThemeData<ApplicationExtension: ApplicationSpecificTheme>: Codable
         /// エントリがない場合はデフォルトで黒にする
         self.suggestLabelTextColor = (try? container.decode(ColorData?.self, forKey: .suggestLabelTextColor)) ?? .color(Color(white: 0))
         self.keyShadow = try? container.decode(ThemeShadowData<ColorData>?.self, forKey: .keyShadow)
+    }
+
+    public var prominentBackgroundColor: Color {
+        ColorTools.hsv(self.resultBackgroundColor.color) { h, s, v, a in
+            Color(hue: h, saturation: s, brightness: min(1, 0.7 * v + 0.3), opacity: min(1, 0.8 * a + 0.2 ))
+        } ?? self.normalKeyFillColor.color
+    }
+
+    public var tabBarButtonBackgroundColor: Color {
+        if case .dynamic(.clear, .normal) = self.resultBackgroundColor {
+            .white
+        } else {
+            prominentBackgroundColor
+        }
+    }
+
+    public var tabBarButtonForegroundColor: Color {
+        if case .dynamic(.clear, .normal) = self.resultBackgroundColor {
+            Color(red: 0.5, green: 0.043, blue: 0.016)
+        } else {
+            self.resultTextColor.color
+        }
     }
 
 }

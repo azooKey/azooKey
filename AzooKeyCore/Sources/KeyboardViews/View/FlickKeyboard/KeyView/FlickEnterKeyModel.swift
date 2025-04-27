@@ -30,24 +30,46 @@ struct FlickEnterKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: 
         [:]
     }
 
-    func label(width: CGFloat, states: VariableStates) -> KeyLabel<Extension> {
-        let text = Design.language.getEnterKeyText(states.enterKeyState)
-        return KeyLabel(.text(text), width: width)
-    }
-
-    func backGroundColorWhenUnpressed<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(states: VariableStates, theme: ThemeData<ThemeExtension>) -> Color {
+    func specialTextColor<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(states: VariableStates, theme: ThemeData<ThemeExtension>) -> Color? {
         switch states.enterKeyState {
         case .complete:
-            return theme.specialKeyFillColor.color
+            nil
         case let .return(type):
             switch type {
             case .default:
-                return theme.specialKeyFillColor.color
+                nil
+            default:
+                if theme == ThemeExtension.native(layout: .flick) {
+                    .white
+                } else {
+                    nil
+                }
+            }
+        }
+
+    }
+
+    func label<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(width: CGFloat, theme: ThemeData<ThemeExtension>, states: VariableStates) -> KeyLabel<Extension> {
+        let text = Design.language.getEnterKeyText(states.enterKeyState)
+
+        return KeyLabel(.text(text), width: width, textColor: specialTextColor(states: states, theme: theme))
+    }
+
+    func backgroundStyleWhenUnpressed<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(states: VariableStates, theme: ThemeData<ThemeExtension>) -> FlickKeyBackgroundStyleValue {
+        switch states.enterKeyState {
+        case .complete:
+            theme.specialKeyFillColor.flickKeyBackgroundStyle
+        case let .return(type):
+            switch type {
+            case .default:
+                theme.specialKeyFillColor.flickKeyBackgroundStyle
             default:
                 if theme == ThemeExtension.default(layout: .flick) {
-                    return Design.colors.specialEnterKeyColor
+                    (Design.colors.specialEnterKeyColor, .normal)
+                } else if theme == ThemeExtension.native(layout: .flick) {
+                    (.accentColor, .normal)
                 } else {
-                    return theme.specialKeyFillColor.color
+                    theme.specialKeyFillColor.flickKeyBackgroundStyle
                 }
             }
         }

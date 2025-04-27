@@ -58,7 +58,7 @@ struct FlickNextCandidateKeyModel<Extension: ApplicationSpecificKeyboardViewExte
 
     private init() {}
 
-    func label(width: CGFloat, states: VariableStates) -> KeyLabel<Extension> {
+    func label<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(width: CGFloat, theme: ThemeData<ThemeExtension>, states: VariableStates) -> KeyLabel<Extension> {
         if states.resultModel.results.isEmpty {
             KeyLabel(.text("空白"), width: width)
         } else {
@@ -73,7 +73,7 @@ struct FlickNextCandidateKeyModel<Extension: ApplicationSpecificKeyboardViewExte
             KeyboardFeedback<Extension>.tabOrOtherKey()
         }
     }
-    func backGroundColorWhenUnpressed<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(states: VariableStates, theme: ThemeData<ThemeExtension>) -> Color {
-        theme.specialKeyFillColor.color
+    func backgroundStyleWhenUnpressed<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(states: VariableStates, theme: ThemeData<ThemeExtension>) -> FlickKeyBackgroundStyleValue {
+        theme.specialKeyFillColor.flickKeyBackgroundStyle
     }
 }

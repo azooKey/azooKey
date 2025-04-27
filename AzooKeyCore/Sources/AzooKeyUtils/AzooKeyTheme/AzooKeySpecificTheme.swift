@@ -19,21 +19,24 @@ public enum AzooKeySpecificTheme: ApplicationSpecificTheme {
         case qwertyHighlightedKeyColor
         case specialKeyColor
         case backgroundColor
+        case nativeSpecialKeyColor
 
         public var color: Color {
             switch self {
             case .backgroundColor:
-                return Design.colors.backGroundColor
+                Design.colors.backGroundColor
             case .normalKeyColor:
-                return Design.colors.normalKeyColor(layout: .flick)
+                Design.colors.normalKeyColor(layout: .flick)
             case .qwertyNormalKeyColor:
-                return Design.colors.normalKeyColor(layout: .qwerty)
+                Design.colors.normalKeyColor(layout: .qwerty)
             case .specialKeyColor:
-                return Design.colors.specialKeyColor
+                Design.colors.specialKeyColor
             case .highlightedKeyColor:
-                return Design.colors.highlightedKeyColor(layout: .flick)
+                Design.colors.highlightedKeyColor(layout: .flick)
             case .qwertyHighlightedKeyColor:
-                return Design.colors.highlightedKeyColor(layout: .qwerty)
+                Design.colors.highlightedKeyColor(layout: .qwerty)
+            case .nativeSpecialKeyColor:
+                Design.colors.nativeSpecialKeyColor
             }
         }
     }
@@ -62,6 +65,25 @@ public extension AzooKeyTheme {
 }
 
 extension AzooKeySpecificTheme: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable {
+    public static func native(layout: KeyboardLayout) -> AzooKeyTheme {
+        .init(
+            backgroundColor: .dynamic(.clear),
+            picture: .none,
+            textColor: .dynamic(.primary),
+            textFont: .regular,
+            resultTextColor: .dynamic(.primary),
+            resultBackgroundColor: .dynamic(.clear),
+            borderColor: .dynamic(.clear),
+            borderWidth: 1,
+            normalKeyFillColor: .color(.white, blendMode: .softLight),
+            specialKeyFillColor: .system(.nativeSpecialKeyColor, blendMode: .softLight),
+            pushedKeyFillColor: .color(.systemGray4, blendMode: .softLight),
+            suggestKeyFillColor: nil,
+            suggestLabelTextColor: .dynamic(.black),
+            keyShadow: .init(color: .color(.black), radius: 0.5, x: 0, y: 0.75)
+        )
+    }
+
     public static func `default`(layout: KeyboardLayout) -> AzooKeyTheme {
         .init(
             backgroundColor: .system(.backgroundColor),

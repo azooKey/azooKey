@@ -10,6 +10,7 @@ import Foundation
 import SwiftUI
 import enum CustardKit.TabData
 import enum KanaKanjiConverterModule.KeyboardLanguage
+import KeyboardThemes
 
 struct QwertyChangeKeyboardKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: QwertyKeyModelProtocol {
     func pressActions(variableStates: VariableStates) -> [ActionType] {
@@ -25,13 +26,13 @@ struct QwertyChangeKeyboardKeyModel<Extension: ApplicationSpecificKeyboardViewEx
     let needSuggestView: Bool = false
 
     let keySizeType: QwertyKeySizeType
-    let unpressedKeyColorType: QwertyUnpressedKeyColorType = .special
+    let unpressedKeyBackground: QwertyUnpressedKeyBackground = .special
 
     init(keySizeType: QwertyKeySizeType) {
         self.keySizeType = keySizeType
     }
 
-    func label(width: CGFloat, states: VariableStates, color: Color?) -> KeyLabel<Extension> {
+    func label<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(width: CGFloat, theme: ThemeData<ThemeExtension>, states: VariableStates, color: Color?) -> KeyLabel<Extension> {
         KeyLabel(.changeKeyboard, width: width, textColor: color)
     }
 

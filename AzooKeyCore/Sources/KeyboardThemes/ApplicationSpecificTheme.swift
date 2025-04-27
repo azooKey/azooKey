@@ -13,5 +13,5 @@ public protocol ApplicationSpecificTheme {
 }
 
 public protocol ApplicationSpecificColor: Codable, Equatable, Sendable {
-    var color: SwiftUI.Color { get }
+    var color: Color { get }
 }

@@ -10,10 +10,17 @@ import Foundation
 import SwiftUI
 
 public extension Shape {
+    @ViewBuilder
     func strokeAndFill(fillContent: some ShapeStyle, strokeContent: some ShapeStyle, lineWidth: CGFloat) -> some View {
-        ZStack {
-            self.fill(fillContent)
-            self.stroke(strokeContent, lineWidth: lineWidth)
+        if #available(iOS 17, *) {
+            self
+                .fill(fillContent)
+                .stroke(strokeContent, lineWidth: lineWidth)
+        } else {
+            ZStack {
+                self.fill(fillContent)
+                self.stroke(strokeContent, lineWidth: lineWidth)
+            }
         }
     }
 }

@@ -37,15 +37,16 @@ struct FlickTabKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: Fl
         self.tab = tab
     }
 
-    func label(width: CGFloat, states: VariableStates) -> KeyLabel<Extension> {
+    func label<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(width: CGFloat, theme: ThemeData<ThemeExtension>, states: VariableStates) -> KeyLabel<Extension> {
         KeyLabel(self.data.labelType, width: width)
     }
 
-    func backGroundColorWhenUnpressed(states: VariableStates, theme: ThemeData<some ApplicationSpecificTheme>) -> Color {
+    func backgroundStyleWhenUnpressed(states: VariableStates, theme: ThemeData<some ApplicationSpecificTheme>) -> FlickKeyBackgroundStyleValue {
         if states.tabManager.isCurrentTab(tab: tab) {
-            return theme.pushedKeyFillColor.color
+            theme.pushedKeyFillColor.flickKeyBackgroundStyle
+        } else {
+            theme.specialKeyFillColor.flickKeyBackgroundStyle
         }
-        return theme.specialKeyFillColor.color
     }
 
     func feedback(variableStates: VariableStates) {

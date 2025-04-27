@@ -10,18 +10,25 @@ import Foundation
 import SwiftUI
 
 public enum ThemeColor<SystemColor: ApplicationSpecificColor>: Sendable {
-    case color(Color)
-    case system(SystemColor)
-    case dynamic(DynamicColor)
+    case color(Color, blendMode: BlendMode = .normal)
+    case system(SystemColor, blendMode: BlendMode = .normal)
+    case dynamic(DynamicColor, blendMode: BlendMode = .normal)
 
     public var color: Color {
         switch self {
-        case let .color(color):
-            return color
-        case let .system(systemColor):
-            return systemColor.color
-        case let .dynamic(dynamicColor):
-            return dynamicColor.color
+        case let .color(color, _):
+            color
+        case let .system(systemColor, _):
+            systemColor.color
+        case let .dynamic(dynamicColor, _):
+            dynamicColor.color
+        }
+    }
+
+    public var blendMode: BlendMode {
+        switch self {
+        case let .color(_, blendMode), let .system(_, blendMode), let .dynamic(_, blendMode):
+            blendMode
         }
     }
 
@@ -60,7 +67,6 @@ public enum ThemeColor<SystemColor: ApplicationSpecificColor>: Sendable {
             }
         }
     }
-
 }
 
 extension ThemeColor: Codable, Equatable {
@@ -71,9 +77,9 @@ extension ThemeColor: Codable, Equatable {
     public init(from decoder: any Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
 
-        let color = try values.decode(Color?.self, forKey: .color)
-        let systemColor = try values.decode(SystemColor?.self, forKey: .systemColor)
-        let dynamicColor = try values.decode(DynamicColor?.self, forKey: .dynamicColor)
+        let color = try values.decodeIfPresent(Color.self, forKey: .color)
+        let systemColor = try values.decodeIfPresent(SystemColor.self, forKey: .systemColor)
+        let dynamicColor = try values.decodeIfPresent(DynamicColor.self, forKey: .dynamicColor)
 
         if let color {
             self = .color(color)
@@ -92,30 +98,23 @@ extension ThemeColor: Codable, Equatable {
         case dynamicColor
     }
 
+    /// - warning: 現在、`blendMode`の値は明示的に保存していない。このため、設定で`blendMode`を制御するためには追加の対応を要する。
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        let color: Color?
-        let systemColor: SystemColor?
-        let dynamicColor: DynamicColor?
+        var color: Color?
+        var systemColor: SystemColor?
+        var dynamicColor: DynamicColor?
         switch self {
-        case let .color(_color):
+        case let .color(_color, _):
             if let matchedDynamicColor = DynamicColor.allCases.first(where: {$0.color == _color}) {
-                color = nil
-                systemColor = nil
                 dynamicColor = matchedDynamicColor
             } else {
                 color = _color
-                systemColor = nil
-                dynamicColor = nil
             }
-        case let .system(_systemColor):
-            color = nil
+        case let .system(_systemColor, _):
             systemColor = _systemColor
-            dynamicColor = nil
-        case let .dynamic(_dynamicColor):
-            color = nil
-            systemColor = nil
+        case let .dynamic(_dynamicColor, _):
             dynamicColor = _dynamicColor
         }
 

@@ -10,6 +10,14 @@ import Foundation
 import KeyboardThemes
 import SwiftUI
 
+public typealias SimpleKeyBackgroundStyleValue = (color: Color, blendMode: BlendMode)
+
+extension ThemeColor {
+    var simpleKeyBackgroundStyle: SimpleKeyBackgroundStyleValue {
+        (self.color, self.blendMode)
+    }
+}
+
 enum SimpleUnpressedKeyColorType: UInt8 {
     case normal
     case special
@@ -17,29 +25,31 @@ enum SimpleUnpressedKeyColorType: UInt8 {
     case selected
     case unimportant
 
-    @MainActor func color<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(states: VariableStates, theme: ThemeData<ThemeExtension>) -> Color {
+    @MainActor func color<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(states: VariableStates, theme: ThemeData<ThemeExtension>) -> SimpleKeyBackgroundStyleValue {
         switch self {
         case .normal:
-            return theme.normalKeyFillColor.color
+            theme.normalKeyFillColor.simpleKeyBackgroundStyle
         case .special:
-            return theme.specialKeyFillColor.color
+            theme.specialKeyFillColor.simpleKeyBackgroundStyle
         case .selected:
-            return theme.pushedKeyFillColor.color
+            theme.pushedKeyFillColor.simpleKeyBackgroundStyle
         case .unimportant:
-            return Color(white: 0, opacity: 0.001)
+            (Color(white: 0, opacity: 0.001), .normal)
         case .enter:
             switch states.enterKeyState {
             case .complete:
-                return theme.specialKeyFillColor.color
+                theme.specialKeyFillColor.simpleKeyBackgroundStyle
             case let .return(type):
                 switch type {
                 case .default:
-                    return theme.specialKeyFillColor.color
+                    theme.specialKeyFillColor.simpleKeyBackgroundStyle
                 default:
                     if theme == ThemeExtension.default(layout: states.tabManager.existentialTab().layout) {
-                        return Design.colors.specialEnterKeyColor
+                        (Design.colors.specialEnterKeyColor, .normal)
+                    } else if theme == ThemeExtension.default(layout: states.tabManager.existentialTab().layout) {
+                        (.accentColor, .normal)
                     } else {
-                        return theme.specialKeyFillColor.color
+                        theme.specialKeyFillColor.simpleKeyBackgroundStyle
                     }
                 }
             }
@@ -55,15 +65,15 @@ protocol SimpleKeyModelProtocol<Extension> {
     @MainActor func longPressActions(variableStates: VariableStates) -> LongpressActionType
     @MainActor func feedback(variableStates: VariableStates)
     @MainActor func label(width: CGFloat, states: VariableStates) -> KeyLabel<Extension>
-    @MainActor func backGroundColorWhenPressed(theme: Extension.Theme) -> Color
+    @MainActor func backgroundStyleWhenPressed(theme: Extension.Theme) -> SimpleKeyBackgroundStyleValue
     /// `pressActions`とは別に、押された際に発火する操作
     /// - note: タブ固有の事情で実行しなければならないような処理に利用すること
     @MainActor func additionalOnPress(variableStates: VariableStates)
 }
 
 extension SimpleKeyModelProtocol {
-    func backGroundColorWhenPressed(theme: ThemeData<some ApplicationSpecificTheme>) -> Color {
-        theme.pushedKeyFillColor.color
+    func backgroundStyleWhenPressed(theme: ThemeData<some ApplicationSpecificTheme>) -> SimpleKeyBackgroundStyleValue {
+        theme.pushedKeyFillColor.simpleKeyBackgroundStyle
     }
 
     func additionalOnPress(variableStates: VariableStates) {}
@@ -163,8 +173,8 @@ struct SimpleNextCandidateKeyModel<Extension: ApplicationSpecificKeyboardViewExt
             KeyboardFeedback<Extension>.tabOrOtherKey()
         }
     }
-    func backGroundColorWhenUnpressed<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(states: VariableStates, theme: ThemeData<ThemeExtension>) -> Color {
-        theme.specialKeyFillColor.color
+    func backgroundStyleWhenPressed<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(states: VariableStates, theme: ThemeData<ThemeExtension>) -> SimpleKeyBackgroundStyleValue {
+        theme.specialKeyFillColor.simpleKeyBackgroundStyle
     }
 }
 

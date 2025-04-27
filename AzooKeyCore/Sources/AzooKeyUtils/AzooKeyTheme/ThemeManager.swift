@@ -10,8 +10,11 @@ import Foundation
 import KeyboardThemes
 import SwiftUtils
 import UIKit
+import SwiftUICore
 
 struct ThemeIndices: Codable, Equatable {
+    static var defaultThemeIndex: Int { 0 }
+    static var classicDefaultThemeIndex: Int { -1 }
     var currentIndices: [Int] = [0]
     var selectedIndex: Int = 0
     var selectedIndex_dark: Int = 0
@@ -88,8 +91,23 @@ public struct ThemeIndexManager: Equatable {
         }
     }
 
+    public func themeTitle(at index: Int) -> LocalizedStringKey? {
+        switch index {
+        case ThemeIndices.classicDefaultThemeIndex:
+            "Classic"
+        case ThemeIndices.defaultThemeIndex:
+            "Default"
+        default:
+            nil
+        }
+    }
+
     public func theme(at index: Int) throws -> AzooKeyTheme {
-        if index == 0 {
+        // 特殊ケース
+        if index == ThemeIndices.defaultThemeIndex {
+            return AzooKeySpecificTheme.native(layout: .flick)
+        }
+        if index == ThemeIndices.classicDefaultThemeIndex {
             return AzooKeySpecificTheme.default(layout: .flick)
         }
         let themeFileURL = Self.fileURL(name: "themes/theme_\(index).theme")
@@ -177,7 +195,9 @@ public struct ThemeIndexManager: Equatable {
     }
 
     public var indices: [Int] {
-        index.currentIndices
+        let indices = index.currentIndices.filter{$0 > 0}.sorted()
+        // 負のindexについてはシステム側で並べる
+        return [ThemeIndices.defaultThemeIndex, ThemeIndices.classicDefaultThemeIndex] + indices
     }
 
     public var selectedIndex: Int {
@@ -189,7 +209,7 @@ public struct ThemeIndexManager: Equatable {
     }
 
     var nextIndex: Int {
-        (index.currentIndices.last ?? 0) + 1
+        (index.currentIndices.max() ?? 0) + 1
     }
 
 }

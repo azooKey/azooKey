@@ -327,6 +327,10 @@ public enum Design {
             Color("BackGroundColor_iOS15")
         }
 
+        public var nativeSpecialKeyColor: Color {
+            Color("NativeSpecialKeyColor")
+        }
+
         public var specialEnterKeyColor: Color {
             Color("OpenKeyColor")
         }
@@ -360,12 +364,6 @@ public enum Design {
             case .qwerty:
                 return Color("RomanHighlightedKeyColor")
             }
-        }
-
-        public func prominentBackgroundColor(_ theme: ThemeData<some ApplicationSpecificTheme>) -> Color {
-            ColorTools.hsv(theme.resultBackgroundColor.color) { h, s, v, a in
-                Color(hue: h, saturation: s, brightness: min(1, 0.7 * v + 0.3), opacity: min(1, 0.8 * a + 0.2 ))
-            } ?? theme.normalKeyFillColor.color
         }
     }
 

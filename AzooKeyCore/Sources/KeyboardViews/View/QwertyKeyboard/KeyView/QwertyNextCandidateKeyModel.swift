@@ -18,7 +18,7 @@ struct QwertyNextCandidateKeyModel<Extension: ApplicationSpecificKeyboardViewExt
 
     let variationsModel: VariationsModel = .init([])
 
-    let unpressedKeyColorType: QwertyUnpressedKeyColorType = .normal
+    let unpressedKeyBackground: QwertyUnpressedKeyBackground = .normal
 
     static var shared: Self { QwertyNextCandidateKeyModel<Extension>() }
 
@@ -38,7 +38,7 @@ struct QwertyNextCandidateKeyModel<Extension: ApplicationSpecificKeyboardViewExt
         }
     }
 
-    func label(width: CGFloat, states: VariableStates, color: Color?) -> KeyLabel<Extension> {
+    func label<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(width: CGFloat, theme: ThemeData<ThemeExtension>, states: VariableStates, color: Color?) -> KeyLabel<Extension> {
         if states.resultModel.results.isEmpty {
             switch states.keyboardLanguage {
             case .el_GR:
@@ -53,8 +53,8 @@ struct QwertyNextCandidateKeyModel<Extension: ApplicationSpecificKeyboardViewExt
         }
     }
 
-    func backGroundColorWhenUnpressed(states: VariableStates, theme: ThemeData<some ApplicationSpecificTheme>) -> Color {
-        theme.specialKeyFillColor.color
+    func backGroundColorWhenUnpressed(states: VariableStates, theme: ThemeData<some ApplicationSpecificTheme>) -> QwertyKeyBackgroundStyleValue {
+        theme.specialKeyFillColor.qwertyKeyBackgroundStyle
     }
 
     func feedback(variableStates: VariableStates) {

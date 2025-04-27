@@ -102,7 +102,7 @@ private struct SearchBarWrapper<Extension: ApplicationSpecificKeyboardViewExtens
         view.barStyle = .default
         view.searchBarStyle = .minimal
         if let theme = configuration.theme {
-            view.searchTextField.backgroundColor = UIColor(Design.colors.prominentBackgroundColor(theme))
+            view.searchTextField.backgroundColor = UIColor(theme.prominentBackgroundColor)
         }
 
         view.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)

@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftUI
+import KeyboardThemes
 
 struct QwertyKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: QwertyKeyModelProtocol {
 
@@ -19,19 +20,19 @@ struct QwertyKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: Qwer
     let variationsModel: VariationsModel
 
     let keySizeType: QwertyKeySizeType
-    let unpressedKeyColorType: QwertyUnpressedKeyColorType
+    let unpressedKeyBackground: QwertyUnpressedKeyBackground
 
-    init(labelType: KeyLabelType, pressActions: [ActionType], longPressActions: LongpressActionType = .none, variationsModel: VariationsModel = VariationsModel([]), keyColorType: QwertyUnpressedKeyColorType = .normal, needSuggestView: Bool = true, for scale: (normalCount: Int, forCount: Int) = (1, 1)) {
+    init(labelType: KeyLabelType, pressActions: [ActionType], longPressActions: LongpressActionType = .none, variationsModel: VariationsModel = VariationsModel([]), keyColorType: QwertyUnpressedKeyBackground = .normal, needSuggestView: Bool = true, for scale: (normalCount: Int, forCount: Int) = (1, 1)) {
         self.labelType = labelType
         self.pressActions = pressActions
         self.longPressActions = longPressActions
         self.needSuggestView = needSuggestView
         self.variationsModel = variationsModel
         self.keySizeType = .normal(of: scale.normalCount, for: scale.forCount)
-        self.unpressedKeyColorType = keyColorType
+        self.unpressedKeyBackground = keyColorType
     }
 
-    func label(width: CGFloat, states: VariableStates, color: Color?) -> KeyLabel<Extension> {
+    func label<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(width: CGFloat, theme: ThemeData<ThemeExtension>, states: VariableStates, color: Color?) -> KeyLabel<Extension> {
         if (states.boolStates.isCapsLocked || states.boolStates.isShifted), states.keyboardLanguage == .en_US, case let .text(text) = self.labelType {
             return KeyLabel(.text(text.uppercased()), width: width, textColor: color)
         }

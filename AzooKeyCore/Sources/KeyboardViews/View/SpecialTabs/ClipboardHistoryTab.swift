@@ -59,7 +59,7 @@ struct ClipboardHistoryTab<Extension: ApplicationSpecificKeyboardViewExtension>:
 
     init() {}
     private var listRowBackgroundColor: Color {
-        Design.colors.prominentBackgroundColor(theme)
+        theme.prominentBackgroundColor
     }
 
     @ViewBuilder
@@ -139,7 +139,10 @@ struct ClipboardHistoryTab<Extension: ApplicationSpecificKeyboardViewExtension>:
 
             }
         }
-        .listRowBackground(listRowBackgroundColor)
+        .listRowBackground(
+            Rectangle()
+                .foregroundStyle(listRowBackgroundColor)
+        )
         .listRowInsets(EdgeInsets())
         .padding(.leading, 7)
         .padding(.trailing, 2)

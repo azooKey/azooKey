@@ -10,6 +10,14 @@ import Foundation
 import KeyboardThemes
 import SwiftUI
 
+public typealias QwertyKeyBackgroundStyleValue = (color: Color, blendMode: BlendMode)
+
+extension ThemeColor {
+    var qwertyKeyBackgroundStyle: QwertyKeyBackgroundStyleValue {
+        (self.color, self.blendMode)
+    }
+}
+
 enum QwertyKeySizeType: Sendable {
     case unit(width: Int, height: Int)
     case normal(of: Int, for: Int)
@@ -40,39 +48,40 @@ enum QwertyKeySizeType: Sendable {
             return design.keyViewHeight
         }
     }
-
 }
 
-enum QwertyUnpressedKeyColorType: Sendable {
+enum QwertyUnpressedKeyBackground: Sendable {
     case normal
     case special
     case enter
     case selected
     case unimportant
 
-    func color<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(states: VariableStates, theme: ThemeData<ThemeExtension>) -> Color {
+    func color<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(states: VariableStates, theme: ThemeData<ThemeExtension>) -> QwertyKeyBackgroundStyleValue {
         switch self {
         case .normal:
-            return theme.normalKeyFillColor.color
+            theme.normalKeyFillColor.qwertyKeyBackgroundStyle
         case .special:
-            return theme.specialKeyFillColor.color
+            theme.specialKeyFillColor.qwertyKeyBackgroundStyle
         case .selected:
-            return theme.pushedKeyFillColor.color
+            theme.pushedKeyFillColor.qwertyKeyBackgroundStyle
         case .unimportant:
-            return Color(white: 0, opacity: 0.001)
+            (Color(white: 0, opacity: 0.001), .normal)
         case .enter:
             switch states.enterKeyState {
             case .complete:
-                return theme.specialKeyFillColor.color
+                theme.specialKeyFillColor.qwertyKeyBackgroundStyle
             case let .return(type):
                 switch type {
                 case .default:
-                    return theme.specialKeyFillColor.color
+                    theme.specialKeyFillColor.qwertyKeyBackgroundStyle
                 default:
                     if theme == ThemeExtension.default(layout: .qwerty) {
-                        return Design.colors.specialEnterKeyColor
+                        (Design.colors.specialEnterKeyColor, .normal)
+                    } else if theme == ThemeExtension.native(layout: .qwerty) {
+                        (.accentColor, .normal)
                     } else {
-                        return theme.specialKeyFillColor.color
+                        theme.specialKeyFillColor.qwertyKeyBackgroundStyle
                     }
                 }
             }
@@ -92,16 +101,16 @@ protocol QwertyKeyModelProtocol<Extension> {
     @MainActor func longPressActions(variableStates: VariableStates) -> LongpressActionType
     /// 二回連続で押した際に発火するActionを指定する
     @MainActor func doublePressActions(variableStates: VariableStates) -> [ActionType]
-    @MainActor func label(width: CGFloat, states: VariableStates, color: Color?) -> KeyLabel<Extension>
-    func backGroundColorWhenPressed(theme: Extension.Theme) -> Color
-    var unpressedKeyColorType: QwertyUnpressedKeyColorType {get}
+    @MainActor func label<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(width: CGFloat, theme: ThemeData<ThemeExtension>, states: VariableStates, color: Color?) -> KeyLabel<Extension>
+    func backgroundStyleWhenPressed(theme: Extension.Theme) -> QwertyKeyBackgroundStyleValue
+    var unpressedKeyBackground: QwertyUnpressedKeyBackground {get}
 
     @MainActor func feedback(variableStates: VariableStates)
 }
 
 extension QwertyKeyModelProtocol {
-    func backGroundColorWhenPressed(theme: ThemeData<some ApplicationSpecificTheme>) -> Color {
-        theme.pushedKeyFillColor.color
+    func backgroundStyleWhenPressed(theme: ThemeData<some ApplicationSpecificTheme>) -> QwertyKeyBackgroundStyleValue {
+        theme.pushedKeyFillColor.qwertyKeyBackgroundStyle
     }
     func doublePressActions(variableStates _: VariableStates) -> [ActionType] {
         []

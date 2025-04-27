@@ -9,6 +9,7 @@
 import Foundation
 import SwiftUI
 import enum KanaKanjiConverterModule.KeyboardLanguage
+import KeyboardThemes
 
 // symbolタブ、123タブで表示される切り替えボタン
 struct QwertySwitchLanguageKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: QwertyKeyModelProtocol {
@@ -48,14 +49,14 @@ struct QwertySwitchLanguageKeyModel<Extension: ApplicationSpecificKeyboardViewEx
     let needSuggestView: Bool = false
 
     let keySizeType: QwertyKeySizeType
-    let unpressedKeyColorType: QwertyUnpressedKeyColorType = .special
+    let unpressedKeyBackground: QwertyUnpressedKeyBackground = .special
 
     init(rowInfo: (normal: Int, functional: Int, space: Int, enter: Int), languages: (KeyboardLanguage, KeyboardLanguage)) {
         self.keySizeType = .functional(normal: rowInfo.normal, functional: rowInfo.functional, enter: rowInfo.enter, space: rowInfo.space)
         self.languages = languages
     }
 
-    func label(width: CGFloat, states: VariableStates, color: Color?) -> KeyLabel<Extension> {
+    func label<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(width: CGFloat, theme: ThemeData<ThemeExtension>, states: VariableStates, color: Color?) -> KeyLabel<Extension> {
         let current = currentTabLanguage(variableStates: states)
         return if languages.0 == current {
             KeyLabel(.selectable(languages.0.symbol, languages.1.symbol), width: width, textColor: color)

@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftUI
+import KeyboardThemes
 
 struct QwertyEnterKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: QwertyKeyModelProtocol {
     let keySizeType: QwertyKeySizeType
@@ -34,12 +35,30 @@ struct QwertyEnterKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>:
         .none
     }
 
-    func label(width: CGFloat, states: VariableStates, color: Color?) -> KeyLabel<Extension> {
-        let text = Design.language.getEnterKeyText(states.enterKeyState)
-        return KeyLabel(.text(text), width: width, textSize: .small, textColor: color)
+    func specialTextColor<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(states: VariableStates, theme: ThemeData<ThemeExtension>) -> Color? {
+        switch states.enterKeyState {
+        case .complete:
+            nil
+        case let .return(type):
+            switch type {
+            case .default:
+                nil
+            default:
+                if theme == ThemeExtension.native(layout: .flick) {
+                    .white
+                } else {
+                    nil
+                }
+            }
+        }
     }
 
-    let unpressedKeyColorType: QwertyUnpressedKeyColorType = .enter
+    func label<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(width: CGFloat, theme: ThemeData<ThemeExtension>, states: VariableStates, color: Color?) -> KeyLabel<Extension> {
+        let text = Design.language.getEnterKeyText(states.enterKeyState)
+        return KeyLabel(.text(text), width: width, textSize: .small, textColor: color ?? specialTextColor(states: states, theme: theme))
+    }
+
+    let unpressedKeyBackground: QwertyUnpressedKeyBackground = .enter
 
     func feedback(variableStates: VariableStates) {
         switch variableStates.enterKeyState {

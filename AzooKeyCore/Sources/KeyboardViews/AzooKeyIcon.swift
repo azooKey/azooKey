@@ -45,14 +45,14 @@ public struct AzooKeyIcon: View {
         case .auto:
             switch colorScheme {
             case .light:
-                return .init(red: 0.398, green: 0.113, blue: 0.218)
+                .init(red: 0.398, green: 0.113, blue: 0.218)
             case .dark:
-                return .white
+                .white
             @unknown default:
-                return .init(red: 0.398, green: 0.113, blue: 0.218)
+                .init(red: 0.398, green: 0.113, blue: 0.218)
             }
         case let .color(color):
-            return color
+            color
         }
     }
 

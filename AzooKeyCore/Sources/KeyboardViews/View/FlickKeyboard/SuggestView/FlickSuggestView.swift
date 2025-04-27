@@ -49,7 +49,7 @@ struct FlickSuggestView<Extension: ApplicationSpecificKeyboardViewExtension>: Vi
             theme != Extension.ThemeExtension.default(layout: .flick) ? .white : .systemGray5
         }
         var shadowColor: Color {
-            if colorScheme == .dark || theme != Extension.ThemeExtension.default(layout: .flick) {
+            if colorScheme == .dark || (theme != Extension.ThemeExtension.default(layout: .flick) && theme != Extension.ThemeExtension.native(layout: .flick)) {
                 .clear
             } else {
                 .gray
@@ -167,7 +167,7 @@ struct FlickSuggestView<Extension: ApplicationSpecificKeyboardViewExtension>: Vi
                         )
                         .zIndex(2)
                         .overlay {
-                            (self.model.label(width: size.width, states: variableStates))
+                            (self.model.label(width: size.width, theme: theme, states: variableStates))
                                 .textColor(.white)
                                 .textSize(.xlarge)
                         }
@@ -196,7 +196,7 @@ struct FlickSuggestView<Extension: ApplicationSpecificKeyboardViewExtension>: Vi
                         .zIndex(1)
                     RoundedRectangle(cornerRadius: 5.0)
                         .strokeAndFill(
-                            fillContent: theme.specialKeyFillColor.color,
+                            fillContent: theme.specialKeyFillColor.color.blendMode(theme.specialKeyFillColor.blendMode),
                             strokeContent: theme.borderColor.color,
                             lineWidth: theme.borderWidth
                         )

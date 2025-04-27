@@ -26,7 +26,8 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
 
     public var body: some View {
         ZStack { [unowned variableStates] in
-            theme.backgroundColor.color
+            Rectangle()
+                .foregroundStyle(theme.backgroundColor.color)
                 .frame(maxWidth: .infinity)
                 .overlay {
                     if let image = theme.picture.image {

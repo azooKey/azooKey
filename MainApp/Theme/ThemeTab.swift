@@ -71,9 +71,27 @@ struct ThemeTabView: View {
                                     Color.black.opacity(0.3)
                                 }
                             }
+                            .background {
+                                Rectangle()
+                                    .foregroundStyle(.systemGray4)
+                            }
                             .onTapGesture {
                                 if manager.selectedIndex != index && manager.selectedIndexInDarkMode != index {
                                     self.manager.select(at: index)
+                                }
+                            }
+                            .overlay(alignment: .bottom) {
+                                if let title = manager.themeTitle(at: index) {
+                                    Text(title)
+                                        .bold()
+                                        .font(.caption)
+                                        .padding(8)
+                                        .background {
+                                            Capsule()
+                                                .foregroundStyle(.regularMaterial)
+                                                .shadow(radius: 1.5)
+                                        }
+                                        .padding(.bottom, 4)
                                 }
                             }
                         if manager.selectedIndex == manager.selectedIndexInDarkMode,
@@ -108,7 +126,7 @@ struct ThemeTabView: View {
                                 }
                             }
                         }
-                        if index != 0 {
+                        if index > 0 {
                             Button("編集", systemImage: "slider.horizontal.3") {
                                 self.editViewIndex = index
                                 self.path.append(.edit(index: index))
@@ -132,11 +150,11 @@ struct ThemeTabView: View {
                         self.editViewIndex = index
                         self.path.append(.edit(index: index))
                     }
-                    .disabled(index == 0)
+                    .disabled(index <= 0)
                     Button("削除する", systemImage: "trash", role: .destructive) {
                         manager.remove(index: index)
                     }
-                    .disabled(index == 0)
+                    .disabled(index <= 0)
                 }
             }
         }

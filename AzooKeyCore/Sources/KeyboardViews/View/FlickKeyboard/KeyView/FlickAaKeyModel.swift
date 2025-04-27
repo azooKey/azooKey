@@ -40,11 +40,11 @@ struct FlickAaKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: Fli
         }
     }
 
-    func label(width: CGFloat, states: VariableStates) -> KeyLabel<Extension> {
+    @MainActor func label<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(width: CGFloat, theme: ThemeData<ThemeExtension>, states: VariableStates) -> KeyLabel<Extension> {
         if states.boolStates.isCapsLocked {
-            return KeyLabel(.image("capslock.fill"), width: width)
+            KeyLabel(.image("capslock.fill"), width: width)
         } else {
-            return KeyLabel(.text("a/A"), width: width)
+            KeyLabel(.text("a/A"), width: width)
         }
     }
 
@@ -52,11 +52,11 @@ struct FlickAaKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: Fli
         KeyboardFeedback<Extension>.tabOrOtherKey()
     }
 
-    func backGroundColorWhenUnpressed(states: VariableStates, theme: ThemeData<some ApplicationSpecificTheme>) -> Color {
+    func backgroundStyleWhenUnpressed(states: VariableStates, theme: ThemeData<some ApplicationSpecificTheme>) -> FlickKeyBackgroundStyleValue {
         if states.boolStates.isCapsLocked {
-            return theme.specialKeyFillColor.color
+            theme.specialKeyFillColor.flickKeyBackgroundStyle
         } else {
-            return theme.normalKeyFillColor.color
+            theme.normalKeyFillColor.flickKeyBackgroundStyle
         }
     }
 }

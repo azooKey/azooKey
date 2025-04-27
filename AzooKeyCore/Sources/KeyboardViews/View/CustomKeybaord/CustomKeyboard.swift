@@ -84,7 +84,7 @@ fileprivate extension CustardInterface {
 }
 
 fileprivate extension CustardKeyDesign.ColorType {
-    var flickKeyColorType: FlickKeyColorType {
+    var FlickKeyBackgroundStyle: FlickKeyBackgroundStyle {
         switch self {
         case .normal:
             return .normal
@@ -97,7 +97,7 @@ fileprivate extension CustardKeyDesign.ColorType {
         }
     }
 
-    var qwertyKeyColorType: QwertyUnpressedKeyColorType {
+    var qwertyKeyColorType: QwertyUnpressedKeyBackground {
         switch self {
         case .normal:
             return .normal
@@ -168,7 +168,7 @@ extension CustardInterfaceKey {
                 longPressActions: value.longpress_actions.longpressActionType,
                 flickKeys: flickKeyModels,
                 needSuggestView: value.longpress_actions == .none && !value.variations.isEmpty,
-                keycolorType: value.design.color.flickKeyColorType
+                keycolorType: value.design.color.FlickKeyBackgroundStyle
             )
         }
     }
@@ -189,7 +189,7 @@ extension CustardInterfaceKey {
             case .changeKeyboard:
                 let changeKeyboardKeySize: QwertyKeySizeType = .normal(of: 1, for: 1)
                 return if let second = Extension.SettingProvider.preferredLanguage.second {
-                    QwertyConditionalKeyModel(keySizeType: changeKeyboardKeySize, needSuggestView: false, unpressedKeyColorType: .special) { states in
+                    QwertyConditionalKeyModel(keySizeType: changeKeyboardKeySize, needSuggestView: false, unpressedKeyBackground: .special) { states in
                         if SemiStaticStates.shared.needsInputModeSwitchKey {
                             return QwertyChangeKeyboardKeyModel(keySizeType: changeKeyboardKeySize)
                         } else {
@@ -211,7 +211,7 @@ extension CustardInterfaceKey {
                         }
                     }
                 } else {
-                    QwertyConditionalKeyModel(keySizeType: changeKeyboardKeySize, needSuggestView: false, unpressedKeyColorType: .special) { states in
+                    QwertyConditionalKeyModel(keySizeType: changeKeyboardKeySize, needSuggestView: false, unpressedKeyBackground: .special) { states in
                         if SemiStaticStates.shared.needsInputModeSwitchKey {
                             // 地球儀キーが必要な場合
                             QwertyChangeKeyboardKeyModel(keySizeType: changeKeyboardKeySize)
@@ -448,11 +448,11 @@ public struct CustardFlickKeysView<Extension: ApplicationSpecificKeyboardViewExt
                             .frame(width: info.contentSize.width, height: info.contentSize.height)
                             .contentShape(Rectangle())
                             .position(x: info.position.x, y: info.position.y)
-                            .blur(radius: needBlur ? 0.75 : 0)
+                            .opacity (needBlur ? 0.75 : 1.0)
                     }
                 }
                 .zIndex(columnSuggestStates.isEmpty ? 0 : 1)
-                .blur(radius: needColumnWideBlur ? 0.75 : 0)
+                .opacity(needColumnWideBlur ? 0.75 : 1.0)
             }
             .frame(width: tabDesign.keysWidth, height: tabDesign.keysHeight)
         }

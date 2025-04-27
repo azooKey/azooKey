@@ -9,6 +9,7 @@
 import CustardKit
 import Foundation
 import SwiftUI
+import KeyboardThemes
 
 struct FlickKogakiKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: FlickKeyModelProtocol {
     let needSuggestView: Bool = true
@@ -35,7 +36,7 @@ struct FlickKogakiKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>:
         .none
     }
 
-    func label(width: CGFloat, states: VariableStates) -> KeyLabel<Extension> {
+    func label<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(width: CGFloat, theme: ThemeData<ThemeExtension>, states: VariableStates) -> KeyLabel<Extension> {
         KeyLabel(self.labelType, width: width)
     }
 

@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import enum CustardKit.TabData
 import enum KanaKanjiConverterModule.KeyboardLanguage
+import KeyboardThemes
 
 struct QwertyConditionalKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: QwertyKeyModelProtocol {
     var keySizeType: QwertyKeySizeType
@@ -17,7 +18,7 @@ struct QwertyConditionalKeyModel<Extension: ApplicationSpecificKeyboardViewExten
 
     var variationsModel: VariationsModel = .init([])
 
-    var unpressedKeyColorType: QwertyUnpressedKeyColorType
+    var unpressedKeyBackground: QwertyUnpressedKeyBackground
 
     /// 条件に基づいてモデルを返すclosure
     var key: (VariableStates) -> (any QwertyKeyModelProtocol<Extension>)
@@ -30,8 +31,8 @@ struct QwertyConditionalKeyModel<Extension: ApplicationSpecificKeyboardViewExten
         key(variableStates).longPressActions(variableStates: variableStates)
     }
 
-    func label(width: CGFloat, states: VariableStates, color: Color?) -> KeyLabel<Extension> {
-        key(states).label(width: width, states: states, color: color)
+    func label<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(width: CGFloat, theme: ThemeData<ThemeExtension>, states: VariableStates, color: Color?) -> KeyLabel<Extension> {
+        key(states).label(width: width, theme: theme, states: states, color: color)
     }
 
     func feedback(variableStates: VariableStates) {

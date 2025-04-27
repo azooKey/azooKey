@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftUI
+import KeyboardThemes
 
 // symbolタブ、123タブで表示される切り替えボタン
 struct QwertyTabKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: QwertyKeyModelProtocol {
@@ -35,13 +36,13 @@ struct QwertyTabKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: Q
     let needSuggestView: Bool = false
 
     let keySizeType: QwertyKeySizeType
-    let unpressedKeyColorType: QwertyUnpressedKeyColorType = .special
+    let unpressedKeyBackground: QwertyUnpressedKeyBackground = .special
 
     init(rowInfo: (normal: Int, functional: Int, space: Int, enter: Int)) {
         self.keySizeType = .functional(normal: rowInfo.normal, functional: rowInfo.functional, enter: rowInfo.enter, space: rowInfo.space)
     }
 
-    func label(width: CGFloat, states: VariableStates, color: Color?) -> KeyLabel<Extension> {
+    func label<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(width: CGFloat, theme: ThemeData<ThemeExtension>, states: VariableStates, color: Color?) -> KeyLabel<Extension> {
         switch SemiStaticStates.shared.needsInputModeSwitchKey {
         case true:
             switch states.keyboardLanguage {

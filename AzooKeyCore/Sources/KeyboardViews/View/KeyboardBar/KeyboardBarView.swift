@@ -95,11 +95,11 @@ struct KeyboardBarButton<Extension: ApplicationSpecificKeyboardViewExtension>: V
     }
 
     private var buttonBackgroundColor: Color {
-        Design.colors.prominentBackgroundColor(theme)
+        theme.tabBarButtonBackgroundColor
     }
 
     private var buttonLabelColor: Color {
-        theme.resultTextColor.color
+        theme.tabBarButtonForegroundColor
     }
 
     private var circleSize: CGFloat {

@@ -195,11 +195,11 @@ struct QwertyKeyView<Extension: ApplicationSpecificKeyboardViewExtension>: View 
             })
     }
 
-    var keyFillColor: Color {
+    var keyFillColor: QwertyKeyBackgroundStyleValue {
         if self.pressState.isActive {
-            return self.model.backGroundColorWhenPressed(theme: theme)
+            self.model.backgroundStyleWhenPressed(theme: theme)
         } else {
-            return self.model.unpressedKeyColorType.color(states: variableStates, theme: theme)
+            self.model.unpressedKeyBackground.color(states: variableStates, theme: theme)
         }
     }
 
@@ -231,22 +231,33 @@ struct QwertyKeyView<Extension: ApplicationSpecificKeyboardViewExtension>: View 
     }
 
     private func label(width: CGFloat, color: Color?) -> some View {
-        self.model.label(width: width, states: variableStates, color: color)
+        self.model.label(width: width, theme: theme, states: variableStates, color: color)
+    }
+
+    private var keyShadow: ShadowStyle {
+        .drop(
+            color: theme.keyShadow?.color.color ?? .clear,
+            radius: theme.keyShadow?.radius ?? 0.0,
+            x: theme.keyShadow?.x ?? 0,
+            y: theme.keyShadow?.y ?? 0
+        )
     }
 
     var body: some View {
         ZStack(alignment: .bottom) {
             Group {
                 RoundedRectangle(cornerRadius: 6)
-                    .strokeAndFill(fillContent: keyFillColor, strokeContent: keyBorderColor, lineWidth: keyBorderWidth)
+                    .strokeAndFill(
+                        fillContent: keyFillColor.color.shadow(keyShadow).blendMode(keyFillColor.blendMode),
+                        strokeContent: keyBorderColor,
+                        lineWidth: keyBorderWidth
+                    )
                     .frame(width: size.width, height: size.height)
                     .contentShape(
                         Rectangle()
                             .size(CGSize(width: size.width + tabDesign.horizontalSpacing, height: size.height + tabDesign.verticalSpacing))
                     )
                     .gesture(gesture)
-                    .compositingGroup()
-                    .shadow(color: theme.keyShadow?.color.color ?? .clear, radius: theme.keyShadow?.radius ?? 0, x: theme.keyShadow?.x ?? 0, y: theme.keyShadow?.y ?? 0)
                     .overlay {
                         label(width: size.width, color: nil)
                     }

@@ -26,9 +26,9 @@ struct FlickKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: Flick
     let labelType: KeyLabelType
     private let pressActions: [ActionType]
     let longPressActions: LongpressActionType
-    private let keycolorType: FlickKeyColorType
+    private let keycolorType: FlickKeyBackgroundStyle
 
-    init(labelType: KeyLabelType, pressActions: [ActionType], longPressActions: LongpressActionType = .none, flickKeys: [FlickDirection: FlickedKeyModel], needSuggestView: Bool = true, keycolorType: FlickKeyColorType = .normal) {
+    init(labelType: KeyLabelType, pressActions: [ActionType], longPressActions: LongpressActionType = .none, flickKeys: [FlickDirection: FlickedKeyModel], needSuggestView: Bool = true, keycolorType: FlickKeyBackgroundStyle = .normal) {
         self.labelType = labelType
         self.pressActions = pressActions
         self.longPressActions = longPressActions
@@ -37,8 +37,8 @@ struct FlickKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: Flick
         self.keycolorType = keycolorType
     }
 
-    func backGroundColorWhenUnpressed(states: VariableStates, theme: ThemeData<some ApplicationSpecificTheme>) -> Color {
-        keycolorType.color(theme: theme)
+    func backgroundStyleWhenUnpressed(states: VariableStates, theme: ThemeData<some ApplicationSpecificTheme>) -> FlickKeyBackgroundStyleValue {
+        keycolorType.backgroundStyle(theme: theme)
     }
 
     func pressActions(variableStates: VariableStates) -> [ActionType] {
@@ -53,7 +53,7 @@ struct FlickKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: Flick
         self.flickKeys
     }
 
-    func label(width: CGFloat, states: VariableStates) -> KeyLabel<Extension> {
+    func label<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(width: CGFloat, theme: ThemeData<ThemeExtension>, states: VariableStates) -> KeyLabel<Extension> {
         KeyLabel(self.labelType, width: width)
     }
 

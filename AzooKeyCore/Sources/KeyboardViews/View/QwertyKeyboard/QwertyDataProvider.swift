@@ -32,7 +32,7 @@ struct QwertyDataProvider<Extension: ApplicationSpecificKeyboardViewExtension> {
         let symbolsKey: any QwertyKeyModelProtocol<Extension> = QwertyFunctionalKeyModel(labelType: .text("#+="), rowInfo: rowInfo, pressActions: [.moveTab(.system(.qwerty_symbols))], longPressActions: .init(start: [.setTabBar(.toggle)]))
         let changeKeyboardKeySize: QwertyKeySizeType = .functional(normal: rowInfo.normal, functional: rowInfo.functional, enter: rowInfo.enter, space: rowInfo.space)
         let changeKeyboardKey: any QwertyKeyModelProtocol<Extension> = if let second = preferredLanguage.second {
-            QwertyConditionalKeyModel(keySizeType: changeKeyboardKeySize, needSuggestView: false, unpressedKeyColorType: .special) { states in
+            QwertyConditionalKeyModel(keySizeType: changeKeyboardKeySize, needSuggestView: false, unpressedKeyBackground: .special) { states in
                 if SemiStaticStates.shared.needsInputModeSwitchKey {
                     // 地球儀キーが必要な場合
                     return switch states.tabManager.existentialTab() {
@@ -74,7 +74,7 @@ struct QwertyDataProvider<Extension: ApplicationSpecificKeyboardViewExtension> {
                 }
             }
         } else {
-            QwertyConditionalKeyModel(keySizeType: changeKeyboardKeySize, needSuggestView: false, unpressedKeyColorType: .special) { states in
+            QwertyConditionalKeyModel(keySizeType: changeKeyboardKeySize, needSuggestView: false, unpressedKeyBackground: .special) { states in
                 if SemiStaticStates.shared.needsInputModeSwitchKey {
                     // 地球儀キーが必要な場合
                     QwertyChangeKeyboardKeyModel(keySizeType: changeKeyboardKeySize)

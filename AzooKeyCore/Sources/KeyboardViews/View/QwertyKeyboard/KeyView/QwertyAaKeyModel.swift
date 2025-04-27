@@ -7,6 +7,7 @@
 //
 import Foundation
 import SwiftUI
+import KeyboardThemes
 
 struct QwertyAaKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: QwertyKeyModelProtocol {
     static var shared: Self { QwertyAaKeyModel() }
@@ -28,7 +29,7 @@ struct QwertyAaKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: Qw
         .init(start: [.setBoolState(VariableStates.BoolStates.isCapsLockedKey, .toggle)])
     }
 
-    func label(width: CGFloat, states: VariableStates, color: Color?) -> KeyLabel<Extension> {
+    func label<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(width: CGFloat, theme: ThemeData<ThemeExtension>, states: VariableStates, color: Color?) -> KeyLabel<Extension> {
         if states.boolStates.isCapsLocked {
             return KeyLabel(.image("capslock.fill"), width: width, textColor: color)
         } else {
@@ -36,7 +37,7 @@ struct QwertyAaKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: Qw
         }
     }
 
-    let unpressedKeyColorType: QwertyUnpressedKeyColorType = .special
+    let unpressedKeyBackground: QwertyUnpressedKeyBackground = .special
 
     func feedback(variableStates: VariableStates) {
         KeyboardFeedback<Extension>.tabOrOtherKey()

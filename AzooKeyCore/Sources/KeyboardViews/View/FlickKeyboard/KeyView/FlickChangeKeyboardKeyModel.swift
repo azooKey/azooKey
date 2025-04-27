@@ -45,7 +45,7 @@ struct FlickChangeKeyboardModel<Extension: ApplicationSpecificKeyboardViewExtens
         return [:]
     }
 
-    func label(width: CGFloat, states: VariableStates) -> KeyLabel<Extension> {
+    func label<ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable>(width: CGFloat, theme: ThemeData<ThemeExtension>, states: VariableStates) -> KeyLabel<Extension> {
         switch SemiStaticStates.shared.needsInputModeSwitchKey {
         case true:
             return KeyLabel(.changeKeyboard, width: width)
@@ -54,8 +54,8 @@ struct FlickChangeKeyboardModel<Extension: ApplicationSpecificKeyboardViewExtens
         }
     }
 
-    func backGroundColorWhenUnpressed(states: VariableStates, theme: ThemeData<some ApplicationSpecificTheme>) -> Color {
-        theme.specialKeyFillColor.color
+    func backgroundStyleWhenUnpressed(states: VariableStates, theme: ThemeData<some ApplicationSpecificTheme>) -> FlickKeyBackgroundStyleValue {
+        theme.specialKeyFillColor.flickKeyBackgroundStyle
     }
 
     func feedback(variableStates: VariableStates) {
