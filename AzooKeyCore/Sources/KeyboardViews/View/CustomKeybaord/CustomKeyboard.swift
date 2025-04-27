@@ -448,7 +448,7 @@ public struct CustardFlickKeysView<Extension: ApplicationSpecificKeyboardViewExt
                             .frame(width: info.contentSize.width, height: info.contentSize.height)
                             .contentShape(Rectangle())
                             .position(x: info.position.x, y: info.position.y)
-                            .opacity (needBlur ? 0.75 : 1.0)
+                            .opacity(needBlur ? 0.75 : 1.0)
                     }
                 }
                 .zIndex(columnSuggestStates.isEmpty ? 0 : 1)
