@@ -15,7 +15,8 @@
             "value" : ""
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "・%@" : {
       "localizations" : {
@@ -209,80 +210,12 @@
         }
       }
     },
-    "「%@」を繰り返し入力" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Input '%@' repeatedly"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "「2020ねん→令和2年」「れいわ2ねん→2020年」のように西暦と和暦を相互に変換して候補に表示します。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Convert Gregorian year and Japanese year mutually and display candidates like 「2020ねん→令和2年」「れいわ2ねん→2020年」."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "「u3042→あ」のように、入力されたunicode番号に対応する文字に変換します。接頭辞にはu, u+, U, U+が使えます。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Convert Unicode order to letter and display candidates like 「u3042→あ」"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "「yyyy/MM/dd hh:mm」というのは日付の書式の書き方で、「yyyy」が4桁の年、「MM」が2桁の月、「dd」は2桁の日付を指しています。「hh」と「mm」も同様に時間と分です。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "'yyyy/MM/dd hh:mm' is the format of dates. 'yyyy' represents the current year in 4 digits, 'MM' represents the current month in 2 digits, 'dd' represents the current date in 2 digits. 'hh' and 'mm' represent the current hour and minute."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "「いんてれsちんg」→「interesting」のように、ローマ字日本語入力中も英語への変換候補を表示します。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Display English word candidates during qwerty Japanese inputting like 「いんてれsちんg」→「interesting」."
           }
         },
         "ja" : {
@@ -415,23 +348,6 @@
         }
       }
     },
-    "「空白」を長押しすると、カーソルバーが現れます。ホームボタンのない端末のフリック入力では左下の%@を押して表示することも可能です。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tap and hold \"空白\" key, the cursor bar appears. If your device doesn't have the home button, you can push %@ and then the button appears."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "「設定」アプリを開く" : {
       "localizations" : {
         "en" : {
@@ -444,17 +360,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
-          }
-        }
-      }
-    },
-    "「連絡先」アプリに登録された氏名のデータを変換に利用します" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use names in 'Contacts.app' in conversion to enable more accurate conversion."
           }
         }
       }
@@ -495,74 +400,6 @@
         }
       }
     },
-    "%@ %@に指を置いて左右になぞることでカーソルが滑らかに移動します。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "By putting your finger on the %1$@ %2$@ and tracing it, the cursor moves smoothly as you move your finger."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "%@キーボードの種類 (現在: %@)" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ keyboard layout (current: %2$@)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "%@というテンプレートが見つかりません。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Template '%@' cannot be found"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "%@など" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@, etc"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "%@の隣までカーソルを移動" : {
       "localizations" : {
         "en" : {
@@ -595,159 +432,6 @@
         }
       }
     },
-    "%@をタップするとリセットされます。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "To reset, tap %@."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "%@をタップすると完了します。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "To finish resizing, tap %@."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "%@を押して完了したあとは通常のキーボードと同様に使えます。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "After tap %@ and resizing has finished, you can use the keyboard in the same way as the normal mode."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "%@を押すと再度編集できます。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "To resize the keyboard, tap %@."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "%@を押すと通常の両手モードに戻ります。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "To escape one-handed mode, tap %@."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "%@を編集できます" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ can be edited"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "%@を長押しでペースト" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Longpress %@ to paste"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "%@文字ずつカーソルを移動" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Move cursor for %@ characters repeatedly"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "%@文字ずつ削除" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete %@ character repeatedly"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "%@文字分カーソルを移動" : {
       "localizations" : {
         "en" : {
@@ -770,40 +454,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete %@ character"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "%@画像を選び直す" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@Change image"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "%@画像を選ぶ" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@Select image"
           }
         },
         "ja" : {
@@ -850,46 +500,12 @@
         }
       }
     },
-    "%を新規作成" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Create new template %@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "⚫︎%@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "⚫︎%@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "1文字ずつ移動したい場合は%@の%@部分または%@部分をタップすることでそれぞれの方向に1文字ずつ移動します。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "When you'd like to move by one character, tap the %1$@ %2$@ or %3$@ and the cursor moves each direction for one character."
           }
         },
         "ja" : {
@@ -1433,23 +1049,6 @@
         }
       }
     },
-    "OSのユーザ辞書の利用" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use device text replacement"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "OS標準のユーザ辞書を利用します。" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1463,17 +1062,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
-          }
-        }
-      }
-    },
-    "QwertyキーボードでAaキーの代わりにシフトキーを利用します。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use shift key instead of Aa key in qwerty keyboards."
           }
         }
       }
@@ -1494,23 +1082,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Specify SF Symbols ID"
-          }
-        }
-      }
-    },
-    "unicode変換" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unicode letters conversion"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
           }
         }
       }
@@ -1771,23 +1342,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "You can create custom tabs where you can list your commonly used work greetings, game phrases, favorite emojis, and more."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "アプリを開く" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open app"
           }
         },
         "ja" : {
@@ -2402,23 +1956,6 @@
         }
       }
     },
-    "キーの文字の大きさを指定できます。文字が大きすぎる場合表示が崩れることがあります。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can set the font size of keys. If the size is too large, the appearance can get collapsed."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "キーの文字の色" : {
       "localizations" : {
         "en" : {
@@ -2499,23 +2036,6 @@
         }
       }
     },
-    "キーの表示サイズ" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Font size of key labels"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "キーの見た目は「ラベル」で設定できます。" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2529,34 +2049,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
-          }
-        }
-      }
-    },
-    "キーの音" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enable keyboard sounds"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "キーボードで入力中、空白キーに「次候補」機能を表示します" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "While composing, the space key will change into the 'Next Candidate' key"
           }
         }
       }
@@ -2609,23 +2101,6 @@
         }
       }
     },
-    "キーボードの種類 (現在: %@)" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keyboard layout (current: %@)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "キーボードの種類をお選びください" : {
       "localizations" : {
         "en" : {
@@ -2648,40 +2123,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Select input style"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "キーボードの高さ" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keyboard height"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "キーボードの高さを調整できます。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can edit keyboard height."
           }
         },
         "ja" : {
@@ -2794,40 +2235,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Set actions when you press this key in detail."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "キーを押した際に端末を振動させます。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enable haptics feedback when you press keys."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "キーを押した際に音を鳴らします♪" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Make sounds when you press keys♪"
           }
         },
         "ja" : {
@@ -2982,23 +2389,6 @@
         }
       }
     },
-    "クリップボードの履歴を保存" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keep clipboard histories"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "ゴキブリの絵文字を非表示" : {
       "localizations" : {
         "en" : {
@@ -3037,23 +2427,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pin this item"
-          }
-        }
-      }
-    },
-    "このアクションはiOSのメジャーアップデートで利用できなくなる可能性があります" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This action could be invalid in future iOS versions"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
           }
         }
       }
@@ -3122,46 +2495,12 @@
         }
       }
     },
-    "このキーにはタブ移動以外のアクションが設定されています。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This key doesn't have a moving tab action."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "このキーにはタブ移動以外のアクションが設定されています。現在のアクションを消去して移動するタブを設定するには「タブを設定する」を押してください" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "This key has an action other than tab navigation assigned to it. To clear the current action and set it to navigate tabs, press 'Set destination tab'"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "このキーには入力以外のアクションが設定されています。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This key doesn't have input action."
           }
         },
         "ja" : {
@@ -3394,23 +2733,6 @@
         }
       }
     },
-    "コピーした文字列の履歴を保存し、専用のタブから入力できるようにします。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keeping histories of copied text, and make it possible to input them from clipboard history tab."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "コピーする" : {
       "localizations" : {
         "en" : {
@@ -3433,23 +2755,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "This may not be an azooKey issue, but a delay in updating the data on the OS side."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "これまでの学習を反映しない" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ignore memories"
           }
         },
         "ja" : {
@@ -3609,12 +2914,11 @@
       }
     },
     "シフトキーを使う" : {
-      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use shift key"
+            "value" : "Use Shift Key"
           }
         }
       }
@@ -3911,41 +3215,7 @@
         }
       }
     },
-    "タブバーに「コピー履歴」ボタンを追加しました。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "'コピー履歴' button is added into tab bar."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "タブバーに追加" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add to tab bar"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "タブバーに追加する" : {
-      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4025,23 +3295,6 @@
         }
       }
     },
-    "タブバーボタン" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tab bar button"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "タブバーを編集" : {
       "localizations" : {
         "en" : {
@@ -4080,23 +3333,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Set destination tab"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "タブを選択" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select destination tab"
           }
         },
         "ja" : {
@@ -4293,23 +3529,6 @@
         }
       }
     },
-    "どちらの入力方式でも%@は大文字固定になっていることを意味します。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "In both input styles, the mark %@ means that currently the keyboard is caps locked."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "とても反応しにくい" : {
       "localizations" : {
         "en" : {
@@ -4332,23 +3551,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Very sensitive"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "どれだけ指を動かしたらフリックと判定するか調整できます。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can adjust how much you move your finger to determine a flick."
           }
         },
         "ja" : {
@@ -4523,17 +3725,6 @@
         }
       }
     },
-    "フィードバックを送信" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Send feedback"
-          }
-        }
-      }
-    },
     "フォントはiOSで標準的に利用される「ヒラギノ明朝」を用いています。明朝体の字形は手書きする際の規範的な字形と必ずしも一致しません。ご了承ください。" : {
       "localizations" : {
         "en" : {
@@ -4588,40 +3779,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Browser could not launched"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "フリックのキーボードでは削除%@キーを左にフリックすると、文頭まで削除することができます。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "If you are using flick input style, by flicking delete key %@ left, you can delete to the beginning of the sentence."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "フリックの感度" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Flicking sensitivity"
           }
         },
         "ja" : {
@@ -4724,17 +3881,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
-          }
-        }
-      }
-    },
-    "フルアクセスが必要です" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Requires full access"
           }
         }
       }
@@ -4899,42 +4045,22 @@
         }
       }
     },
-    "ペーストボタン" : {
-      "extractionState" : "manual",
+    "ベースを選ぶ" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enable paste button"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
+            "value" : "Select base"
           }
         }
       }
     },
-    "ベースを選ぶ" : {
-
-    },
     "ベース無しで始める" : {
-
-    },
-    "まず「テンプレートの管理」から新しいテンプレートを作成します。画面右上の%@を押して、テンプレートを追加しましょう。" : {
-      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To begin with, let's make a new template on 'Manage templates'. Push the button %@ and add a new template."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
+            "value" : "Start without base"
           }
         }
       }
@@ -5019,46 +4145,12 @@
         }
       }
     },
-    "もっと便利にする" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "More useful"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "ユーザ辞書" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Text replacement"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "ユーザ辞書で作成したテンプレートを使う際は、%@という形式で記述します。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "When you use the template in the text replacement, input as '%@'."
           }
         },
         "ja" : {
@@ -5509,46 +4601,12 @@
         }
       }
     },
-    "今回は「タイムスタンプ」というテンプレートなので、%@と入力します。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "We created 'Timestamp' template, so input %@."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "以上で設定が完了です。あとは実際に使ってみましょう。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "All the settings are now done. Let's use it."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "以下は、フルアクセスをオンにすることで利用できる設定項目です。フルアクセスを必要とする機能は、すべてデフォルトで無効になっているため、フルアクセスを許可しただけでキーボードの振る舞いが変わることはありません。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The following are the settings that can be used when full access is turned on. As all functions requiring full access are disabled by default, simply granting full access will not change the behavior of the keyboard."
           }
         },
         "ja" : {
@@ -5753,40 +4811,6 @@
         }
       }
     },
-    "入力される文字" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inputted letters"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "入力される文字とは異なっていても構いません。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Not necessarily equal to input letter."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "入力する文字" : {
       "localizations" : {
         "en" : {
@@ -5835,57 +4859,6 @@
         }
       }
     },
-    "入力中のテキストを保護 (試験版)" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Protect composing text (experimental)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "入力中のテキストを保護し、Webアプリなどでの入力において挙動を安定させます。\n試験的機能のため、仕様の変更、不具合などが発生する可能性があります。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "By protecting composing text, azooKey will behave more stably in some web apps. \nSince this is an experimental feature, this feature may be discontinued without notice."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "入力中の文字列を自動的に変換します。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hiragana characters you input are immediately converted into kanji text, without manual operation"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "入力方式" : {
       "localizations" : {
         "en" : {
@@ -5908,40 +4881,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Select input style"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "全角英数字(ａｂｃ１２３)への変換候補を表示します。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Display full-width numbers and roman letters candidates like 'ａｂｃ１２３'"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "全角英数字変換" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Full-width numbers and roman letters candidates"
           }
         },
         "ja" : {
@@ -6206,40 +5145,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Edit actions"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "半角ｶﾀｶﾅへの変換を候補に表示します。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Display half-width ｶﾀｶﾅ(katakana) candidates."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "半角カナ変換" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Half-width kana candidates"
           }
         },
         "ja" : {
@@ -6565,7 +5470,6 @@
       }
     },
     "変換に連絡先データを利用" : {
-      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -6597,23 +5501,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "You can add text replacements. It is different from thee device's text replacements."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "変換候補の文字の大きさを指定できます。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can set the font size of candidates."
           }
         },
         "ja" : {
@@ -6656,23 +5543,6 @@
         }
       }
     },
-    "変換候補の表示サイズ" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Font size of candidates"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "変換候補の追加" : {
       "localizations" : {
         "en" : {
@@ -6705,46 +5575,12 @@
         }
       }
     },
-    "変換候補欄が空のときにタブバーボタンを表示します" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Display tab bar button when there is no candidates"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "変換精度向上のため、報告をいただけると大変助かります。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reporting would be greatly appreciated as it helps improve conversion accuracy."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "大きな文字で表示する" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zoom in"
           }
         },
         "ja" : {
@@ -6845,46 +5681,12 @@
         }
       }
     },
-    "学習する(デフォルト)" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use memorizing (default)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "学習のリセット" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reset memories"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "学習の使用" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use memorizing"
           }
         },
         "ja" : {
@@ -7007,23 +5809,6 @@
         }
       }
     },
-    "左下のカーソル移動キーの上フリックにペーストボタンを追加します" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add a paste button to the upper flick of the lower left cursor bar key."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "左向き" : {
       "localizations" : {
         "en" : {
@@ -7050,17 +5835,6 @@
         }
       }
     },
-    "意図した変換ではない" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unexpected candidate"
-          }
-        }
-      }
-    },
     "手順を見る" : {
       "localizations" : {
         "en" : {
@@ -7083,23 +5857,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Color of selected keys"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "押した時の動作" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Actions when select"
           }
         },
         "ja" : {
@@ -7190,46 +5947,12 @@
         }
       }
     },
-    "振動フィードバック" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enable keyboard haptics"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "操作性" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Usability"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "操作性が向上した新しいカーソルバーを有効化します。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enable new cursor bar which has been greatly improved usability."
           }
         },
         "ja" : {
@@ -7490,40 +6213,6 @@
         }
       }
     },
-    "新しいカーソルバーを使う" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use new cursor bar"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "新たな学習を停止" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stop memorizing"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "新機能" : {
       "localizations" : {
         "en" : {
@@ -7672,23 +6361,6 @@
         }
       }
     },
-    "日本語入力中の英単語変換" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Conversion to English words during Japanese input"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "時刻" : {
       "localizations" : {
         "en" : {
@@ -7753,46 +6425,12 @@
         }
       }
     },
-    "更新" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Update"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "更新履歴" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Update histories (Japanese)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "書き出す" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Export"
           }
         },
         "ja" : {
@@ -8211,28 +6849,6 @@
         }
       }
     },
-    "次候補キーを使う" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use 'Next Candidate' Key"
-          }
-        }
-      }
-    },
-    "欲しい変換がない" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No expected candidate"
-          }
-        }
-      }
-    },
     "正しくない形式のファイルです" : {
       "localizations" : {
         "en" : {
@@ -8287,40 +6903,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zooming difficult letters"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "片手モードで解除ボタンを表示しない" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Do not display release button in one-handed mode"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "片手モードの際に表示される解除ボタンを非表示にします。片手モードの調整はタブバーのボタンから行えます。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hide the reset button displayed in one-handed mode. One-handed mode adjustment can be done from the tab bar button."
           }
         },
         "ja" : {
@@ -8453,57 +7035,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Background color of special keys"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "現在" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Current"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "現在のアクションを消去して入力する文字を設定するには「入力を設定する」を押してください" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "To delete current actions and set inputted letters, please push 'set destination tab.'"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "現在のアクションを消去して移動するタブを設定するには「タブを設定する」を押してください" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "To delete current actions and set destination tab, please push 'set destination tab.'"
           }
         },
         "ja" : {
@@ -8768,23 +7299,6 @@
         }
       }
     },
-    "移動" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Move"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "移動・追加" : {
       "localizations" : {
         "en" : {
@@ -8807,23 +7321,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Count of movement"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "移動先：%@" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Destination: %@"
           }
         },
         "ja" : {
@@ -9198,23 +7695,6 @@
         }
       }
     },
-    "自動" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auto"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "自動的にタブバーに追加" : {
       "localizations" : {
         "en" : {
@@ -9269,23 +7749,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "With auto-prefix-completion, selecting candidate is more easy when you are inputting long text."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "英字入力をした際、「𝕥𝕪𝕡𝕠𝕘𝕣𝕒𝕡𝕙𝕪」のような装飾字体を候補に表示します。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Display decorated font candidates like '𝕥𝕪𝕡𝕠𝕘𝕣𝕒𝕡𝕙𝕪' during English inputting."
           }
         },
         "ja" : {
@@ -9408,46 +7871,12 @@
         }
       }
     },
-    "装飾英字変換" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Decorated letters candidates"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "西暦" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gregorian"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "西暦⇄和暦変換" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gregorian - Japanese calendar conversion"
           }
         },
         "ja" : {
@@ -9933,18 +8362,11 @@
       }
     },
     "追加" : {
-      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
           }
         }
       }
@@ -10081,23 +8503,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Select"
-          }
-        }
-      }
-    },
-    "長押し" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Longpress"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
           }
         }
       }

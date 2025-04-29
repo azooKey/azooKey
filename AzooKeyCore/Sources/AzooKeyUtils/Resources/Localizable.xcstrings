@@ -1,0 +1,792 @@
+{
+  "sourceLanguage" : "ja",
+  "strings" : {
+    "「､｡?!」キーの「左」「上」「右」フリックに割り当てられた文字を変更することができます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can change the characters assigned to the left, up, and right flicks of the “､｡?!” key."
+          }
+        }
+      }
+    },
+    "「､｡?!」キーのフリック割り当て" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flick Assignments for the “､｡?!” Key"
+          }
+        }
+      }
+    },
+    "「☆123」キーの「上」「右」「下」フリックに、好きな操作を割り当てて利用することができます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can assign your preferred actions to the up, right, and down flicks of the “☆123” key."
+          }
+        }
+      }
+    },
+    "「☆123」キーのフリック割り当て" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flick Assignments for the “☆123” Key"
+          }
+        }
+      }
+    },
+    "「abc」キーの「上」「右」「下」フリックに、好きな操作を割り当てて利用することができます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can assign your preferred actions to the up, right, and down flicks of the “abc” key."
+          }
+        }
+      }
+    },
+    "「abc」キーのフリック割り当て" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flick Assignments for the “abc” Key"
+          }
+        }
+      }
+    },
+    "「u3042→あ」のように、入力されたunicode番号に対応する文字に変換します。接頭辞にはu, u+, U, U+が使えます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert Unicode order to letter and display candidates like 「u3042→あ」"
+          }
+        }
+      }
+    },
+    "「あいう」キーの「上」「右」「下」フリックに、好きな操作を割り当てて利用することができます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can assign your preferred actions to the up, right, and down flicks of the “あいう” key."
+          }
+        }
+      }
+    },
+    "「あいう」キーのフリック割り当て" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flick Assignments for the “あいう” Key"
+          }
+        }
+      }
+    },
+    "「いんてれsちんg」→「interesting」のように、ローマ字日本語入力中も英語への変換候補を表示します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Display English word candidates during qwerty Japanese inputting like 「いんてれsちんg」→「interesting」."
+          }
+        }
+      }
+    },
+    "「小ﾞﾟ」キーの「左」「上」「右」フリックに、好きな文字列を割り当てて利用することができます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can assign your preferred text strings to the left, up, and right flicks of the “小ﾞﾟ” key."
+          }
+        }
+      }
+    },
+    "「小ﾞﾟ」キーのフリック割り当て" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flick Assignments for the “小ﾞﾟ” Key"
+          }
+        }
+      }
+    },
+    "「新たに学習し、反映する(デフォルト)」「新たな学習を停止する」「新たに学習せず、これまでの学習も反映しない」選択できます。この設定の変更で学習結果が消えることはありません。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can choose from “Learn and Reflect (Default),” “Stop New Learning,” and “Do Not Learn or Reflect Past Learning.”\nChanging this setting will not erase any previously learned results."
+          }
+        }
+      }
+    },
+    "「連絡先」アプリに登録された氏名のデータを変換に利用します" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use names in 'Contacts.app' in conversion to enable more accurate conversion."
+          }
+        }
+      }
+    },
+    "Classic" : {
+      "shouldTranslate" : false
+    },
+    "Default" : {
+      "shouldTranslate" : false
+    },
+    "OSのユーザ辞書の利用" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use device text replacement"
+          }
+        }
+      }
+    },
+    "OS標準のユーザ辞書を利用します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use device text replacement and display the candidates."
+          }
+        }
+      }
+    },
+    "QwertyキーボードでAaキーの代わりにシフトキーを利用します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use shift key instead of Aa key in qwerty keyboards"
+          }
+        }
+      }
+    },
+    "unicode変換" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unicode letters conversion"
+          }
+        }
+      }
+    },
+    "web検索などで入力した単語を学習しません。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Words entered through web searches and similar activities will not be learned."
+          }
+        }
+      }
+    },
+    "カーソルバーを自動表示" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatically Show Cursor Bar"
+          }
+        }
+      }
+    },
+    "カーソル移動の際にカーソルバーを自動表示します" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatically show the cursor bar when moving the cursor."
+          }
+        }
+      }
+    },
+    "キーの文字の大きさを指定できます。文字が大きすぎる場合表示が崩れることがあります。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can set the font size of keys. If the size is too large, the appearance can get collapsed."
+          }
+        }
+      }
+    },
+    "キーの表示サイズ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Font size of key labels"
+          }
+        }
+      }
+    },
+    "キーの音" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable keyboard sounds"
+          }
+        }
+      }
+    },
+    "キーボードで入力中、空白キーに「次候補」機能を表示します" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "While composing, the space key will change into the 'Next Candidate' key"
+          }
+        }
+      }
+    },
+    "キーボードの高さ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keyboard height"
+          }
+        }
+      }
+    },
+    "キーボードの高さを調整できます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can edit keyboard height."
+          }
+        }
+      }
+    },
+    "キーボード上で入力する言語を選択できます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can select the language to input on the keyboard."
+          }
+        }
+      }
+    },
+    "キーを押した際に端末を振動させます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable haptics feedback when you press keys."
+          }
+        }
+      }
+    },
+    "キーを押した際に音を鳴らします♪" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make sounds when you press keys♪"
+          }
+        }
+      }
+    },
+    "クリップボードの履歴を保存" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep clipboard histories"
+          }
+        }
+      }
+    },
+    "コピーした文字列の履歴を保存し、専用のタブから入力できるようにします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keeping histories of copied text, and make it possible to input them from clipboard history tab."
+          }
+        }
+      }
+    },
+    "これまでの学習を反映しない" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignore memories"
+          }
+        }
+      }
+    },
+    "シフトキーの以前の挙動を利用します。iOS 18以降では廃止されます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use the previous behavior of the Shift key. This will be discontinued starting from iOS 18."
+          }
+        }
+      }
+    },
+    "シフトキーの古い挙動を使う" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use the Old Shift Key Behavior"
+          }
+        }
+      }
+    },
+    "シフトキーを使う" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use shift key"
+          }
+        }
+      }
+    },
+    "タブバーに「コピー履歴」を開くためのボタン%@を追加しました。「ペーストの許可」を求めるダイアログが繰り返し出る場合、本体設定の「ほかのAppからペースト」を「許可」に設定してください。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A button %@ to open the “Copy History” has been added to the tab bar.\nIf a dialog repeatedly asks for permission to paste, please set “Paste from Other Apps” to “Allow” in the main device settings."
+          }
+        }
+      }
+    },
+    "タブバーボタン" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Display tab bar button when there is no candidates"
+          }
+        }
+      }
+    },
+    "どれだけ指を動かしたらフリックと判定するか調整できます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can adjust how much you move your finger to determine a flick."
+          }
+        }
+      }
+    },
+    "フリックの感度" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flicking sensitivity"
+          }
+        }
+      }
+    },
+    "ペーストボタン" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable paste button"
+          }
+        }
+      }
+    },
+    "ライブ変換" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live Conversion"
+          }
+        }
+      }
+    },
+    "入力する言語" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language"
+          }
+        }
+      }
+    },
+    "入力中のテキストを保護 (試験版)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protect composing text (experimental)"
+          }
+        }
+      }
+    },
+    "入力中のテキストを保護し、Webアプリなどでの入力において挙動を安定させます。\n試験的機能のため、仕様の変更、不具合などが発生する可能性があります。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By protecting composing text, azooKey will behave more stably in some web apps. Since this is an experimental feature, this feature may be discontinued without notice."
+          }
+        }
+      }
+    },
+    "入力中の文字列を自動的に変換します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hiragana characters you input are immediately converted into kanji text, without manual operation"
+          }
+        }
+      }
+    },
+    "全角英数字(ａｂｃ１２３)への変換候補を表示します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Display full-width numbers and roman letters candidates like 'ａｂｃ１２３'"
+          }
+        }
+      }
+    },
+    "全角英数字変換" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Full-width numbers and roman letters candidates"
+          }
+        }
+      }
+    },
+    "半角ｶﾀｶﾅへの変換を候補に表示します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Display half-width ｶﾀｶﾅ(katakana) candidates."
+          }
+        }
+      }
+    },
+    "半角カナ変換" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Half-width kana candidates"
+          }
+        }
+      }
+    },
+    "変換に連絡先データを利用" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use contacts data for conversion"
+          }
+        }
+      }
+    },
+    "変換候補の文字の大きさを指定できます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can set the font size of candidates."
+          }
+        }
+      }
+    },
+    "変換候補の表示サイズ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Font size of candidates"
+          }
+        }
+      }
+    },
+    "変換候補欄が空のときにタブバーボタンを表示します" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Display tab bar button when there is no candidates"
+          }
+        }
+      }
+    },
+    "学習する(デフォルト)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use memorizing (default)"
+          }
+        }
+      }
+    },
+    "学習のリセット" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset memories"
+          }
+        }
+      }
+    },
+    "学習の使用" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use memorizing"
+          }
+        }
+      }
+    },
+    "学習履歴を全て消去します。この操作は取り消せません。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This will erase all learning history. This action cannot be undone."
+          }
+        }
+      }
+    },
+    "左下のカーソル移動キーの上フリックにペーストボタンを追加します" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a paste button to the upper flick of the lower left cursor bar key."
+          }
+        }
+      }
+    },
+    "振動フィードバック" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable keyboard haptics"
+          }
+        }
+      }
+    },
+    "操作性が向上した新しいカーソルバーを有効化します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable new cursor bar which has been greatly improved usability."
+          }
+        }
+      }
+    },
+    "数字タブの「、。！？…」部分に好きな記号や文字を割り当てて利用することができます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can assign your preferred symbols or characters to the “、。！？…” section of the numbers tab."
+          }
+        }
+      }
+    },
+    "数字タブのカスタムキー機能" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom Key Feature for the Numbers Tab"
+          }
+        }
+      }
+    },
+    "新しいカーソルバーを使う" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use improved cursor bar"
+          }
+        }
+      }
+    },
+    "新たな学習を停止" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop memorizing"
+          }
+        }
+      }
+    },
+    "日本語キーボードの種類" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Types of Japanese Keyboards"
+          }
+        }
+      }
+    },
+    "日本語の入力方法をフリック入力とローマ字入力から選択できます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can choose between flick input and romanized input for Japanese typing."
+          }
+        }
+      }
+    },
+    "日本語入力中の英単語変換" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conversion to English words during Japanese input"
+          }
+        }
+      }
+    },
+    "検索時は学習を停止" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop Learning During Searches"
+          }
+        }
+      }
+    },
+    "次候補キーを使う" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use 'Next Candidate' Key"
+          }
+        }
+      }
+    },
+    "片手モードで解除ボタンを表示しない" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Do not display release button in one-handed mode"
+          }
+        }
+      }
+    },
+    "片手モードの際に表示される解除ボタンを非表示にします。片手モードの調整はタブバーのボタンから行えます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide the reset button displayed in one-handed mode. One-handed mode adjustment can be done from the tab bar button."
+          }
+        }
+      }
+    },
+    "自動確定の速さ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speed of Auto Prefix Completion"
+          }
+        }
+      }
+    },
+    "自動確定を使うと長い文章を打っているときに候補の選択がしやすくなります。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "With auto-prefix-completion, selecting candidate is more easy when you are inputting long text."
+          }
+        }
+      }
+    },
+    "英字入力をした際、「𝕥𝕪𝕡𝕠𝕘𝕣𝕒𝕡𝕙𝕪」のような装飾字体を候補に表示します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Display decorated font candidates like '𝕥𝕪𝕡𝕠𝕘𝕣𝕒𝕡𝕙𝕪' during English inputting."
+          }
+        }
+      }
+    },
+    "英語キーボードの種類" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Types of English Keyboards"
+          }
+        }
+      }
+    },
+    "英語の入力方法をフリック入力とローマ字入力から選択できます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can choose between flick input and romanized input for English typing."
+          }
+        }
+      }
+    },
+    "装飾英字変換" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decorated letters candidates"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

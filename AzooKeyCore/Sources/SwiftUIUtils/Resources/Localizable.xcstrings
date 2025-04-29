@@ -1,0 +1,29 @@
+{
+  "sourceLanguage" : "ja",
+  "strings" : {
+    "%@" : {
+      "shouldTranslate" : false
+    },
+    "1増やす" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Increment"
+          }
+        }
+      }
+    },
+    "1減らす" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decrement"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

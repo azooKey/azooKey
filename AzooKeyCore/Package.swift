@@ -8,6 +8,7 @@ let swiftSettings: [SwiftSetting] = [
 ]
 let package = Package(
     name: "AzooKeyCore",
+    defaultLocalization: "ja",
     platforms: [.iOS(.v16), .macOS(.v13)],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
@@ -49,7 +50,9 @@ let package = Package(
             dependencies: [
                 .product(name: "SwiftUtils", package: "AzooKeyKanaKanjiConverter")
             ],
-            resources: [],
+            resources: [
+                .process("Resources")
+            ],
             swiftSettings: swiftSettings
         ),
         .target(
@@ -58,7 +61,9 @@ let package = Package(
                 "SwiftUIUtils",
                 .product(name: "SwiftUtils", package: "AzooKeyKanaKanjiConverter")
             ],
-            resources: [],
+            resources: [
+                .process("Resources")
+            ],
             swiftSettings: swiftSettings
         ),
         .target(
@@ -70,7 +75,9 @@ let package = Package(
                 .product(name: "KanaKanjiConverterModule", package: "AzooKeyKanaKanjiConverter"),
                 .product(name: "CustardKit", package: "CustardKit"),
             ],
-            resources: [],
+            resources: [
+                .process("Resources")
+            ],
             swiftSettings: swiftSettings
         ),
         .target(
@@ -79,7 +86,9 @@ let package = Package(
                 "KeyboardThemes",
                 "KeyboardViews"
             ],
-            resources: [],
+            resources: [
+                .process("Resources")
+            ],
             swiftSettings: swiftSettings
         ),
         .target(
@@ -87,7 +96,9 @@ let package = Package(
             dependencies: [
                 .product(name: "KanaKanjiConverterModule", package: "AzooKeyKanaKanjiConverter")
             ],
-            resources: [],
+            resources: [
+                .process("Resources")
+            ],
             swiftSettings: swiftSettings
         ),
         .testTarget(
