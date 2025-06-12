@@ -8,7 +8,7 @@
 
 import Foundation
 import KeyboardThemes
-import SwiftUICore
+import SwiftUI
 import SwiftUtils
 import UIKit
 
