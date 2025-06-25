@@ -38,6 +38,14 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
     private var buttonHeight: CGFloat {
         Design.keyboardBarHeight(interfaceHeight: variableStates.interfaceSize.height, orientation: variableStates.keyboardOrientation) * 0.6
     }
+    
+    private var resultFont: Font {
+        Design.fonts.resultViewFont(theme: theme, userSizePrefrerence: Extension.SettingProvider.resultViewFontSize)
+    }
+    
+    private var undoButtonFont: Font {
+        .system(size: Design.fonts.resultViewFontSize(userPrefrerence: Extension.SettingProvider.resultViewFontSize) * 0.9)
+    }
 
     init(isResultViewExpanded: Binding<Bool>) {
         self._isResultViewExpanded = isResultViewExpanded
@@ -100,9 +108,11 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                             LazyHStack(spacing: 10) {
                                 ForEach(variableStates.resultModel.resultData, id: \.id) {(data: ResultData) in
                                     if data.candidate.inputable {
-                                        Button(data.candidate.text) {
+                                        Button {
                                             KeyboardFeedback<Extension>.click()
                                             self.pressed(candidate: data.candidate)
+                                        } label: {
+                                            Text(data.candidate.text.toJapaneseAttributedString(font: resultFont))
                                         }
                                         .buttonStyle(ResultButtonStyle<Extension>(height: buttonHeight, selected: .init(selection: variableStates.resultModel.selection, index: data.id)))
                                         .contextMenu {
@@ -110,8 +120,7 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                                         }
                                         .id(data.id)
                                     } else {
-                                        Text(data.candidate.text)
-                                            .font(Design.fonts.resultViewFont(theme: theme, userSizePrefrerence: Extension.SettingProvider.resultViewFontSize))
+                                        Text(data.candidate.text.toJapaneseAttributedString(font: resultFont))
                                             .underline(true, color: .accentColor)
                                     }
                                 }
@@ -249,7 +258,6 @@ struct ResultButtonStyle<Extension: ApplicationSpecificKeyboardViewExtension>: B
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(Design.fonts.resultViewFont(theme: theme, userSizePrefrerence: self.userSizePreference))
             .frame(height: height)
             .padding(.all, 5)
             .foregroundStyle(theme.resultTextColor.color) // 文字色は常に不透明度1で描画する
