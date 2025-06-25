@@ -6,11 +6,8 @@
 //  Copyright © 2020 ensan. All rights reserved.
 //
 
-import Foundation
 import SwiftUI
-import SwiftUIUtils
 
-@MainActor
 struct LargeTextView: View {
     private let text: String
     @Binding private var isViewOpen: Bool
@@ -24,11 +21,11 @@ struct LargeTextView: View {
     private var font: Font {
         Font.system(size: Design.largeTextViewFontSize(text, upsideComponent: variableStates.upsideComponent, orientation: variableStates.keyboardOrientation), weight: .regular, design: .serif)
     }
+
     var body: some View {
         VStack {
             ScrollView(.horizontal, showsIndicators: true, content: {
-                Text(text)
-                    .font(font)
+                Text(text.toJapaneseAttributedString(font: self.font))
             })
             Button {
                 isViewOpen = false
