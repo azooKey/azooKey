@@ -13,7 +13,7 @@ import SwiftUI
 struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: View {
     @EnvironmentObject private var variableStates: VariableStates
     @Binding private var isResultViewExpanded: Bool
-
+    
     private var splitedResults: [SplitedResultData] {
         Self.registerResults(results: variableStates.resultModel.results, interfaceWidth: variableStates.interfaceSize.width)
     }
@@ -23,14 +23,18 @@ struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: 
     private var buttonHeight: CGFloat {
         Design.keyboardBarHeight(interfaceHeight: variableStates.interfaceSize.height, orientation: variableStates.keyboardOrientation) * 0.6
     }
-
+    
+    private var resultFont: Font {
+        .system(size: Design.fonts.resultViewFontSize(userPrefrerence: Extension.SettingProvider.resultViewFontSize))
+    }
+    
     @Environment(Extension.Theme.self) private var theme
     @Environment(\.userActionManager) private var action
-
+    
     init(isResultViewExpanded: Binding<Bool>) {
         self._isResultViewExpanded = isResultViewExpanded
     }
-
+    
     var body: some View {
         VStack {
             HStack(alignment: .center) {
@@ -61,7 +65,7 @@ struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: 
                                 Button {
                                     self.pressed(data: datum)
                                 } label: {
-                                    Text(datum.candidate.text)
+                                    Text(datum.candidate.text.toJapaneseAttributedString(font: resultFont))
                                 }
                                 .buttonStyle(ResultButtonStyle<Extension>(height: 18))
                                 .contextMenu {
@@ -77,16 +81,16 @@ struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: 
         }
         .frame(height: variableStates.interfaceSize.height, alignment: .bottom)
     }
-
+    
     private func pressed(data: ResultData) {
         self.action.notifyComplete(data.candidate, variableStates: variableStates)
         self.collapse()
     }
-
+    
     private func collapse() {
         isResultViewExpanded = false
     }
-
+    
     private static func registerResults(results: [ResultData], interfaceWidth: CGFloat) -> [SplitedResultData] {
         var curSum: CGFloat = .zero
         var splited: [SplitedResultData] = []
@@ -106,7 +110,7 @@ struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: 
         splited.append(SplitedResultData(id: splited.count, results: curResult))
         return splited
     }
-
+    
 }
 
 private struct SplitedResultData: Identifiable {
