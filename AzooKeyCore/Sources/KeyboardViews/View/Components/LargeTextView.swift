@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+@MainActor
 struct LargeTextView: View {
     private let text: String
     @Binding private var isViewOpen: Bool
