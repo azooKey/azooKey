@@ -310,4 +310,25 @@ public final class VariableStates: ObservableObject {
             self.interfacePosition = item.position
         }
     }
+
+    @MainActor
+    func resetOneHandedModeSetting() {
+        // 設定管理オブジェクトを通じて、oneHandedModeSettingを更新する
+        keyboardInternalSettingManager.update(\.oneHandedModeSetting) { setting in
+            // ステップ1: まず、カスタム設定をまっさらな状態にリセットする
+            setting.reset(layout: self.keyboardLayout, orientation: self.keyboardOrientation)
+
+            // ステップ2: 次に、リセットされた項目に「本来のデフォルト値」を再設定する
+            let defaultHeight = Design.keyboardHeight(screenWidth: SemiStaticStates.shared.screenWidth, orientation: self.keyboardOrientation) + Design.keyboardScreenBottomPadding
+            let defaultSize = CGSize(width: SemiStaticStates.shared.screenWidth, height: defaultHeight)
+            setting.setIfFirst(layout: self.keyboardLayout, orientation: self.keyboardOrientation, size: defaultSize, position: .zero, forced: true) // forced: trueで確実に上書きする
+        }
+
+        // `updateResizingState()`を呼んで、UIに即時反映させる
+        // これにより、リセット後の正しいデフォルトサイズが画面に表示される
+        DispatchQueue.main.async {
+            self.updateResizingState()
+        }
+    }
+
 }

@@ -239,14 +239,8 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                 Button {
                     KeyboardFeedback<Extension>.reset()
                     withAnimation(.interactiveSpring()) {
-                        self.position = .zero
-                        self.size.width = initialSize.width
-                        self.size.height = initialSize.height
+                        variableStates.resetOneHandedModeSetting()
                     }
-                    self.top_left_edge = (.zero, .zero)
-                    self.bottom_right_edge = (.init(x: initialSize.width, y: initialSize.height), .init(x: initialSize.width, y: initialSize.height))
-                    self.initialPosition = .zero
-                    self.updateUserDefaults()
                 } label: {
                     Circle()
                         .fill(Color.red)

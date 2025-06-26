@@ -49,6 +49,12 @@ public struct OneHandedModeSetting: Sendable, Codable, StaticInitialValueAvailab
         }
     }
 
+    mutating func reset(layout: KeyboardLayout, orientation: KeyboardOrientation) {
+        // 対応する設定項目に、新しい空のインスタンスを代入して上書きする
+        // これにより、hasUsedフラグもfalseに戻るため、setIfFirstが機能するようになる
+        self[keyPath: keyPath(layout: layout, orientation: orientation)] = OneHandedModeSettingItem()
+    }
+
 }
 
 struct OneHandedModeSettingItem: Sendable, Codable {
