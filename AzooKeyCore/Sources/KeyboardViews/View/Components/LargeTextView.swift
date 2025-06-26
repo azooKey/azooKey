@@ -26,7 +26,8 @@ struct LargeTextView: View {
     var body: some View {
         VStack {
             ScrollView(.horizontal, showsIndicators: true, content: {
-                Text(text.toJapaneseAttributedString(font: self.font))
+                Text(Design.fonts.forceJapaneseFont(text: text))
+                    .font(font)
             })
             Button {
                 isViewOpen = false

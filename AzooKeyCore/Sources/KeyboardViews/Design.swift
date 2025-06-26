@@ -237,12 +237,8 @@ public enum Design {
         }
 
         func forceJapaneseFont(text: String) -> AttributedString {
-            let baseFont = Font.body
-            
             var attributedString = AttributedString(text)
             attributedString.languageIdentifier = "ja"
-            attributedString.font = baseFont
-            
             return attributedString
         }
 
