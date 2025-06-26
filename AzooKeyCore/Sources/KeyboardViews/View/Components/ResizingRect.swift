@@ -121,7 +121,7 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                 let new_py = (top_left_edge.current.y + bottom_right_edge.current.y - initialSize.height) / 2
 
                 // 以下のいずれかの条件に合致する場合、変更を無効にする
-                // 新しい高さが、定義した最小値を下回った場合
+                // [修正点 1/2]新しい高さが、定義した最小値を下回った場合
                 let isTooShort = newHeight < self.minimumHeight
                 // 2. 操作対象が上ハンドルで、かつ新しい高さがデフォルトの高さを超えた場合
                 let isTooTall = isTopHandle && newHeight > self.initialSize.height
@@ -303,6 +303,11 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
         self._position = position
     }
 
+    private var isAtDefaultWidth: Bool {
+        // 浮動小数点数の計算誤差を考慮し、0.1ポイント未満の差は「同じ」と見なします
+        return abs(self.size.width - self.initialSize.width) < 0.1
+    }
+
     private enum HV {
         case H, V
     }
@@ -408,11 +413,15 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
     @ViewBuilder func body(content: Content) -> some View {
         switch variableStates.resizingState {
         case .onehanded:
-            if !hideResetButtonInOneHandedMode {
+            if !hideResetButtonInOneHandedMode && !isAtDefaultWidth {
                 editButton()
             }
+            let userScreenHeight = Design.keyboardHeight(
+                screenWidth: SemiStaticStates.shared.screenWidth,
+                orientation: variableStates.keyboardOrientation
+            )
             content
-                .frame(width: size.width, height: size.height)
+                .frame(width: size.width, height: userScreenHeight)
                 .offset(x: position.x, y: position.y)
         case .fullwidth:
             content
