@@ -205,11 +205,11 @@ struct ResultContextMenuView: View {
             }
             .disabled(!SemiStaticStates.shared.hasFullAccess)
         }
-#if DEBUG
+        #if DEBUG
         Button("デバッグ情報を表示する", systemImage: "ladybug.fill") {
             debug(self.candidate.getDebugInformation())
         }
-#endif
+        #endif
     }
 }
 
