@@ -107,19 +107,32 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
             }
     }
 
-    func yGesture(target: KeyPath<Self, Binding<Position>>) -> some Gesture {
+    func yGesture(target: KeyPath<Self, Binding<Position>>, isTopHandle: Bool) -> some Gesture {
         DragGesture(minimumDistance: .zero, coordinateSpace: .global)
             .onChanged {value in
                 let dy = value.location.y - value.startLocation.y
-                let before = self[keyPath: target].wrappedValue.current.y
+                // 変更前のY座標を保持
+                let before_y = self[keyPath: target].wrappedValue.current.y
+                // 新しいY座標を一旦計算
                 self[keyPath: target].wrappedValue.current.y = self[keyPath: target].wrappedValue.initial.y + dy
-                let height = abs(bottom_right_edge.current.y - top_left_edge.current.y)
-                let py = (top_left_edge.current.y + bottom_right_edge.current.y - initialSize.height) / 2
-                if py < -initialSize.height / 2 || py > initialSize.height / 2 {
-                    self[keyPath: target].wrappedValue.current.y = before
+
+                // 新しい高さと中心位置を計算
+                let newHeight = abs(bottom_right_edge.current.y - top_left_edge.current.y)
+                let new_py = (top_left_edge.current.y + bottom_right_edge.current.y - initialSize.height) / 2
+
+                // 以下のいずれかの条件に合致する場合、変更を無効にする
+                // 1. 操作対象が上ハンドルで、かつ新しい高さがデフォルトの高さを超えた場合
+                let isTooTall = isTopHandle && newHeight > self.initialSize.height
+                // 2. キーボード全体が描画領域外に出てしまう場合 (既存のチェック)
+                let isOutOfBounds = new_py < -initialSize.height / 2 || new_py > initialSize.height / 2
+
+                if isTooTall || isOutOfBounds {
+                    // 条件に合致した場合、Y座標をドラッグ前の値に戻す
+                    self[keyPath: target].wrappedValue.current.y = before_y
                 } else {
-                    self.size.height = height
-                    self.position.y = py
+                    // 条件に合わなければ、計算結果を適用する
+                    self.size.height = newHeight
+                    self.position.y = new_py
                 }
             }
             .onEnded {_ in
@@ -201,7 +214,7 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                 }
             }
             .stroke(Color.white, lineWidth: 3)
-            .gesture(yGesture(target: \.$top_left_edge))
+            .gesture(yGesture(target: \.$top_left_edge,isTopHandle: true))
             Path {path in
                 for i in 0..<4 {
                     let x = size.width - size.width / 24 * CGFloat(i)
