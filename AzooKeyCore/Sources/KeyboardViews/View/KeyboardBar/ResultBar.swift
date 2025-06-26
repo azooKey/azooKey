@@ -38,14 +38,6 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
     private var buttonHeight: CGFloat {
         Design.keyboardBarHeight(interfaceHeight: variableStates.interfaceSize.height, orientation: variableStates.keyboardOrientation) * 0.6
     }
-    
-    private var resultFont: Font {
-        Design.fonts.resultViewFont(theme: theme, userSizePrefrerence: Extension.SettingProvider.resultViewFontSize)
-    }
-    
-    private var undoButtonFont: Font {
-        .system(size: Design.fonts.resultViewFontSize(userPrefrerence: Extension.SettingProvider.resultViewFontSize) * 0.9)
-    }
 
     init(isResultViewExpanded: Binding<Bool>) {
         self._isResultViewExpanded = isResultViewExpanded
@@ -108,19 +100,25 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                             LazyHStack(spacing: 10) {
                                 ForEach(variableStates.resultModel.resultData, id: \.id) {(data: ResultData) in
                                     if data.candidate.inputable {
-                                        Button {
+                                        Button(action: {
                                             KeyboardFeedback<Extension>.click()
                                             self.pressed(candidate: data.candidate)
-                                        } label: {
-                                            Text(data.candidate.text.toJapaneseAttributedString(font: resultFont))
-                                        }
+                                        }, label: {
+                                            Text(
+                                                Design.fonts.forceJapaneseResultFont(
+                                                    text: data.candidate.text,
+                                                    theme: theme,
+                                                    userSizePrefrerence: Extension.SettingProvider.resultViewFontSize
+                                                )
+                                            )
+                                        })
                                         .buttonStyle(ResultButtonStyle<Extension>(height: buttonHeight, selected: .init(selection: variableStates.resultModel.selection, index: data.id)))
                                         .contextMenu {
                                             ResultContextMenuView(candidate: data.candidate, displayResetLearningButton: Extension.SettingProvider.canResetLearningForCandidate, index: data.id)
                                         }
                                         .id(data.id)
                                     } else {
-                                        Text(data.candidate.text.toJapaneseAttributedString(font: resultFont))
+                                        Text(Design.fonts.forceJapaneseResultFont(text: data.candidate.text, theme: theme, userSizePrefrerence: Extension.SettingProvider.resultViewFontSize))
                                             .underline(true, color: .accentColor)
                                     }
                                 }
@@ -207,11 +205,11 @@ struct ResultContextMenuView: View {
             }
             .disabled(!SemiStaticStates.shared.hasFullAccess)
         }
-        #if DEBUG
+#if DEBUG
         Button("デバッグ情報を表示する", systemImage: "ladybug.fill") {
             debug(self.candidate.getDebugInformation())
         }
-        #endif
+#endif
     }
 }
 
