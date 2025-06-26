@@ -256,6 +256,7 @@ struct ResultButtonStyle<Extension: ApplicationSpecificKeyboardViewExtension>: B
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
+            .font(Design.fonts.resultViewFont(theme: theme, userSizePrefrerence: self.userSizePreference))
             .frame(height: height)
             .padding(.all, 5)
             .foregroundStyle(theme.resultTextColor.color) // 文字色は常に不透明度1で描画する
