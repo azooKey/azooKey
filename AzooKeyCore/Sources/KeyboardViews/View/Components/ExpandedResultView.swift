@@ -24,10 +24,6 @@ struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: 
         Design.keyboardBarHeight(interfaceHeight: variableStates.interfaceSize.height, orientation: variableStates.keyboardOrientation) * 0.6
     }
 
-    private var resultFont: Font {
-        .system(size: Design.fonts.resultViewFontSize(userPrefrerence: Extension.SettingProvider.resultViewFontSize))
-    }
-
     @Environment(Extension.Theme.self) private var theme
     @Environment(\.userActionManager) private var action
 
@@ -65,7 +61,9 @@ struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: 
                                 Button {
                                     self.pressed(data: datum)
                                 } label: {
-                                    Text(datum.candidate.text.toJapaneseAttributedString(font: resultFont))
+                                    Text(
+                                        Design.fonts.forceJapaneseFont(text: datum.candidate.text)
+                                    )
                                 }
                                 .buttonStyle(ResultButtonStyle<Extension>(height: 18))
                                 .contextMenu {
