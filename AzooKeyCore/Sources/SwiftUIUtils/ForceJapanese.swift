@@ -1,10 +1,3 @@
-//
-//  ForceJapanese.swift
-//  AzooKeyCore
-//  中華フォント問題を回避するため、文字列の言語属性を強制的に日本語に設定するユーティリティ。
-//  Created by Kazuma on 2025-06-25.
-//
-
 import SwiftUI
 
 /// 日本語フォントを強制的に適用するためのユーティリティを提供する構造体。
@@ -20,13 +13,13 @@ public struct ForceJapanese {
     /// - Returns: 言語とフォントが指定されたAttributedString。
     public static func create(from text: String, font: Font) -> AttributedString {
         var attributedString = AttributedString(text)
-        
+
         // 言語識別子を "ja" (日本語) に設定
         attributedString.languageIdentifier = "ja"
         
         // フォントを設定
         attributedString.font = font
-        
+
         return attributedString
     }
 }
@@ -38,7 +31,7 @@ public struct ForceJapanese {
 // 使い方:
 // Text("表示したいテキスト".toJapaneseAttributedString(font: .body))
 extension String {
-    
+
     /// この文字列を、指定されたフォントで日本語強制表示するAttributedStringに変換します。
     /// - Parameter font: 適用したいSwiftUIのFont。
     /// - Returns: 言語とフォントが指定されたAttributedString。
