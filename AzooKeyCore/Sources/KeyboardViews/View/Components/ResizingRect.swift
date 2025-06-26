@@ -26,7 +26,7 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
 
     private let initialSize: CGSize
     private let minimumWidth: CGFloat = 120
-    // private let minimumHeight: CGFloat = 120
+    private let minimumHeight: CGFloat = 120
 
     init(size: Binding<CGSize>, position: Binding<CGPoint>, initialSize: CGSize) {
         self._size = size
@@ -121,12 +121,15 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                 let new_py = (top_left_edge.current.y + bottom_right_edge.current.y - initialSize.height) / 2
 
                 // 以下のいずれかの条件に合致する場合、変更を無効にする
-                // 1. 操作対象が上ハンドルで、かつ新しい高さがデフォルトの高さを超えた場合
+                // 新しい高さが、定義した最小値を下回った場合
+                let isTooShort = newHeight < self.minimumHeight
+                // 2. 操作対象が上ハンドルで、かつ新しい高さがデフォルトの高さを超えた場合
                 let isTooTall = isTopHandle && newHeight > self.initialSize.height
-                // 2. キーボード全体が描画領域外に出てしまう場合 (既存のチェック)
+                // 3. キーボード全体が描画領域外に出てしまう場合
                 let isOutOfBounds = new_py < -initialSize.height / 2 || new_py > initialSize.height / 2
 
-                if isTooTall || isOutOfBounds {
+                // isTooShort をチェック条件に追加
+                if isTooShort || isTooTall || isOutOfBounds {
                     // 条件に合致した場合、Y座標をドラッグ前の値に戻す
                     self[keyPath: target].wrappedValue.current.y = before_y
                 } else {
