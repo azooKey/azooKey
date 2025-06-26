@@ -187,16 +187,16 @@ public enum Design {
         switch layoutMode(orientation: orientation) {
         case .phoneVertical:
             return (interfaceHeight - 12) * 37 / 204
-            // return screenWidth / 8
+        // return screenWidth / 8
         case .padVertical:
             return (interfaceHeight - 12) * 31 / 180
-            // return screenWidth / 12
+        // return screenWidth / 12
         case .phoneHorizontal:
             return (interfaceHeight - 12) * 28 / 153
-            // return screenWidth / 18
+        // return screenWidth / 18
         case .padHorizontal:
             return (interfaceHeight - 12) * 9 / 55
-            // return screenWidth / 22
+        // return screenWidth / 22
         }
     }
 
