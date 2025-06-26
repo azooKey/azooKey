@@ -236,7 +236,17 @@ public enum Design {
             Font.system(size: fontSize ?? resultViewFontSize(userPrefrerence: userSizePrefrerence)).weight(theme.textFont.weight)
         }
 
-        func forceJapaneseResultFont(text: String, theme: ThemeData<some ApplicationSpecificTheme>, userSizePrefrerence: CGFloat) -> AttributedString {
+        func forceJapaneseFont(text: String) -> AttributedString {
+            let baseFont = Font.body
+            
+            var attributedString = AttributedString(text)
+            attributedString.languageIdentifier = "ja"
+            attributedString.font = baseFont
+            
+            return attributedString
+        }
+
+        func forceJapaneseFont(text: String, theme: ThemeData<some ApplicationSpecificTheme>, userSizePrefrerence: CGFloat) -> AttributedString {
             let baseFont = self.resultViewFont(theme: theme, userSizePrefrerence: userSizePrefrerence)
 
             var attributedString = AttributedString(text)

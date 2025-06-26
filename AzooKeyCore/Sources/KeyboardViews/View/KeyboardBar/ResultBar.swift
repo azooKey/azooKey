@@ -105,7 +105,7 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                                             self.pressed(candidate: data.candidate)
                                         }, label: {
                                             Text(
-                                                Design.fonts.forceJapaneseResultFont(
+                                                Design.fonts.forceJapaneseFont(
                                                     text: data.candidate.text,
                                                     theme: theme,
                                                     userSizePrefrerence: Extension.SettingProvider.resultViewFontSize
@@ -118,7 +118,7 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                                         }
                                         .id(data.id)
                                     } else {
-                                        Text(Design.fonts.forceJapaneseResultFont(text: data.candidate.text, theme: theme, userSizePrefrerence: Extension.SettingProvider.resultViewFontSize))
+                                        Text(Design.fonts.forceJapaneseFont(text: data.candidate.text, theme: theme, userSizePrefrerence: Extension.SettingProvider.resultViewFontSize))
                                             .underline(true, color: .accentColor)
                                     }
                                 }
