@@ -192,18 +192,16 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
             }
             .stroke(Color.white, lineWidth: 3)
             .gesture(xGesture(target: \.$top_left_edge))
-            /*
-             Path {path in
-             for i in 0..<4 {
-             let y = size.height / 24 * CGFloat(i)
-             let ratio = (1 - CGFloat(i) / 4) * 0.8
-             path.move(to: CGPoint(x: size.width / 2 - size.width * edgeRatio * ratio, y: y))
-             path.addLine(to: CGPoint(x: size.width / 2 + size.width * edgeRatio * ratio, y: y))
-             }
-             }
-             .stroke(Color.white, lineWidth: 3)
-             .gesture(yGesture(target: \.$top_left_edge))
-             */
+            Path {path in
+                for i in 0..<4 {
+                    let y = size.height / 24 * CGFloat(i)
+                    let ratio = (1 - CGFloat(i) / 4) * 0.8
+                    path.move(to: CGPoint(x: size.width / 2 - size.width * edgeRatio * ratio, y: y))
+                    path.addLine(to: CGPoint(x: size.width / 2 + size.width * edgeRatio * ratio, y: y))
+                }
+            }
+            .stroke(Color.white, lineWidth: 3)
+            .gesture(yGesture(target: \.$top_left_edge))
             Path {path in
                 for i in 0..<4 {
                     let x = size.width - size.width / 24 * CGFloat(i)
