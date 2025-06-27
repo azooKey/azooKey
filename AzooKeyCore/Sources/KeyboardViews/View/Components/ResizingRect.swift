@@ -118,24 +118,19 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
 
                 // 新しい高さと中心位置を計算
                 let newHeight = abs(bottom_right_edge.current.y - top_left_edge.current.y)
-                let new_py = (top_left_edge.current.y + bottom_right_edge.current.y - initialSize.height) / 2
 
                 // 以下のいずれかの条件に合致する場合、変更を無効にする
-                // [修正点 1/2]新しい高さが、定義した最小値を下回った場合
+                // 新しい高さが、定義した最小値を下回った場合
                 let isTooShort = newHeight < self.minimumHeight
-                // 2. 操作対象が上ハンドルで、かつ新しい高さがデフォルトの高さを超えた場合
-                let isTooTall = isTopHandle && newHeight > self.initialSize.height
-                // 3. キーボード全体が描画領域外に出てしまう場合
-                let isOutOfBounds = new_py < -initialSize.height / 2 || new_py > initialSize.height / 2
 
                 // isTooShort をチェック条件に追加
-                if isTooShort || isTooTall || isOutOfBounds {
+                if isTooShort {
                     // 条件に合致した場合、Y座標をドラッグ前の値に戻す
                     self[keyPath: target].wrappedValue.current.y = before_y
                 } else {
                     // 条件に合わなければ、計算結果を適用する
                     self.size.height = newHeight
-                    self.position.y = new_py
+                    //self.position.y = new_py
                 }
             }
             .onEnded {_ in
@@ -416,13 +411,9 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
             if !hideResetButtonInOneHandedMode && !isAtDefaultWidth {
                 editButton()
             }
-            let userScreenHeight = Design.keyboardHeight(
-                screenWidth: SemiStaticStates.shared.screenWidth,
-                orientation: variableStates.keyboardOrientation
-            )
             content
-                .frame(width: size.width, height: userScreenHeight)
-                .offset(x: position.x, y: position.y)
+                .frame(width: size.width, height: size.height)
+                .offset(x: position.x, y: 0)
         case .fullwidth:
             content
         case .resizing:

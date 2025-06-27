@@ -8,6 +8,7 @@
 
 import AzooKeyUtils
 import Contacts
+import Combine
 import KanaKanjiConverterModule
 import KeyboardViews
 import SwiftUI
@@ -71,6 +72,7 @@ final class KeyboardViewController: UIInputViewController {
     private var hostViewWidthConstraint: NSLayoutConstraint?
     private var hostViewHeightConstraint: NSLayoutConstraint?
     private var hostViewBottomConstraint: NSLayoutConstraint?
+    private var cancellables = Set<AnyCancellable>()
 
     override func loadView() {
         super.loadView()
@@ -88,6 +90,19 @@ final class KeyboardViewController: UIInputViewController {
         // 高さの設定を反映する
         @KeyboardSetting(.keyboardHeightScale) var keyboardHeightScale: Double
         SemiStaticStates.shared.setKeyboardHeightScale(keyboardHeightScale)
+
+        KeyboardViewController.variableStates
+            .$interfaceSize
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] newSize in
+                guard let self = self else { return }
+                // 制約の高さを更新
+                self.keyboardHeightConstraint?.constant = newSize.height
+                self.keyboardHeightConstraint?.isActive = true
+                self.view.setNeedsLayout()
+                self.view.superview?.layoutIfNeeded()
+            }
+            .store(in: &cancellables)
     }
 
     private func setupKeyboardView() {
