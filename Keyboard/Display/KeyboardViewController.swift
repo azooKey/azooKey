@@ -93,10 +93,12 @@ final class KeyboardViewController: UIInputViewController {
 
         KeyboardViewController.variableStates
             .$interfaceSize
+            .combineLatest(KeyboardViewController.variableStates.$resizingState)
             .receive(on: DispatchQueue.main)
+            .filter { _, state in state != .resizing }
+            .map { interfaceSize, _ in interfaceSize } 
             .sink { [weak self] newSize in
                 guard let self = self else { return }
-                // 制約の高さを更新
                 self.keyboardHeightConstraint?.constant = newSize.height
                 self.keyboardHeightConstraint?.isActive = true
                 self.view.setNeedsLayout()

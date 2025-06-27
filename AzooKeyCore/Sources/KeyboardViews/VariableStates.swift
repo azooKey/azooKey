@@ -141,7 +141,7 @@ public final class VariableStates: ObservableObject {
     @Published public var upsideComponent: UpsideComponent?
 
     /// 片手モード編集状態
-    @Published private(set) var resizingState: ResizingState = .fullwidth
+    @Published public var resizingState: ResizingState = .fullwidth
 
     /// 周囲のテキストが変化した場合にインクリメントする値。変化の検出に利用する。
     /// - note: この値がどれだけ変化するかは実装によるので、変化量は意味をなさない。
