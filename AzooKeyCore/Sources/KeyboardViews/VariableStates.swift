@@ -143,6 +143,8 @@ public final class VariableStates: ObservableObject {
     /// 片手モード編集状態
     @Published public var resizingState: ResizingState = .fullwidth
 
+    @Published public var maximumHeight: CGFloat = 0
+
     /// 周囲のテキストが変化した場合にインクリメントする値。変化の検出に利用する。
     /// - note: この値がどれだけ変化するかは実装によるので、変化量は意味をなさない。
     @Published public var textChangedCount: Int = 0
@@ -184,6 +186,8 @@ public final class VariableStates: ObservableObject {
             interfaceSize = CGSize(width: min(item.size.width, SemiStaticStates.shared.screenWidth), height: min(item.size.height, Design.keyboardScreenHeight(upsideComponent: self.upsideComponent, orientation: self.keyboardOrientation)))
             interfacePosition = item.position
         }
+        // maximumHeight を現在の interfaceSize.height に合わせる
+        self.maximumHeight = interfaceSize.height
         self.resizingState = state
         keyboardInternalSettingManager.update(\.oneHandedModeSetting) {value in
             value.update(layout: keyboardLayout, orientation: keyboardOrientation) {value in

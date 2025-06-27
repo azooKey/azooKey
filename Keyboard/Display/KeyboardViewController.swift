@@ -91,14 +91,30 @@ final class KeyboardViewController: UIInputViewController {
         @KeyboardSetting(.keyboardHeightScale) var keyboardHeightScale: Double
         SemiStaticStates.shared.setKeyboardHeightScale(keyboardHeightScale)
 
-        let fixedMaxHeight: CGFloat = 300
+        let layout      = KeyboardViewController.variableStates.keyboardLayout
+        let orientation = KeyboardViewController.variableStates.keyboardOrientation
+        let savedItem   = KeyboardViewController
+            .variableStates
+            .keyboardInternalSettingManager
+            .oneHandedModeSetting
+            .item(layout: layout, orientation: orientation)
+        // If it's non-zero, use it as the starting maximumHeight
+        if savedItem.maxHeight > 0 {
+            KeyboardViewController.variableStates.maximumHeight = savedItem.maxHeight
+        }
+
+        // ─── ② Drive the height constraint with interfaceSize, state, and maxHeight ─────────────────────────────────
         KeyboardViewController.variableStates
             .$interfaceSize
-            .combineLatest(KeyboardViewController.variableStates.$resizingState)
+            .combineLatest(
+                KeyboardViewController.variableStates.$resizingState,
+                KeyboardViewController.variableStates.$maximumHeight
+            )
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] interfaceSize, state in
+            .sink { [weak self] interfaceSize, state, maxH in
                 guard let self = self else { return }
-                let height = (state == .resizing) ? fixedMaxHeight : interfaceSize.height
+                // In resizing mode use the dynamic maxH; otherwise default to interfaceSize.height
+                let height = (state == .resizing) ? maxH : interfaceSize.height
                 self.keyboardHeightConstraint?.constant = height
                 self.keyboardHeightConstraint?.isActive = true
                 self.view.setNeedsLayout()

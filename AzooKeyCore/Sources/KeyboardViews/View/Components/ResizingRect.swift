@@ -126,7 +126,7 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                 let isShrinkOnBottom = !isTopHandle && newHeight < size.height
                 // 最小・最大を超えたらキャンセル
                 let isTooShort = newHeight < minimumHeight
-                let isTooTall  = newHeight > maximumHeight
+                let isTooTall  = newHeight > variableStates.maximumHeight
 
                 if isTooShort || isTooTall || isShrinkOnBottom {
                     // 範囲外なら元に戻す
@@ -283,6 +283,27 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                                 .font(Font.system(size: r * 0.5))
                         }
                 }
+                Button {
+                    let screenWidth = UIScreen.main.bounds.width
+                    let orientation = variableStates.keyboardOrientation
+                    let baseline = Design
+                        .keyboardHeight(screenWidth: screenWidth,
+                                        orientation: orientation)
+                    + Design.keyboardScreenBottomPadding
+
+                    variableStates.maximumHeight = min(
+                        variableStates.maximumHeight + 64, baseline
+                    )
+                } label: {
+                    Circle()
+                        .fill(Color.blue)
+                        .frame(width: r, height: r)
+                        .overlay {
+                            Image(systemName: "arrow.up")
+                                .foregroundStyle(.white)
+                                .font(.system(size: r * 0.5))
+                        }
+                }
             }
         }
     }
@@ -390,12 +411,27 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
                     }
             }
 
+            let button4 = Button {
+                variableStates.maximumHeight += 32
+            } label: {
+                Circle()
+                    .fill(Color.blue)
+                    .frame(width: r, height: r)
+                    .overlay {
+                        Image(systemName: "arrow.up")
+                            .foregroundStyle(.white)
+                            .font(Font.system(size: r * 0.5))
+                    }
+            }
+                .frame(width: r, height: r)
+
             switch data.stack {
             case .H:
                 HStack {
                     button1
                     button2
                     button3
+                    button4
                 }
                 .position(x: data.position.x, y: data.position.y)
             case .V:
@@ -403,6 +439,7 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
                     button1
                     button2
                     button3
+                    button4
                 }
                 .position(x: data.position.x, y: data.position.y)
             }
@@ -422,6 +459,9 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
         case .fullwidth:
             content
         case .resizing:
+            let maximumHeight = variableStates.maximumHeight
+            let height = variableStates.interfaceSize.height
+            let offSet = (maximumHeight - height)/2
             ZStack {
                 content
                 Rectangle()
@@ -433,7 +473,7 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
                 ResizingRect<Extension>(size: $size, position: $position, initialSize: initialSize)
             }
             .frame(width: size.width, height: size.height)
-            .offset(x: position.x, y: position.y)
+            .offset(x: position.x, y: offSet)
         }
     }
 }
