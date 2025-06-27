@@ -114,30 +114,28 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                 let dy = value.location.y - value.startLocation.y
                 // ドラッグ前の Y 値を記憶
                 let beforeY = self[keyPath: target].wrappedValue.current.y
-                // 新しい Y 値を仮設定
+                // 仮セット
                 self[keyPath: target].wrappedValue.current.y = self[keyPath: target].wrappedValue.initial.y + dy
 
-                // 上下エッジの現在位置
-                let topY = top_left_edge.current.y
+                // エッジ位置と新しい高さを計算
+                let topY    = top_left_edge.current.y
                 let bottomY = bottom_right_edge.current.y
-                // 新しい高さ
                 let newHeight = abs(bottomY - topY)
 
-                // ① 最小高さ未満はキャンセル
-                var shouldApply = newHeight >= minimumHeight
-                // ② 下端ハンドルの場合、縮める方向（newHeight < size.height）はキャンセル
-                if !isTopHandle && newHeight < size.height {
-                    shouldApply = false
-                }
+                // 縮小禁止（下端ハンドルの場合）
+                let isShrinkOnBottom = !isTopHandle && newHeight < size.height
+                // 最小・最大を超えたらキャンセル
+                let isTooShort = newHeight < minimumHeight
+                let isTooTall  = newHeight > maximumHeight
 
-                if shouldApply {
-                    // サイズ／位置を適用
-                    self.size.height = newHeight
-                    // centerY の再計算
-                    self.position.y = (topY + bottomY - initialSize.height) / 2
-                } else {
-                    // 元に戻す
+                if isTooShort || isTooTall || isShrinkOnBottom {
+                    // 範囲外なら元に戻す
                     self[keyPath: target].wrappedValue.current.y = beforeY
+                } else {
+                    // 有効範囲内なら適用
+                    self.size.height   = newHeight
+                    // centerY 再計算（initialSizeは元の高さ）
+                    self.position.y    = (topY + bottomY - initialSize.height) / 2
                 }
             }
             .onEnded { _ in
