@@ -91,15 +91,15 @@ final class KeyboardViewController: UIInputViewController {
         @KeyboardSetting(.keyboardHeightScale) var keyboardHeightScale: Double
         SemiStaticStates.shared.setKeyboardHeightScale(keyboardHeightScale)
 
+        let fixedMaxHeight: CGFloat = 300
         KeyboardViewController.variableStates
             .$interfaceSize
             .combineLatest(KeyboardViewController.variableStates.$resizingState)
             .receive(on: DispatchQueue.main)
-            .filter { _, state in state != .resizing }
-            .map { interfaceSize, _ in interfaceSize } 
-            .sink { [weak self] newSize in
+            .sink { [weak self] interfaceSize, state in
                 guard let self = self else { return }
-                self.keyboardHeightConstraint?.constant = newSize.height
+                let height = (state == .resizing) ? fixedMaxHeight : interfaceSize.height
+                self.keyboardHeightConstraint?.constant = height
                 self.keyboardHeightConstraint?.isActive = true
                 self.view.setNeedsLayout()
                 self.view.superview?.layoutIfNeeded()

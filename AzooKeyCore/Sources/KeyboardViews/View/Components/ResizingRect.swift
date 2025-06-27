@@ -27,6 +27,7 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
     private let initialSize: CGSize
     private let minimumWidth: CGFloat = 120
     private let minimumHeight: CGFloat = 120
+    private let maximumHeight: CGFloat  = 300
 
     init(size: Binding<CGSize>, position: Binding<CGPoint>, initialSize: CGSize) {
         self._size = size
@@ -109,31 +110,37 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
 
     func yGesture(target: KeyPath<Self, Binding<Position>>, isTopHandle: Bool) -> some Gesture {
         DragGesture(minimumDistance: .zero, coordinateSpace: .global)
-            .onChanged {value in
+            .onChanged { value in
                 let dy = value.location.y - value.startLocation.y
-                // 変更前のY座標を保持
-                let before_y = self[keyPath: target].wrappedValue.current.y
-                // 新しいY座標を一旦計算
+                // ドラッグ前の Y 値を記憶
+                let beforeY = self[keyPath: target].wrappedValue.current.y
+                // 新しい Y 値を仮設定
                 self[keyPath: target].wrappedValue.current.y = self[keyPath: target].wrappedValue.initial.y + dy
 
-                // 新しい高さと中心位置を計算
-                let newHeight = abs(bottom_right_edge.current.y - top_left_edge.current.y)
+                // 上下エッジの現在位置
+                let topY = top_left_edge.current.y
+                let bottomY = bottom_right_edge.current.y
+                // 新しい高さ
+                let newHeight = abs(bottomY - topY)
 
-                // 以下のいずれかの条件に合致する場合、変更を無効にする
-                // 新しい高さが、定義した最小値を下回った場合
-                let isTooShort = newHeight < self.minimumHeight
+                // ① 最小高さ未満はキャンセル
+                var shouldApply = newHeight >= minimumHeight
+                // ② 下端ハンドルの場合、縮める方向（newHeight < size.height）はキャンセル
+                if !isTopHandle && newHeight < size.height {
+                    shouldApply = false
+                }
 
-                // isTooShort をチェック条件に追加
-                if isTooShort {
-                    // 条件に合致した場合、Y座標をドラッグ前の値に戻す
-                    self[keyPath: target].wrappedValue.current.y = before_y
-                } else {
-                    // 条件に合わなければ、計算結果を適用する
+                if shouldApply {
+                    // サイズ／位置を適用
                     self.size.height = newHeight
-                    //self.position.y = new_py
+                    // centerY の再計算
+                    self.position.y = (topY + bottomY - initialSize.height) / 2
+                } else {
+                    // 元に戻す
+                    self[keyPath: target].wrappedValue.current.y = beforeY
                 }
             }
-            .onEnded {_ in
+            .onEnded { _ in
                 self.correctOrder()
                 self.setInitial()
                 self.updateUserDefaults()
