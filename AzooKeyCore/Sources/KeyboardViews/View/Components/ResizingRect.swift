@@ -336,11 +336,14 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
         // --- 1. ボタンサイズの計算 ---
         let spacing: CGFloat = 7.0
         let numberOfButtons: CGFloat = 4.0
+        let UIMaxButtonDiameter: CGFloat = 48.0
 
         // 縦方向と横方向、両方にはみ出さない直径(r)を計算
         let rFromHeight = (availableHeight - spacing * (numberOfButtons - 1)) / numberOfButtons
-        let rFromWidth = availableWidth - 8 // 左右の端から少し余白をとる
-        let r = max(0, min(rFromHeight, rFromWidth)) * 0.9
+        let fittableRFromWidth = availableWidth - 8 // 左右の端から少し余白をとる
+        let fittableR = max(0, min(rFromHeight, fittableRFromWidth))
+
+        let r = min(fittableR, UIMaxButtonDiameter) * 0.9
 
         // --- 2. 表示/非表示の決定 ---
         // 計算の結果、ボタンがタップできる十分な大きさを持つ場合のみ表示する
