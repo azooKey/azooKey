@@ -288,8 +288,8 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                     let orientation = variableStates.keyboardOrientation
                     let baseline = Design
                         .keyboardHeight(screenWidth: screenWidth,
-                                        orientation: orientation)
-                    + Design.keyboardScreenBottomPadding
+                                        orientation: orientation) * 2
+                    + Design.keyboardScreenBottomPadding * 2
 
                     variableStates.maximumHeight = min(
                         variableStates.maximumHeight + 64, baseline
