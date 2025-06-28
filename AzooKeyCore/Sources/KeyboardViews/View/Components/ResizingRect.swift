@@ -26,7 +26,7 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
 
     private let initialSize: CGSize
     private let minimumWidth: CGFloat = 120
-    private let minimumHeight: CGFloat = 120
+    private let minimumHeight: CGFloat = 160
     private let maximumHeight: CGFloat  = 300
 
     init(size: Binding<CGSize>, position: Binding<CGPoint>, initialSize: CGSize) {
@@ -315,9 +315,11 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
     @Binding private var position: CGPoint
     @Binding private var size: CGSize
     @EnvironmentObject private var variableStates: VariableStates
+
     private var hideResetButtonInOneHandedMode: Bool {
         Extension.SettingProvider.hideResetButtonInOneHandedMode
     }
+
     init(size: Binding<CGSize>, position: Binding<CGPoint>, initialSize: CGSize) {
         self.initialSize = initialSize
         self._size = size
@@ -329,133 +331,115 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
         return abs(self.size.width - self.initialSize.width) < 0.1
     }
 
-    private enum HV {
-        case H, V
-    }
-    private var editButtonData: (max: CGFloat, position: CGPoint, stack: HV) {
-        let leftMargin = position.x + initialSize.width / 2 - size.width / 2
-        let rightMargin = initialSize.width / 2 - position.x - size.width / 2
-        let topMargin = position.y + initialSize.height / 2 - size.height / 2
-        let bottomMargin = initialSize.height / 2 - position.y - size.height / 2
-        let maxMargin = max(leftMargin, rightMargin, topMargin, bottomMargin)
-        let position: CGPoint
-        let stack: HV
-        if leftMargin == maxMargin {
-            position = .init(x: maxMargin / 2, y: initialSize.height / 2)
-            stack = .V
-        } else if rightMargin == maxMargin {
-            position = .init(x: initialSize.width - maxMargin / 2, y: initialSize.height / 2)
-            stack = .V
-        } else if topMargin == maxMargin {
-            position = .init(x: initialSize.width / 2, y: maxMargin / 2)
-            stack = .H
-        } else {
-            position = .init(x: initialSize.width / 2, y: initialSize.height - maxMargin / 2)
-            stack = .H
-        }
-        return (maxMargin, position, stack)
-    }
+    @ViewBuilder
+    private func editButtons(availableWidth: CGFloat, availableHeight: CGFloat) -> some View {
+        // --- 1. ボタンサイズの計算 ---
+        let spacing: CGFloat = 7.0
+        let numberOfButtons: CGFloat = 4.0
 
-    @ViewBuilder func editButton() -> some View {
-        let data = self.editButtonData
-        if data.max >= 30 {
-            let max = min(initialSize.width, initialSize.height) * 0.15
-            let r = min(data.max * 0.7, max)
-            let button1 = Button {
-                variableStates.setResizingMode(.resizing)
-            } label: {
-                Circle()
-                    .fill(Color.blue)
-                    .frame(width: r, height: r)
-                    .overlay {
-                        Image(systemName: "aspectratio")
-                            .foregroundStyle(.white)
-                            .font(Font.system(size: r * 0.5))
+        // 縦方向と横方向、両方にはみ出さない直径(r)を計算
+        let rFromHeight = (availableHeight - spacing * (numberOfButtons - 1)) / numberOfButtons
+        let rFromWidth = availableWidth - 8 // 左右の端から少し余白をとる
+        let r = max(0, min(rFromHeight, rFromWidth))
+
+        // --- 2. 表示/非表示の決定 ---
+        // 計算の結果、ボタンがタップできる十分な大きさを持つ場合のみ表示する
+        if r >= 16 {
+            // 上下にSpacerを持つコンテナVStackを追加し、垂直中央揃えを強制する
+            VStack {
+                // 元々のボタンをまとめたVStack
+                VStack(spacing: spacing) {
+                    let button1 = Button {
+                        variableStates.setResizingMode(.resizing)
+                    } label: {
+                        Circle().fill(Color.blue)
+                            .overlay {
+                                Image(systemName: "aspectratio").foregroundStyle(.white).font(.system(size: r * 0.5))
+                            }
                     }
-            }
-            .frame(width: r, height: r)
+                        .frame(width: r, height: r)
+                        .contentShape(Circle())
 
-            let button2 = Button {
-                variableStates.setResizingMode(.fullwidth)
-            } label: {
-                Circle()
-                    .fill(Color.blue)
-                    .frame(width: r, height: r)
-                    .overlay {
-                        Image(systemName: "arrow.up.backward.and.arrow.down.forward")
-                            .foregroundStyle(.white)
-                            .font(Font.system(size: r * 0.5))
+                    let button2 = Button {
+                        variableStates.setResizingMode(.fullwidth)
+                    } label: {
+                        Circle().fill(Color.blue)
+                            .overlay {
+                                Image(systemName: "arrow.up.backward.and.arrow.down.forward").foregroundStyle(.white).font(.system(size: r * 0.5))
+                            }
                     }
-            }
-            .frame(width: r, height: r)
+                        .frame(width: r, height: r).contentShape(Circle())
 
-            let button3 = Button {
-                KeyboardFeedback<Extension>.reset()
-                withAnimation(.interactiveSpring()) {
-                    self.position = .zero
-                    self.size.width = initialSize.width
-                    self.size.height = initialSize.height
-                    variableStates.setResizingMode(.fullwidth)
-                }
-                variableStates.keyboardInternalSettingManager.update(\.oneHandedModeSetting) {value in
-                    value.set(layout: variableStates.keyboardLayout, orientation: variableStates.keyboardOrientation, size: initialSize, position: .zero)
-                }
-            } label: {
-                Circle()
-                    .fill(Color.red)
-                    .frame(width: r, height: r)
-                    .overlay {
-                        Image(systemName: "arrow.triangle.2.circlepath")
-                            .foregroundStyle(.white)
-                            .font(Font.system(size: r * 0.5))
+                    let button3 = Button {
+                        KeyboardFeedback<Extension>.reset()
+                        withAnimation(.interactiveSpring()) {
+                            self.position = .zero
+                            self.size = initialSize
+                            variableStates.setResizingMode(.fullwidth)
+                        }
+                        variableStates.keyboardInternalSettingManager.update(\.oneHandedModeSetting) {value in
+                            value.set(layout: variableStates.keyboardLayout, orientation: variableStates.keyboardOrientation, size: initialSize, position: .zero)
+                        }
+                    } label: {
+                        Circle().fill(Color.red)
+                            .overlay {
+                                Image(systemName: "arrow.triangle.2.circlepath").foregroundStyle(.white).font(.system(size: r * 0.5))
+                            }
                     }
-            }
+                        .frame(width: r, height: r).contentShape(Circle())
 
-            let button4 = Button {
-                variableStates.maximumHeight += 32
-            } label: {
-                Circle()
-                    .fill(Color.blue)
-                    .frame(width: r, height: r)
-                    .overlay {
-                        Image(systemName: "arrow.up")
-                            .foregroundStyle(.white)
-                            .font(Font.system(size: r * 0.5))
+                    let button4 = Button {
+                        variableStates.maximumHeight += 32
+                    } label: {
+                        Circle().fill(Color.blue)
+                            .overlay {
+                                Image(systemName: "arrow.up").foregroundStyle(.white).font(.system(size: r * 0.5))
+                            }
                     }
-            }
-                .frame(width: r, height: r)
+                        .frame(width: r, height: r).contentShape(Circle())
 
-            switch data.stack {
-            case .H:
-                HStack {
                     button1
                     button2
                     button3
                     button4
                 }
-                .position(x: data.position.x, y: data.position.y)
-            case .V:
-                VStack {
-                    button1
-                    button2
-                    button3
-                    button4
-                }
-                .position(x: data.position.x, y: data.position.y)
             }
-
         }
     }
 
-    @ViewBuilder func body(content: Content) -> some View {
+    func body(content: Content) -> some View {
         switch variableStates.resizingState {
         case .onehanded:
-            if !hideResetButtonInOneHandedMode && !isAtDefaultWidth {
-                editButton()
-            }
+            // 親Viewに対して、そのサイズを教えてくれるGeometryReaderを重ねる
             content
                 .frame(width: size.width, height: size.height)
                 .offset(x: position.x, y: 0)
+                .overlay {
+                    if !hideResetButtonInOneHandedMode && !isAtDefaultWidth {
+                        // GeometryReaderが親のサイズ(initialSize)を正確に教えてくれる
+                        GeometryReader { geo in
+                            // --- 親を基準としたレイアウト計算 ---
+                            let leftMargin = position.x + geo.size.width / 2 - size.width / 2
+                            let rightMargin = geo.size.width / 2 - position.x - size.width / 2
+
+                            // 左右の広い方のマージンにボタンを配置
+                            if leftMargin >= rightMargin {
+                                // 左側に配置
+                                HStack {
+                                    editButtons(availableWidth: leftMargin, availableHeight: geo.size.height)
+                                    Spacer()
+                                }
+                            } else {
+                                // 右側に配置
+                                HStack {
+                                    Spacer()
+                                    editButtons(availableWidth: rightMargin, availableHeight: geo.size.height)
+                                }
+                            }
+                        }
+                    }
+                }
+
         case .fullwidth:
             content
         case .resizing:
