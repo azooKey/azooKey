@@ -340,13 +340,14 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
         // 縦方向と横方向、両方にはみ出さない直径(r)を計算
         let rFromHeight = (availableHeight - spacing * (numberOfButtons - 1)) / numberOfButtons
         let rFromWidth = availableWidth - 8 // 左右の端から少し余白をとる
-        let r = max(0, min(rFromHeight, rFromWidth))
+        let r = max(0, min(rFromHeight, rFromWidth)) * 0.9
 
         // --- 2. 表示/非表示の決定 ---
         // 計算の結果、ボタンがタップできる十分な大きさを持つ場合のみ表示する
         if r >= 16 {
             // 上下にSpacerを持つコンテナVStackを追加し、垂直中央揃えを強制する
-            VStack {
+            VStack() {
+                Spacer()
                 // 元々のボタンをまとめたVStack
                 VStack(spacing: spacing) {
                     let button1 = Button {
@@ -368,7 +369,8 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
                                 Image(systemName: "arrow.up.backward.and.arrow.down.forward").foregroundStyle(.white).font(.system(size: r * 0.5))
                             }
                     }
-                        .frame(width: r, height: r).contentShape(Circle())
+                        .frame(width: r, height: r)
+                        .contentShape(Circle())
 
                     let button3 = Button {
                         KeyboardFeedback<Extension>.reset()
@@ -386,7 +388,8 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
                                 Image(systemName: "arrow.triangle.2.circlepath").foregroundStyle(.white).font(.system(size: r * 0.5))
                             }
                     }
-                        .frame(width: r, height: r).contentShape(Circle())
+                        .frame(width: r, height: r)
+                        .contentShape(Circle())
 
                     let button4 = Button {
                         variableStates.maximumHeight += 32
@@ -396,13 +399,15 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
                                 Image(systemName: "arrow.up").foregroundStyle(.white).font(.system(size: r * 0.5))
                             }
                     }
-                        .frame(width: r, height: r).contentShape(Circle())
+                        .frame(width: r, height: r)
+                        .contentShape(Circle())
 
                     button1
                     button2
                     button3
                     button4
                 }
+                Spacer()
             }
         }
     }
