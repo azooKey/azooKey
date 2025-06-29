@@ -7,6 +7,7 @@
 //
 
 import AzooKeyUtils
+import Combine
 import Contacts
 import KanaKanjiConverterModule
 import KeyboardViews
@@ -71,6 +72,7 @@ final class KeyboardViewController: UIInputViewController {
     private var hostViewWidthConstraint: NSLayoutConstraint?
     private var hostViewHeightConstraint: NSLayoutConstraint?
     private var hostViewBottomConstraint: NSLayoutConstraint?
+    private var cancellables = Set<AnyCancellable>()
 
     override func loadView() {
         super.loadView()
@@ -88,6 +90,37 @@ final class KeyboardViewController: UIInputViewController {
         // 高さの設定を反映する
         @KeyboardSetting(.keyboardHeightScale) var keyboardHeightScale: Double
         SemiStaticStates.shared.setKeyboardHeightScale(keyboardHeightScale)
+
+        let layout      = KeyboardViewController.variableStates.keyboardLayout
+        let orientation = KeyboardViewController.variableStates.keyboardOrientation
+        let savedItem   = KeyboardViewController
+            .variableStates
+            .keyboardInternalSettingManager
+            .oneHandedModeSetting
+            .item(layout: layout, orientation: orientation)
+        // If it's non-zero, use it as the starting maximumHeight
+        if savedItem.maxHeight > 0 {
+            KeyboardViewController.variableStates.maximumHeight = savedItem.maxHeight
+        }
+
+        // ─── ② Drive the height constraint with interfaceSize, state, and maxHeight ─────────────────────────────────
+        KeyboardViewController.variableStates
+            .$interfaceSize
+            .combineLatest(
+                KeyboardViewController.variableStates.$resizingState,
+                KeyboardViewController.variableStates.$maximumHeight
+            )
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] interfaceSize, state, maxH in
+                guard let self = self else { return }
+                // In resizing mode use the dynamic maxH; otherwise default to interfaceSize.height
+                let height = (state == .resizing) ? maxH : interfaceSize.height
+                self.keyboardHeightConstraint?.constant = height
+                self.keyboardHeightConstraint?.isActive = true
+                self.view.setNeedsLayout()
+                self.view.superview?.layoutIfNeeded()
+            }
+            .store(in: &cancellables)
     }
 
     private func setupKeyboardView() {

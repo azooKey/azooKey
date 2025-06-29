@@ -141,7 +141,9 @@ public final class VariableStates: ObservableObject {
     @Published public var upsideComponent: UpsideComponent?
 
     /// 片手モード編集状態
-    @Published private(set) var resizingState: ResizingState = .fullwidth
+    @Published public var resizingState: ResizingState = .fullwidth
+
+    @Published public var maximumHeight: CGFloat = 0
 
     /// 周囲のテキストが変化した場合にインクリメントする値。変化の検出に利用する。
     /// - note: この値がどれだけ変化するかは実装によるので、変化量は意味をなさない。
@@ -177,13 +179,25 @@ public final class VariableStates: ObservableObject {
     @MainActor public func setResizingMode(_ state: ResizingState) {
         switch state {
         case .fullwidth:
+            // fullwidthへのリセットは変更なし
             interfaceSize = .init(width: SemiStaticStates.shared.screenWidth, height: Design.keyboardHeight(screenWidth: SemiStaticStates.shared.screenWidth, orientation: self.keyboardOrientation) + 2)
-        case .onehanded, .resizing:
+            interfacePosition = .zero
+
+        case .onehanded:
+            // リサイズ完了時(.onehandedへの遷移)は、現在のinterfaceSizeを信頼する。
+            // ストレージからの再読み込みは行わず、何もしない(break)。
+            // これにより、競合状態を防ぎ、保持されている最新の高さが使われる。
+            break
+
+        case .resizing:
+            // リサイズ開始時は、保存された値から初期状態を読み込むので変更なし
             let item = keyboardInternalSettingManager.oneHandedModeSetting.item(layout: keyboardLayout, orientation: keyboardOrientation)
-            // キーボードスクリーンのサイズを超えないように設定
-            interfaceSize = CGSize(width: min(item.size.width, SemiStaticStates.shared.screenWidth), height: min(item.size.height, Design.keyboardScreenHeight(upsideComponent: self.upsideComponent, orientation: self.keyboardOrientation)))
+            interfaceSize = CGSize(width: min(item.size.width, SemiStaticStates.shared.screenWidth), height: item.size.height)
             interfacePosition = item.position
         }
+
+        // 以下の処理は全ケースで共通
+        self.maximumHeight = interfaceSize.height
         self.resizingState = state
         keyboardInternalSettingManager.update(\.oneHandedModeSetting) {value in
             value.update(layout: keyboardLayout, orientation: keyboardOrientation) {value in
@@ -306,8 +320,29 @@ public final class VariableStates: ObservableObject {
         case .onehanded, .resizing:
             let item = keyboardInternalSettingManager.oneHandedModeSetting.item(layout: layout, orientation: orientation)
             // 安全のため、指示されたwidth, heightを超える値を許可しない。
-            self.interfaceSize = CGSize(width: min(screenWidth, item.size.width), height: min(height, item.size.height))
+            self.interfaceSize = CGSize(width: min(screenWidth, item.size.width), height: item.size.height)
             self.interfacePosition = item.position
         }
     }
+
+    @MainActor
+    func resetOneHandedModeSetting() {
+        // 設定管理オブジェクトを通じて、oneHandedModeSettingを更新する
+        keyboardInternalSettingManager.update(\.oneHandedModeSetting) { setting in
+            // ステップ1: まず、カスタム設定をまっさらな状態にリセットする
+            setting.reset(layout: self.keyboardLayout, orientation: self.keyboardOrientation)
+
+            // ステップ2: 次に、リセットされた項目に「本来のデフォルト値」を再設定する
+            let defaultHeight = Design.keyboardHeight(screenWidth: SemiStaticStates.shared.screenWidth, orientation: self.keyboardOrientation) + Design.keyboardScreenBottomPadding
+            let defaultSize = CGSize(width: SemiStaticStates.shared.screenWidth, height: defaultHeight)
+            setting.setIfFirst(layout: self.keyboardLayout, orientation: self.keyboardOrientation, size: defaultSize, position: .zero, forced: true) // forced: trueで確実に上書きする
+        }
+
+        // `updateResizingState()`を呼んで、UIに即時反映させる
+        // これにより、リセット後の正しいデフォルトサイズが画面に表示される
+        DispatchQueue.main.async {
+            self.updateResizingState()
+        }
+    }
+
 }

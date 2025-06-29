@@ -116,8 +116,6 @@ struct SettingTabView: View {
                 }
 
                 Section("表示") {
-                    KeyboardHeightSettingView(.keyboardHeightScale)
-                        .searchKeys("高さ", "大きさ", "サイズ")
                     FontSizeSettingView(.keyViewFontSize, .key, availableValueRange: 15 ... 28)
                         .searchKeys("フォント", "サイズ", "文字サイズ")
                     FontSizeSettingView(.resultViewFontSize, .result, availableValueRange: 12...24)

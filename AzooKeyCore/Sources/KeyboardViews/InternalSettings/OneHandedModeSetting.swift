@@ -27,7 +27,7 @@ public struct OneHandedModeSetting: Sendable, Codable, StaticInitialValueAvailab
         }
     }
 
-    func item(layout: KeyboardLayout, orientation: KeyboardOrientation) -> OneHandedModeSettingItem {
+    public func item(layout: KeyboardLayout, orientation: KeyboardOrientation) -> OneHandedModeSettingItem {
         self[keyPath: keyPath(layout: layout, orientation: orientation)]
     }
 
@@ -49,9 +49,15 @@ public struct OneHandedModeSetting: Sendable, Codable, StaticInitialValueAvailab
         }
     }
 
+    mutating func reset(layout: KeyboardLayout, orientation: KeyboardOrientation) {
+        // 対応する設定項目に、新しい空のインスタンスを代入して上書きする
+        // これにより、hasUsedフラグもfalseに戻るため、setIfFirstが機能するようになる
+        self[keyPath: keyPath(layout: layout, orientation: orientation)] = OneHandedModeSettingItem()
+    }
+
 }
 
-struct OneHandedModeSettingItem: Sendable, Codable {
+public struct OneHandedModeSettingItem: Sendable, Codable {
     // 最後の状態がOneHandedModeだったかどうか
     var isLastOnehandedMode: Bool = false
     // 使われたことがあるか
@@ -59,4 +65,5 @@ struct OneHandedModeSettingItem: Sendable, Codable {
     // データ
     var size: CGSize = .zero
     var position: CGPoint = .zero
+    public var maxHeight: CGFloat = 0
 }
