@@ -26,8 +26,6 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
 
     private let initialSize: CGSize
     private let minimumWidth: CGFloat = 120
-    private let minimumHeight: CGFloat = 160
-    private let maximumHeight: CGFloat  = 300
 
     init(size: Binding<CGSize>, position: Binding<CGPoint>, initialSize: CGSize) {
         self._size = size
@@ -125,7 +123,7 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                 // 縮小禁止（下端ハンドルの場合）
                 let isShrinkOnBottom = !isTopHandle && newHeight < size.height
                 // 最小・最大を超えたらキャンセル
-                let isTooShort = newHeight < minimumHeight
+                let isTooShort = newHeight < Design.keyboardHeight(screenWidth: SemiStaticStates.shared.screenWidth, orientation: variableStates.keyboardOrientation) / 2
                 let isTooTall  = newHeight > variableStates.maximumHeight
 
                 if isTooShort || isTooTall || isShrinkOnBottom {
@@ -217,7 +215,7 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                 }
             }
             .stroke(Color.white, lineWidth: 3)
-            .gesture(yGesture(target: \.$top_left_edge,isTopHandle: true))
+            .gesture(yGesture(target: \.$top_left_edge, isTopHandle: true))
             Path {path in
                 for i in 0..<4 {
                     let x = size.width - size.width / 24 * CGFloat(i)
@@ -289,7 +287,7 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                     let baseline = Design
                         .keyboardHeight(screenWidth: screenWidth,
                                         orientation: orientation) * 2
-                    + Design.keyboardScreenBottomPadding * 2
+                        + Design.keyboardScreenBottomPadding * 2
 
                     variableStates.maximumHeight = min(
                         variableStates.maximumHeight + 64, baseline
@@ -328,7 +326,7 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
 
     private var isAtDefaultWidth: Bool {
         // 浮動小数点数の計算誤差を考慮し、0.1ポイント未満の差は「同じ」と見なします
-        return abs(self.size.width - self.initialSize.width) < 0.1
+        abs(self.size.width - self.initialSize.width) < 0.1
     }
 
     @ViewBuilder
@@ -349,7 +347,7 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
         // 計算の結果、ボタンがタップできる十分な大きさを持つ場合のみ表示する
         if r >= 16 {
             // 上下にSpacerを持つコンテナVStackを追加し、垂直中央揃えを強制する
-            VStack() {
+            VStack {
                 Spacer()
                 // 元々のボタンをまとめたVStack
                 VStack(spacing: spacing) {
@@ -361,8 +359,8 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
                                 Image(systemName: "aspectratio").foregroundStyle(.white).font(.system(size: r * 0.5))
                             }
                     }
-                        .frame(width: r, height: r)
-                        .contentShape(Circle())
+                    .frame(width: r, height: r)
+                    .contentShape(Circle())
 
                     let button2 = Button {
                         variableStates.setResizingMode(.fullwidth)
@@ -372,8 +370,8 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
                                 Image(systemName: "arrow.up.backward.and.arrow.down.forward").foregroundStyle(.white).font(.system(size: r * 0.5))
                             }
                     }
-                        .frame(width: r, height: r)
-                        .contentShape(Circle())
+                    .frame(width: r, height: r)
+                    .contentShape(Circle())
 
                     let button3 = Button {
                         KeyboardFeedback<Extension>.reset()
@@ -391,8 +389,8 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
                                 Image(systemName: "arrow.triangle.2.circlepath").foregroundStyle(.white).font(.system(size: r * 0.5))
                             }
                     }
-                        .frame(width: r, height: r)
-                        .contentShape(Circle())
+                    .frame(width: r, height: r)
+                    .contentShape(Circle())
 
                     let button4 = Button {
                         variableStates.maximumHeight += 32
@@ -402,8 +400,8 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
                                 Image(systemName: "arrow.up").foregroundStyle(.white).font(.system(size: r * 0.5))
                             }
                     }
-                        .frame(width: r, height: r)
-                        .contentShape(Circle())
+                    .frame(width: r, height: r)
+                    .contentShape(Circle())
 
                     button1
                     button2
@@ -453,7 +451,7 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
         case .resizing:
             let maximumHeight = variableStates.maximumHeight
             let height = variableStates.interfaceSize.height
-            let offSet = (maximumHeight - height)/2
+            let offSet = (maximumHeight - height) / 2
             ZStack {
                 content
                 Rectangle()

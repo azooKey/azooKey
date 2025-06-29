@@ -7,8 +7,8 @@
 //
 
 import AzooKeyUtils
-import Contacts
 import Combine
+import Contacts
 import KanaKanjiConverterModule
 import KeyboardViews
 import SwiftUI
