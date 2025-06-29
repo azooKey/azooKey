@@ -313,11 +313,9 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
     @Binding private var position: CGPoint
     @Binding private var size: CGSize
     @EnvironmentObject private var variableStates: VariableStates
-
     private var hideResetButtonInOneHandedMode: Bool {
         Extension.SettingProvider.hideResetButtonInOneHandedMode
     }
-
     init(size: Binding<CGSize>, position: Binding<CGPoint>, initialSize: CGSize) {
         self.initialSize = initialSize
         self._size = size
