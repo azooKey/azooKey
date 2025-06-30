@@ -108,14 +108,26 @@ final class KeyboardViewController: UIInputViewController {
             .$interfaceSize
             .combineLatest(
                 KeyboardViewController.variableStates.$resizingState,
-                KeyboardViewController.variableStates.$maximumHeight
+                KeyboardViewController.variableStates.$maximumHeight,
+                KeyboardViewController.variableStates.$upsideComponent
             )
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] interfaceSize, state, maxH in
+            .sink { [weak self] interfaceSize, state, maxH, upsideComponent in
                 guard let self = self else { return }
                 // In resizing mode use the dynamic maxH; otherwise default to interfaceSize.height
-                let height = (state == .resizing) ? maxH : interfaceSize.height
-                self.keyboardHeightConstraint?.constant = height
+                // 1. upsideComponentの高さを計算する（存在しない場合は0）
+                let upsideComponentHeight = upsideComponent.map { component in
+                    Design.upsideComponentHeight(component, orientation: KeyboardViewController.variableStates.keyboardOrientation)
+                } ?? 0
+
+                // 2. キーボード本体の高さを決定する
+                let bodyHeight = (state == .resizing) ? maxH : interfaceSize.height
+
+                // 3. 全体の高さを「本体の高さ + upsideComponentの高さ」として計算する
+                let totalHeight = bodyHeight + upsideComponentHeight
+
+                // 4. 計算した全体の高さを制約に設定する
+                self.keyboardHeightConstraint?.constant = totalHeight
                 self.keyboardHeightConstraint?.isActive = true
                 self.view.setNeedsLayout()
                 self.view.superview?.layoutIfNeeded()
@@ -322,7 +334,6 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     func updateScreenHeight() {
-        self.keyboardHeightConstraint?.constant = Design.keyboardScreenHeight(upsideComponent: KeyboardViewController.variableStates.upsideComponent, orientation: KeyboardViewController.variableStates.keyboardOrientation)
         self.keyboardHeightConstraint?.isActive = true
         self.view.setNeedsLayout()
         self.view.superview?.layoutIfNeeded()
