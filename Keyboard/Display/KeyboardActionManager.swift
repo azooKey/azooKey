@@ -18,7 +18,7 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
     override init() {}
 
     private var inputManager = InputManager()
-    private unowned var delegate: KeyboardViewController!
+    private weak var delegate: KeyboardViewController?
 
     // 即時変数
     private var tasks: [(type: LongpressActionType, task: Task<Void, any Error>)] = []
@@ -57,7 +57,12 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
     }
 
     override func makeChangeKeyboardButtonView<Extension: ApplicationSpecificKeyboardViewExtension>() -> ChangeKeyboardButtonView<Extension> {
-        delegate?.makeChangeKeyboardButtonView(size: Design.fonts.iconFontSize(keyViewFontSizePreference: Extension.SettingProvider.keyViewFontSize)) ?? ChangeKeyboardButtonView(selector: nil, size: Design.fonts.iconFontSize(keyViewFontSizePreference: Extension.SettingProvider.keyViewFontSize))
+        guard let delegate = self.delegate else {
+            // delegateがnilの場合、フォールバックを返す
+            return ChangeKeyboardButtonView(selector: nil, size: Design.fonts.iconFontSize(keyViewFontSizePreference: Extension.SettingProvider.keyViewFontSize))
+        }
+        // delegateが存在する場合、そのメソッドを呼び出す
+        return delegate.makeChangeKeyboardButtonView(size: Design.fonts.iconFontSize(keyViewFontSizePreference: Extension.SettingProvider.keyViewFontSize))
     }
 
     /// 変換を確定した場合に呼ばれる。
@@ -218,11 +223,11 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
             case nil:
                 if variableStates.upsideComponent != nil {
                     variableStates.upsideComponent = nil
-                    self.delegate.updateScreenHeight()
+                    self.delegate?.updateScreenHeight()
                 }
             case .some:
                 variableStates.upsideComponent = type
-                self.delegate.updateScreenHeight()
+                self.delegate?.updateScreenHeight()
             }
 
         case let .setTabBar(operation):
@@ -246,10 +251,10 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
             self.hideLearningMemory()
 
         case .dismissKeyboard:
-            self.delegate.dismissKeyboard()
+            self.delegate?.dismissKeyboard()
 
         case let .openApp(scheme):
-            delegate.openApp(scheme: scheme)
+            delegate?.openApp(scheme: scheme)
 
         case let .setBoolState(key, operation):
             switch operation {
