@@ -24,6 +24,7 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
         self.defaultTab = defaultTab
     }
 
+    @MainActor
     public var body: some View {
         ZStack { [unowned variableStates] in
             Rectangle()
@@ -48,24 +49,29 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
                     }
                     .frame(height: Design.upsideComponentHeight(upsideComponent, orientation: variableStates.keyboardOrientation))
                 }
-                if isResultViewExpanded {
-                    ExpandedResultView<Extension>(isResultViewExpanded: $isResultViewExpanded)
-                } else {
-                    KeyboardBarView<Extension>(isResultViewExpanded: $isResultViewExpanded)
-                        .frame(height: Design.keyboardBarHeight(interfaceHeight: variableStates.interfaceSize.height, orientation: variableStates.keyboardOrientation))
-                        // バーのタッチ判定領域はpaddingより前まで
-                        .contentShape(Rectangle())
-                        .padding(.vertical, 6)
-                    keyboardView(tab: defaultTab ?? variableStates.tabManager.existentialTab())
+                // キーボード本体部分を新しいVStackで囲み、モディファイアをこちらに移動
+                VStack(spacing: 0) {
+                    if isResultViewExpanded {
+                        ExpandedResultView<Extension>(isResultViewExpanded: $isResultViewExpanded)
+                    } else {
+                        KeyboardBarView<Extension>(isResultViewExpanded: $isResultViewExpanded)
+                            .frame(height: Design.keyboardBarHeight(interfaceHeight: variableStates.interfaceSize.height, orientation: variableStates.keyboardOrientation))
+                            // バーのタッチ判定領域はpaddingより前まで
+                            .contentShape(Rectangle())
+                            .padding(.vertical, 6)
+                        keyboardView(tab: defaultTab ?? variableStates.tabManager.existentialTab())
+                    }
                 }
+                .resizingFrame(
+                    size: $variableStates.interfaceSize,
+                    position: $variableStates.interfacePosition,
+                    initialSize: CGSize(width: SemiStaticStates.shared.screenWidth, height: Design.keyboardHeight(screenWidth: SemiStaticStates.shared.screenWidth, orientation: variableStates.keyboardOrientation)),
+                    extension: Extension.self
+                )
+                .padding(.bottom, Design.keyboardScreenBottomPadding)
+                // ▲ 修正箇所 ▲
             }
-            .resizingFrame(
-                size: $variableStates.interfaceSize,
-                position: $variableStates.interfacePosition,
-                initialSize: CGSize(width: SemiStaticStates.shared.screenWidth, height: Design.keyboardHeight(screenWidth: SemiStaticStates.shared.screenWidth, orientation: variableStates.keyboardOrientation)),
-                extension: Extension.self
-            )
-            .padding(.bottom, Design.keyboardScreenBottomPadding)
+
             if variableStates.boolStates.isTextMagnifying {
                 LargeTextView(text: variableStates.magnifyingText, isViewOpen: $variableStates.boolStates.isTextMagnifying)
             }

@@ -7,6 +7,7 @@
 //
 
 import AzooKeyUtils
+import Combine
 import Contacts
 import KanaKanjiConverterModule
 import KeyboardViews
@@ -71,6 +72,7 @@ final class KeyboardViewController: UIInputViewController {
     private var hostViewWidthConstraint: NSLayoutConstraint?
     private var hostViewHeightConstraint: NSLayoutConstraint?
     private var hostViewBottomConstraint: NSLayoutConstraint?
+    private var cancellables = Set<AnyCancellable>()
 
     override func loadView() {
         super.loadView()
@@ -88,6 +90,49 @@ final class KeyboardViewController: UIInputViewController {
         // 高さの設定を反映する
         @KeyboardSetting(.keyboardHeightScale) var keyboardHeightScale: Double
         SemiStaticStates.shared.setKeyboardHeightScale(keyboardHeightScale)
+
+        let layout      = KeyboardViewController.variableStates.keyboardLayout
+        let orientation = KeyboardViewController.variableStates.keyboardOrientation
+        let savedItem   = KeyboardViewController
+            .variableStates
+            .keyboardInternalSettingManager
+            .oneHandedModeSetting
+            .item(layout: layout, orientation: orientation)
+        // If it's non-zero, use it as the starting maximumHeight
+        if savedItem.maxHeight > 0 {
+            KeyboardViewController.variableStates.maximumHeight = savedItem.maxHeight
+        }
+
+        // ─── ② Drive the height constraint with interfaceSize, state, and maxHeight ─────────────────────────────────
+        KeyboardViewController.variableStates
+            .$interfaceSize
+            .combineLatest(
+                KeyboardViewController.variableStates.$resizingState,
+                KeyboardViewController.variableStates.$maximumHeight,
+                KeyboardViewController.variableStates.$upsideComponent
+            )
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] interfaceSize, state, maxH, upsideComponent in
+                guard let self = self else { return }
+                // In resizing mode use the dynamic maxH; otherwise default to interfaceSize.height
+                // 1. upsideComponentの高さを計算する（存在しない場合は0）
+                let upsideComponentHeight = upsideComponent.map { component in
+                    Design.upsideComponentHeight(component, orientation: KeyboardViewController.variableStates.keyboardOrientation)
+                } ?? 0
+
+                // 2. キーボード本体の高さを決定する
+                let bodyHeight = (state == .resizing) ? maxH : interfaceSize.height
+
+                // 3. 全体の高さを「本体の高さ + upsideComponentの高さ」として計算する
+                let totalHeight = bodyHeight + upsideComponentHeight
+
+                // 4. 計算した全体の高さを制約に設定する
+                self.keyboardHeightConstraint?.constant = totalHeight
+                self.keyboardHeightConstraint?.isActive = true
+                self.view.setNeedsLayout()
+                self.view.superview?.layoutIfNeeded()
+            }
+            .store(in: &cancellables)
     }
 
     private func setupKeyboardView() {
@@ -289,7 +334,6 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     func updateScreenHeight() {
-        self.keyboardHeightConstraint?.constant = Design.keyboardScreenHeight(upsideComponent: KeyboardViewController.variableStates.upsideComponent, orientation: KeyboardViewController.variableStates.keyboardOrientation)
         self.keyboardHeightConstraint?.isActive = true
         self.view.setNeedsLayout()
         self.view.superview?.layoutIfNeeded()

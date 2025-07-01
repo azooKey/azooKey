@@ -26,7 +26,6 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
 
     private let initialSize: CGSize
     private let minimumWidth: CGFloat = 120
-    // private let minimumHeight: CGFloat = 120
 
     init(size: Binding<CGSize>, position: Binding<CGPoint>, initialSize: CGSize) {
         self._size = size
@@ -107,22 +106,37 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
             }
     }
 
-    func yGesture(target: KeyPath<Self, Binding<Position>>) -> some Gesture {
+    func yGesture(target: KeyPath<Self, Binding<Position>>, isTopHandle: Bool) -> some Gesture {
         DragGesture(minimumDistance: .zero, coordinateSpace: .global)
-            .onChanged {value in
+            .onChanged { value in
                 let dy = value.location.y - value.startLocation.y
-                let before = self[keyPath: target].wrappedValue.current.y
+                // ドラッグ前の Y 値を記憶
+                let beforeY = self[keyPath: target].wrappedValue.current.y
+                // 仮セット
                 self[keyPath: target].wrappedValue.current.y = self[keyPath: target].wrappedValue.initial.y + dy
-                let height = abs(bottom_right_edge.current.y - top_left_edge.current.y)
-                let py = (top_left_edge.current.y + bottom_right_edge.current.y - initialSize.height) / 2
-                if py < -initialSize.height / 2 || py > initialSize.height / 2 {
-                    self[keyPath: target].wrappedValue.current.y = before
+
+                // エッジ位置と新しい高さを計算
+                let topY    = top_left_edge.current.y
+                let bottomY = bottom_right_edge.current.y
+                let newHeight = abs(bottomY - topY)
+
+                // 縮小禁止（下端ハンドルの場合）
+                let isShrinkOnBottom = !isTopHandle && newHeight < size.height
+                // 最小・最大を超えたらキャンセル
+                let isTooShort = newHeight < Design.keyboardHeight(screenWidth: SemiStaticStates.shared.screenWidth, orientation: variableStates.keyboardOrientation) / 2
+                let isTooTall  = newHeight > variableStates.maximumHeight
+
+                if isTooShort || isTooTall || isShrinkOnBottom {
+                    // 範囲外なら元に戻す
+                    self[keyPath: target].wrappedValue.current.y = beforeY
                 } else {
-                    self.size.height = height
-                    self.position.y = py
+                    // 有効範囲内なら適用
+                    self.size.height   = newHeight
+                    // centerY 再計算（initialSizeは元の高さ）
+                    self.position.y    = (topY + bottomY - initialSize.height) / 2
                 }
             }
-            .onEnded {_ in
+            .onEnded { _ in
                 self.correctOrder()
                 self.setInitial()
                 self.updateUserDefaults()
@@ -192,18 +206,16 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
             }
             .stroke(Color.white, lineWidth: 3)
             .gesture(xGesture(target: \.$top_left_edge))
-            /*
-             Path {path in
-             for i in 0..<4 {
-             let y = size.height / 24 * CGFloat(i)
-             let ratio = (1 - CGFloat(i) / 4) * 0.8
-             path.move(to: CGPoint(x: size.width / 2 - size.width * edgeRatio * ratio, y: y))
-             path.addLine(to: CGPoint(x: size.width / 2 + size.width * edgeRatio * ratio, y: y))
-             }
-             }
-             .stroke(Color.white, lineWidth: 3)
-             .gesture(yGesture(target: \.$top_left_edge))
-             */
+            Path {path in
+                for i in 0..<4 {
+                    let y = size.height / 24 * CGFloat(i)
+                    let ratio = (1 - CGFloat(i) / 4) * 0.8
+                    path.move(to: CGPoint(x: size.width / 2 - size.width * edgeRatio * ratio, y: y))
+                    path.addLine(to: CGPoint(x: size.width / 2 + size.width * edgeRatio * ratio, y: y))
+                }
+            }
+            .stroke(Color.white, lineWidth: 3)
+            .gesture(yGesture(target: \.$top_left_edge, isTopHandle: true))
             Path {path in
                 for i in 0..<4 {
                     let x = size.width - size.width / 24 * CGFloat(i)
@@ -241,14 +253,8 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                 Button {
                     KeyboardFeedback<Extension>.reset()
                     withAnimation(.interactiveSpring()) {
-                        self.position = .zero
-                        self.size.width = initialSize.width
-                        self.size.height = initialSize.height
+                        variableStates.resetOneHandedModeSetting()
                     }
-                    self.top_left_edge = (.zero, .zero)
-                    self.bottom_right_edge = (.init(x: initialSize.width, y: initialSize.height), .init(x: initialSize.width, y: initialSize.height))
-                    self.initialPosition = .zero
-                    self.updateUserDefaults()
                 } label: {
                     Circle()
                         .fill(Color.red)
@@ -275,6 +281,27 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                                 .font(Font.system(size: r * 0.5))
                         }
                 }
+                Button {
+                    let screenWidth = UIScreen.main.bounds.width
+                    let orientation = variableStates.keyboardOrientation
+                    let baseline = Design
+                        .keyboardHeight(screenWidth: screenWidth,
+                                        orientation: orientation) * 2
+                        + Design.keyboardScreenBottomPadding * 2
+
+                    variableStates.maximumHeight = min(
+                        variableStates.maximumHeight + 64, baseline
+                    )
+                } label: {
+                    Circle()
+                        .fill(Color.blue)
+                        .frame(width: r, height: r)
+                        .overlay {
+                            Image(systemName: "arrow.up")
+                                .foregroundStyle(.white)
+                                .font(.system(size: r * 0.5))
+                        }
+                }
             }
         }
     }
@@ -295,120 +322,134 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
         self._position = position
     }
 
-    private enum HV {
-        case H, V
-    }
-    private var editButtonData: (max: CGFloat, position: CGPoint, stack: HV) {
-        let leftMargin = position.x + initialSize.width / 2 - size.width / 2
-        let rightMargin = initialSize.width / 2 - position.x - size.width / 2
-        let topMargin = position.y + initialSize.height / 2 - size.height / 2
-        let bottomMargin = initialSize.height / 2 - position.y - size.height / 2
-        let maxMargin = max(leftMargin, rightMargin, topMargin, bottomMargin)
-        let position: CGPoint
-        let stack: HV
-        if leftMargin == maxMargin {
-            position = .init(x: maxMargin / 2, y: initialSize.height / 2)
-            stack = .V
-        } else if rightMargin == maxMargin {
-            position = .init(x: initialSize.width - maxMargin / 2, y: initialSize.height / 2)
-            stack = .V
-        } else if topMargin == maxMargin {
-            position = .init(x: initialSize.width / 2, y: maxMargin / 2)
-            stack = .H
-        } else {
-            position = .init(x: initialSize.width / 2, y: initialSize.height - maxMargin / 2)
-            stack = .H
-        }
-        return (maxMargin, position, stack)
+    private var isAtDefaultWidth: Bool {
+        // 浮動小数点数の計算誤差を考慮し、0.1ポイント未満の差は「同じ」と見なします
+        self.size.width.isApproximatelyEqual(to: self.initialSize.width, absoluteTolerance: 0.1)
     }
 
-    @ViewBuilder func editButton() -> some View {
-        let data = self.editButtonData
-        if data.max >= 30 {
-            let max = min(initialSize.width, initialSize.height) * 0.15
-            let r = min(data.max * 0.7, max)
-            let button1 = Button {
-                variableStates.setResizingMode(.resizing)
-            } label: {
-                Circle()
-                    .fill(Color.blue)
-                    .frame(width: r, height: r)
-                    .overlay {
-                        Image(systemName: "aspectratio")
-                            .foregroundStyle(.white)
-                            .font(Font.system(size: r * 0.5))
-                    }
-            }
-            .frame(width: r, height: r)
+    @ViewBuilder
+    private func editButtons(availableWidth: CGFloat, availableHeight: CGFloat) -> some View {
+        // --- 1. ボタンサイズの計算 ---
+        let spacing: CGFloat = 7.0
+        let numberOfButtons: CGFloat = 4.0
+        let UIMaxButtonDiameter: CGFloat = 48.0
 
-            let button2 = Button {
-                variableStates.setResizingMode(.fullwidth)
-            } label: {
-                Circle()
-                    .fill(Color.blue)
-                    .frame(width: r, height: r)
-                    .overlay {
-                        Image(systemName: "arrow.up.backward.and.arrow.down.forward")
-                            .foregroundStyle(.white)
-                            .font(Font.system(size: r * 0.5))
-                    }
-            }
-            .frame(width: r, height: r)
+        // 縦方向と横方向、両方にはみ出さない直径(r)を計算
+        let rFromHeight = (availableHeight - spacing * (numberOfButtons - 1)) / numberOfButtons
+        let fittableRFromWidth = availableWidth - 8 // 左右の端から少し余白をとる
+        let fittableR = max(0, min(rFromHeight, fittableRFromWidth))
 
-            let button3 = Button {
-                KeyboardFeedback<Extension>.reset()
-                withAnimation(.interactiveSpring()) {
-                    self.position = .zero
-                    self.size.width = initialSize.width
-                    self.size.height = initialSize.height
-                    variableStates.setResizingMode(.fullwidth)
-                }
-                variableStates.keyboardInternalSettingManager.update(\.oneHandedModeSetting) {value in
-                    value.set(layout: variableStates.keyboardLayout, orientation: variableStates.keyboardOrientation, size: initialSize, position: .zero)
-                }
-            } label: {
-                Circle()
-                    .fill(Color.red)
-                    .frame(width: r, height: r)
-                    .overlay {
-                        Image(systemName: "arrow.triangle.2.circlepath")
-                            .foregroundStyle(.white)
-                            .font(Font.system(size: r * 0.5))
-                    }
-            }
+        let r = min(fittableR, UIMaxButtonDiameter) * 0.9
 
-            switch data.stack {
-            case .H:
-                HStack {
+        // --- 2. 表示/非表示の決定 ---
+        // 計算の結果、ボタンがタップできる十分な大きさを持つ場合のみ表示する
+        if r >= 16 {
+            // 上下にSpacerを持つコンテナVStackを追加し、垂直中央揃えを強制する
+            VStack {
+                Spacer()
+                // 元々のボタンをまとめたVStack
+                VStack(spacing: spacing) {
+                    let button1 = Button {
+                        variableStates.setResizingMode(.resizing)
+                    } label: {
+                        Circle().fill(Color.blue)
+                            .overlay {
+                                Image(systemName: "aspectratio").foregroundStyle(.white).font(.system(size: r * 0.5))
+                            }
+                    }
+                    .frame(width: r, height: r)
+                    .contentShape(Circle())
+
+                    let button2 = Button {
+                        variableStates.setResizingMode(.fullwidth)
+                    } label: {
+                        Circle().fill(Color.blue)
+                            .overlay {
+                                Image(systemName: "arrow.up.backward.and.arrow.down.forward").foregroundStyle(.white).font(.system(size: r * 0.5))
+                            }
+                    }
+                    .frame(width: r, height: r)
+                    .contentShape(Circle())
+
+                    let button3 = Button {
+                        KeyboardFeedback<Extension>.reset()
+                        withAnimation(.interactiveSpring()) {
+                            self.position = .zero
+                            self.size = initialSize
+                            variableStates.setResizingMode(.fullwidth)
+                        }
+                        variableStates.keyboardInternalSettingManager.update(\.oneHandedModeSetting) {value in
+                            value.set(layout: variableStates.keyboardLayout, orientation: variableStates.keyboardOrientation, size: initialSize, position: .zero)
+                        }
+                    } label: {
+                        Circle().fill(Color.red)
+                            .overlay {
+                                Image(systemName: "arrow.triangle.2.circlepath").foregroundStyle(.white).font(.system(size: r * 0.5))
+                            }
+                    }
+                    .frame(width: r, height: r)
+                    .contentShape(Circle())
+
+                    let button4 = Button {
+                        variableStates.maximumHeight += 32
+                    } label: {
+                        Circle().fill(Color.blue)
+                            .overlay {
+                                Image(systemName: "arrow.up").foregroundStyle(.white).font(.system(size: r * 0.5))
+                            }
+                    }
+                    .frame(width: r, height: r)
+                    .contentShape(Circle())
+
                     button1
                     button2
                     button3
+                    button4
                 }
-                .position(x: data.position.x, y: data.position.y)
-            case .V:
-                VStack {
-                    button1
-                    button2
-                    button3
-                }
-                .position(x: data.position.x, y: data.position.y)
+                Spacer()
             }
-
         }
     }
 
-    @ViewBuilder func body(content: Content) -> some View {
+    func body(content: Content) -> some View {
         switch variableStates.resizingState {
         case .onehanded:
-            if !hideResetButtonInOneHandedMode {
-                editButton()
-            }
+            // 親Viewに対して、そのサイズを教えてくれるGeometryReaderを重ねる
             content
                 .frame(width: size.width, height: size.height)
-                .offset(x: position.x, y: position.y)
+                .offset(x: position.x, y: 0)
+                .overlay {
+                    if !hideResetButtonInOneHandedMode && !isAtDefaultWidth {
+                        // GeometryReaderが親のサイズ(initialSize)を正確に教えてくれる
+                        GeometryReader { geo in
+                            // --- 親を基準としたレイアウト計算 ---
+                            let leftMargin = position.x + geo.size.width / 2 - size.width / 2
+                            let rightMargin = geo.size.width / 2 - position.x - size.width / 2
+
+                            // 左右の広い方のマージンにボタンを配置
+                            if leftMargin >= rightMargin {
+                                // 左側に配置
+                                HStack {
+                                    editButtons(availableWidth: leftMargin, availableHeight: geo.size.height)
+                                    Spacer()
+                                }
+                            } else {
+                                // 右側に配置
+                                HStack {
+                                    Spacer()
+                                    editButtons(availableWidth: rightMargin, availableHeight: geo.size.height)
+                                }
+                            }
+                        }
+                    }
+                }
+
         case .fullwidth:
             content
         case .resizing:
+            let maximumHeight = variableStates.maximumHeight
+            let height = variableStates.interfaceSize.height
+            let offSet = (maximumHeight - height) / 2
             ZStack {
                 content
                 Rectangle()
@@ -420,7 +461,7 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
                 ResizingRect<Extension>(size: $size, position: $position, initialSize: initialSize)
             }
             .frame(width: size.width, height: size.height)
-            .offset(x: position.x, y: position.y)
+            .offset(x: position.x, y: offSet)
         }
     }
 }
