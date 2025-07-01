@@ -57,12 +57,7 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
     }
 
     override func makeChangeKeyboardButtonView<Extension: ApplicationSpecificKeyboardViewExtension>() -> ChangeKeyboardButtonView<Extension> {
-        guard let delegate = self.delegate else {
-            // delegateがnilの場合、フォールバックを返す
-            return ChangeKeyboardButtonView(selector: nil, size: Design.fonts.iconFontSize(keyViewFontSizePreference: Extension.SettingProvider.keyViewFontSize))
-        }
-        // delegateが存在する場合、そのメソッドを呼び出す
-        return delegate.makeChangeKeyboardButtonView(size: Design.fonts.iconFontSize(keyViewFontSizePreference: Extension.SettingProvider.keyViewFontSize))
+        delegate?.makeChangeKeyboardButtonView(size: Design.fonts.iconFontSize(keyViewFontSizePreference: Extension.SettingProvider.keyViewFontSize)) ?? ChangeKeyboardButtonView(selector: nil, size: Design.fonts.iconFontSize(keyViewFontSizePreference: Extension.SettingProvider.keyViewFontSize))
     }
 
     /// 変換を確定した場合に呼ばれる。
