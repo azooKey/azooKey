@@ -254,6 +254,7 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                     KeyboardFeedback<Extension>.reset()
                     withAnimation(.interactiveSpring()) {
                         variableStates.resetOneHandedModeSetting()
+                        variableStates.heightScaleFromKeyboardHeightSetting = 1
                     }
                 } label: {
                     Circle()
@@ -271,6 +272,7 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                     } else {
                         variableStates.setResizingMode(.onehanded)
                     }
+                    variableStates.heightScaleFromKeyboardHeightSetting = 1
                 } label: {
                     Circle()
                         .fill(Color.blue)

@@ -87,23 +87,31 @@ final class KeyboardViewController: UIInputViewController {
         KeyboardViewController.loadedInstanceCount += 1
         // 初期化の順序としてこの位置に置くこと
         KeyboardViewController.variableStates.initialize()
-        // 高さの設定を反映する
-        @KeyboardSetting(.keyboardHeightScale) var keyboardHeightScale: Double
-        SemiStaticStates.shared.setKeyboardHeightScale(keyboardHeightScale)
 
-        let layout      = KeyboardViewController.variableStates.keyboardLayout
+        // 以前の高さの設定を反映する
+        @KeyboardSetting(.keyboardHeightScale) var keyboardHeightScale: Double
+        guard keyboardHeightScale != 1 else { return }
+
+        let defaults = UserDefaults.standard
+        let key = "user_has_overwritten_keyboard_height_setting"
+
+        let heightScaleToApply = defaults.bool(forKey: key) ? 1.0 : keyboardHeightScale
+        KeyboardViewController.variableStates.heightScaleFromKeyboardHeightSetting = heightScaleToApply
+
+        defaults.set(true, forKey: key)
+
+        let layout = KeyboardViewController.variableStates.keyboardLayout
         let orientation = KeyboardViewController.variableStates.keyboardOrientation
-        let savedItem   = KeyboardViewController
+        let savedItem = KeyboardViewController
             .variableStates
             .keyboardInternalSettingManager
             .oneHandedModeSetting
             .item(layout: layout, orientation: orientation)
-        // If it's non-zero, use it as the starting maximumHeight
+
         if savedItem.maxHeight > 0 {
             KeyboardViewController.variableStates.maximumHeight = savedItem.maxHeight
         }
 
-        // ─── ② Drive the height constraint with interfaceSize, state, and maxHeight ─────────────────────────────────
         KeyboardViewController.variableStates
             .$interfaceSize
             .combineLatest(
@@ -120,7 +128,6 @@ final class KeyboardViewController: UIInputViewController {
                     Design.upsideComponentHeight(component, orientation: KeyboardViewController.variableStates.keyboardOrientation)
                 } ?? 0
 
-                // 2. キーボード本体の高さを決定する
                 let bodyHeight = (state == .resizing) ? maxH : interfaceSize.height
 
                 // 3. 全体の高さを「本体の高さ + upsideComponentの高さ」として計算する
