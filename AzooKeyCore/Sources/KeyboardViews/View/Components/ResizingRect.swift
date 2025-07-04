@@ -204,15 +204,6 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                 let cur = min(size.width, size.height) * 0.22
                 let max = min(initialSize.width, initialSize.height) * 0.22
                 let r = min(cur, max)
-                Circle()
-                    .fill(Color.blue)
-                    .frame(width: r, height: r)
-                    .overlay {
-                        Image(systemName: "arrow.up.and.down.and.arrow.left.and.right")
-                            .foregroundStyle(.white)
-                            .font(Font.system(size: r * 0.5))
-                    }
-                    .gesture(moveGesture)
                 Button {
                     KeyboardFeedback<Extension>.reset()
                     withAnimation(.interactiveSpring()) {
