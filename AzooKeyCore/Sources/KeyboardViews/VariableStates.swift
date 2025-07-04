@@ -147,7 +147,6 @@ public final class VariableStates: ObservableObject {
 
     // 以前の KeyboardHeightSettingView を取得する
     @Published public var heightScaleFromKeyboardHeightSetting: CGFloat = 1
-    private var userHasOverwrittenHeightScaleFromKeyboardHeightSetting: Bool = false
 
     /// 周囲のテキストが変化した場合にインクリメントする値。変化の検出に利用する。
     /// - note: この値がどれだけ変化するかは実装によるので、変化量は意味をなさない。
