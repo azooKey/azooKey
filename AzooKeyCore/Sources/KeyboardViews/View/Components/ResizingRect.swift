@@ -392,21 +392,9 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
                     .frame(width: r, height: r)
                     .contentShape(Circle())
 
-                    let button4 = Button {
-                        variableStates.maximumHeight += 32
-                    } label: {
-                        Circle().fill(Color.blue)
-                            .overlay {
-                                Image(systemName: "arrow.up").foregroundStyle(.white).font(.system(size: r * 0.5))
-                            }
-                    }
-                    .frame(width: r, height: r)
-                    .contentShape(Circle())
-
                     button1
                     button2
                     button3
-                    button4
                 }
                 Spacer()
             }
