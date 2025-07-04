@@ -170,32 +170,6 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
 
     var body: some View {
         ZStack {
-            /*
-             Path{path in
-             path.move(to: CGPoint(x: 0, y: height * edgeRatio))
-             path.addLine(to: CGPoint(x: 0, y: 0))
-             path.addLine(to: CGPoint(x: width * edgeRatio, y: 0))
-             }.stroke(edgeColor, lineWidth: lineWidth)
-             .gesture(gesture(x: \.$top_left_edge.x, y: \.$top_left_edge.y))
-             Path{path in
-             path.move(to: CGPoint(x: width, y: height * edgeRatio))
-             path.addLine(to: CGPoint(x: width, y: 0))
-             path.addLine(to: CGPoint(x: width * (1-edgeRatio), y: 0))
-             }.stroke(edgeColor, lineWidth: lineWidth)
-             .gesture(gesture(x: \.$bottom_right_edge.x, y: \.$top_left_edge.y, left: false))
-             Path{path in
-             path.move(to: CGPoint(x: 0, y: height * (1-edgeRatio)))
-             path.addLine(to: CGPoint(x: 0, y: height))
-             path.addLine(to: CGPoint(x: width * edgeRatio, y: height))
-             }.stroke(edgeColor, lineWidth: lineWidth)
-             .gesture(gesture(x: \.$top_left_edge.x, y: \.$bottom_right_edge.y, top: false))
-             Path{path in
-             path.move(to: CGPoint(x: width, y: height * (1-edgeRatio)))
-             path.addLine(to: CGPoint(x: width, y: height))
-             path.addLine(to: CGPoint(x: width * (1-edgeRatio), y: height))
-             }.stroke(edgeColor, lineWidth: lineWidth)
-             .gesture(gesture(x: \.$bottom_right_edge.x, y: \.$bottom_right_edge.y, top: false, left: false))
-             */
             Path {path in
                 for i in 0..<4 {
                     let x = size.width / 24 * CGFloat(i)
@@ -226,17 +200,6 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
             }
             .stroke(Color.white, lineWidth: 3)
             .gesture(xGesture(target: \.$bottom_right_edge))
-            /*
-             Path{path in
-             for i in 0..<4{
-             let y = height - height / 24 * CGFloat(i)
-             let ratio = (1 - CGFloat(i) / 4) * 0.8
-             path.move(to: CGPoint(x: width / 2 - width * edgeRatio * ratio, y: y))
-             path.addLine(to: CGPoint(x: width / 2 + width * edgeRatio * ratio, y: y))
-             }
-             }.stroke(Color.white, lineWidth: 3)
-             .gesture(yGesture(y: \.$bottom_right_edge.y, top: false))
-             */
             HStack {
                 let cur = min(size.width, size.height) * 0.22
                 let max = min(initialSize.width, initialSize.height) * 0.22
@@ -343,7 +306,6 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
 
         let r = min(fittableR, UIMaxButtonDiameter) * 0.9
 
-        // --- 2. 表示/非表示の決定 ---
         // 計算の結果、ボタンがタップできる十分な大きさを持つ場合のみ表示する
         if r >= 16 {
             // 上下にSpacerを持つコンテナVStackを追加し、垂直中央揃えを強制する
