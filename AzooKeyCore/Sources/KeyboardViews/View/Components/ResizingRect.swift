@@ -306,6 +306,7 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
                 VStack(spacing: spacing) {
                     let button1 = Button {
                         variableStates.setResizingMode(.resizing)
+                        variableStates.heightScaleFromKeyboardHeightSetting = 1
                     } label: {
                         Circle().fill(Color.blue)
                             .overlay {
@@ -317,6 +318,7 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
 
                     let button2 = Button {
                         variableStates.setResizingMode(.fullwidth)
+                        variableStates.heightScaleFromKeyboardHeightSetting = 1
                     } label: {
                         Circle().fill(Color.blue)
                             .overlay {
@@ -333,6 +335,7 @@ struct ResizingBindingFrame<Extension: ApplicationSpecificKeyboardViewExtension>
                             self.size = initialSize
                             variableStates.setResizingMode(.fullwidth)
                         }
+                        variableStates.heightScaleFromKeyboardHeightSetting = 1
                         variableStates.keyboardInternalSettingManager.update(\.oneHandedModeSetting) {value in
                             value.set(layout: variableStates.keyboardLayout, orientation: variableStates.keyboardOrientation, size: initialSize, position: .zero)
                         }
