@@ -253,7 +253,7 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                         .fill(Color.blue)
                         .frame(width: r, height: r)
                         .overlay {
-                            Image(systemName: "arrow.up")
+                            Image(systemName: "arrow.up.to.line.compact")
                                 .foregroundStyle(.white)
                                 .font(.system(size: r * 0.5))
                         }
