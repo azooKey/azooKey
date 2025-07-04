@@ -88,17 +88,7 @@ final class KeyboardViewController: UIInputViewController {
         // 初期化の順序としてこの位置に置くこと
         KeyboardViewController.variableStates.initialize()
 
-        // 以前の高さの設定を反映する
-        @KeyboardSetting(.keyboardHeightScale) var keyboardHeightScale: Double
-        guard keyboardHeightScale != 1 else { return }
-
-        let defaults = UserDefaults.standard
-        let key = "user_has_overwritten_keyboard_height_setting"
-
-        let heightScaleToApply = defaults.bool(forKey: key) ? 1.0 : keyboardHeightScale
-        KeyboardViewController.variableStates.heightScaleFromKeyboardHeightSetting = heightScaleToApply
-
-        defaults.set(true, forKey: key)
+        self.setupInitialKeyboardHeight()
 
         let layout = KeyboardViewController.variableStates.keyboardLayout
         let orientation = KeyboardViewController.variableStates.keyboardOrientation
@@ -185,6 +175,20 @@ final class KeyboardViewController: UIInputViewController {
         @unknown default:
             return (try? indexManager.theme(at: indexManager.selectedIndex)) ?? defaultTheme
         }
+    }
+
+    private func setupInitialKeyboardHeight() {
+        @KeyboardSetting(.keyboardHeightScale) var keyboardHeightScale: Double
+
+        guard keyboardHeightScale != 1 else { return }
+
+        let defaults = UserDefaults.standard
+        let key = "user_has_overwritten_keyboard_height_setting"
+
+        let heightScaleToApply = defaults.bool(forKey: key) ? 1.0 : keyboardHeightScale
+        KeyboardViewController.variableStates.heightScaleFromKeyboardHeightSetting = heightScaleToApply
+
+        defaults.set(true, forKey: key)
     }
 
     override func viewWillAppear(_ animated: Bool) {
