@@ -227,6 +227,9 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                         variableStates.setResizingMode(.onehanded)
                     }
                     variableStates.heightScaleFromKeyboardHeightSetting = 1
+                    let defaults = UserDefaults.standard
+                    let key = "user_has_overwritten_keyboard_height_setting"
+                    defaults.set(true, forKey: key)
                 } label: {
                     Circle()
                         .fill(Color.blue)
