@@ -147,17 +147,28 @@ public enum Design {
     /// screenWidthに依存して決定する
     /// 12はresultViewのpadding
     @MainActor public static func keyboardHeight(screenWidth: CGFloat, orientation: KeyboardOrientation, upsideComponent: UpsideComponent? = nil) -> CGFloat {
+        let scale: CGFloat
+        if let upsideComponent {
+            switch orientation {
+            case .vertical:
+                scale = min(2.2, SemiStaticStates.shared.keyboardHeightScale + upsideComponentScale(upsideComponent).vertical)
+            case .horizontal:
+                scale = min(2.2, SemiStaticStates.shared.keyboardHeightScale + upsideComponentScale(upsideComponent).horizontal)
+            }
+        } else {
+            scale = 1
+        }
         // 安全装置として、widthが本来のscreenWidthを超えないようにする。
         let width = min(screenWidth, SemiStaticStates.shared.screenWidth)
         switch layoutMode(orientation: orientation) {
         case .phoneVertical:
-            return 51 / 74 * width + 12
+            return 51 / 74 * width * scale + 12
         case .padVertical:
-            return 15 / 31 * width + 12
+            return 15 / 31 * width * scale + 12
         case .phoneHorizontal:
-            return 17 / 56 * width + 12
+            return 17 / 56 * width * scale + 12
         case .padHorizontal:
-            return 5 / 18 * width + 12
+            return 5 / 18 * width * scale + 12
         }
     }
 
