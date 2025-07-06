@@ -178,7 +178,7 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func setupInitialKeyboardHeight() {
-        let keyboardHeightScale: Double = 1.8
+        @KeyboardSetting(.keyboardHeightScale) var keyboardHeightScale: Double
 
         guard keyboardHeightScale != 1 else { return }
 
