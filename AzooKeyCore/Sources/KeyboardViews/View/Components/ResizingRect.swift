@@ -65,25 +65,6 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
         self.bottom_right_edge.initial = self.bottom_right_edge.current
     }
 
-    func gesture(x: KeyPath<Self, Binding<Position>>, y: KeyPath<Self, Binding<Position>>, top: Bool = true, left: Bool = true) -> some Gesture {
-        DragGesture(minimumDistance: .zero, coordinateSpace: .global)
-            .onChanged {value in
-                let dx = value.location.x - value.startLocation.x
-                let dy = value.location.y - value.startLocation.y
-                self[keyPath: x].wrappedValue.current.x = self[keyPath: x].wrappedValue.initial.x + dx
-                self[keyPath: y].wrappedValue.current.y = self[keyPath: y].wrappedValue.initial.y + dy
-                size.width = abs(bottom_right_edge.current.x - top_left_edge.current.x)
-                size.height = abs(bottom_right_edge.current.y - top_left_edge.current.y)
-                position.x = (top_left_edge.current.x + bottom_right_edge.current.x - initialSize.width) / 2
-                position.y = (top_left_edge.current.y + bottom_right_edge.current.y - initialSize.height) / 2
-            }
-            .onEnded {_ in
-                self.correctOrder()
-                self.setInitial()
-                self.updateUserDefaults()
-            }
-    }
-
     func xGesture(target: KeyPath<Self, Binding<Position>>) -> some Gesture {
         DragGesture(minimumDistance: .zero, coordinateSpace: .global)
             .onChanged {value in
@@ -138,31 +119,6 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
             }
             .onEnded { _ in
                 self.correctOrder()
-                self.setInitial()
-                self.updateUserDefaults()
-            }
-    }
-
-    var moveGesture: some Gesture {
-        DragGesture(minimumDistance: .zero, coordinateSpace: .global)
-            .onChanged {value in
-                let dx = value.location.x - value.startLocation.x
-                let dy = value.location.y - value.startLocation.y
-                let px = self.initialPosition.x + dx
-                let py = self.initialPosition.y + dy
-                if  -initialSize.width / 2 < px && px < initialSize.width / 2 &&
-                        -initialSize.height / 2 < py && py < initialSize.height / 2 {
-                    withAnimation(.interactiveSpring()) {
-                        self.position.x = px
-                        self.position.y = py
-                        self.top_left_edge.current.x = self.top_left_edge.initial.x + dx
-                        self.top_left_edge.current.y = self.top_left_edge.initial.y + dy
-                        self.bottom_right_edge.current.x = self.bottom_right_edge.initial.x + dx
-                        self.bottom_right_edge.current.y = self.bottom_right_edge.initial.y + dy
-                    }
-                }
-            }
-            .onEnded {_ in
                 self.setInitial()
                 self.updateUserDefaults()
             }
