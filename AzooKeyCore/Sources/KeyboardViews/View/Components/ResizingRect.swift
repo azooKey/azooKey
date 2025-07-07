@@ -162,6 +162,7 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                 let r = min(cur, max)
                 Button {
                     KeyboardFeedback<Extension>.reset()
+                    variableStates.keyboardInternalSettingManager.oneHandedModeSetting.userHasOverwrittenKeyboardHeightSetting = true
                     withAnimation(.interactiveSpring()) {
                         variableStates.resetOneHandedModeSetting()
                         variableStates.heightScaleFromKeyboardHeightSetting = 1
@@ -183,9 +184,7 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                         variableStates.setResizingMode(.onehanded)
                     }
                     variableStates.heightScaleFromKeyboardHeightSetting = 1
-                    let defaults = UserDefaults.standard
-                    let key = "user_has_overwritten_keyboard_height_setting"
-                    defaults.set(true, forKey: key)
+                    variableStates.keyboardInternalSettingManager.oneHandedModeSetting.userHasOverwrittenKeyboardHeightSetting = true
                 } label: {
                     Circle()
                         .fill(Color.blue)

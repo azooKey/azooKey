@@ -18,6 +18,19 @@ public struct OneHandedModeSetting: Sendable, Codable, StaticInitialValueAvailab
     private(set) var qwerty_vertical = OneHandedModeSettingItem()
     private(set) var qwerty_horizontal = OneHandedModeSettingItem()
 
+    private static let userHasOverwrittenKeyboardHeightSettingKey = "user_has_overwritten_keyboard_height_setting"
+
+    public var userHasOverwrittenKeyboardHeightSetting: Bool {
+            get {
+                // UserDefaultsから値を読み込む
+                UserDefaults.standard.bool(forKey: Self.userHasOverwrittenKeyboardHeightSettingKey)
+            }
+            set {
+                // UserDefaultsに値を書き込む
+                UserDefaults.standard.set(newValue, forKey: Self.userHasOverwrittenKeyboardHeightSettingKey)
+            }
+        }
+
     private func keyPath(layout: KeyboardLayout, orientation: KeyboardOrientation) -> WritableKeyPath<Self, OneHandedModeSettingItem> {
         switch (layout, orientation) {
         case (.flick, .vertical): return \.flick_vertical

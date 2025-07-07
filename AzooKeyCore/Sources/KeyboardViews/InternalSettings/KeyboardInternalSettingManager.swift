@@ -38,7 +38,7 @@ public struct KeyboardInternalSettingManager: UserDefaultsManager {
         self.emojiTabExpandModePreference = Self.load(key: .emoji_tab_expand_mode_preference, userDefaults: userDefaults)
     }
 
-    private(set) public var oneHandedModeSetting: OneHandedModeSetting
+    public var oneHandedModeSetting: OneHandedModeSetting
     private(set) public var tabCharacterPreference: TabCharacterPreference
     private(set) public var emojiTabExpandModePreference: EmojiTabExpandModePreference
 }

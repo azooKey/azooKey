@@ -145,7 +145,6 @@ public final class VariableStates: ObservableObject {
 
     @Published public var maximumHeight: CGFloat = 0
 
-    // 以前の KeyboardHeightSettingView を取得する
     @Published public var heightScaleFromKeyboardHeightSetting: CGFloat = 1
 
     /// 周囲のテキストが変化した場合にインクリメントする値。変化の検出に利用する。
