@@ -151,9 +151,9 @@ public enum Design {
         if let upsideComponent {
             switch orientation {
             case .vertical:
-                scale = min(2.2, SemiStaticStates.shared.keyboardHeightScale + upsideComponentScale(upsideComponent).vertical)
+                scale = min(2.2, 1.0 + upsideComponentScale(upsideComponent).vertical)
             case .horizontal:
-                scale = min(2.2, SemiStaticStates.shared.keyboardHeightScale + upsideComponentScale(upsideComponent).horizontal)
+                scale = min(2.2, 1.0 + upsideComponentScale(upsideComponent).horizontal)
             }
         } else {
             scale = 1
