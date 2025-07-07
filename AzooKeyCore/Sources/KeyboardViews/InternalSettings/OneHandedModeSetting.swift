@@ -18,19 +18,6 @@ public struct OneHandedModeSetting: Sendable, Codable, StaticInitialValueAvailab
     private(set) var qwerty_vertical = OneHandedModeSettingItem()
     private(set) var qwerty_horizontal = OneHandedModeSettingItem()
 
-    private static let userHasOverwrittenKeyboardHeightSettingKey = "user_has_overwritten_keyboard_height_setting"
-
-    public var userHasOverwrittenKeyboardHeightSetting: Bool {
-        get {
-            // UserDefaultsから値を読み込む
-            UserDefaults.standard.bool(forKey: Self.userHasOverwrittenKeyboardHeightSettingKey)
-        }
-        set {
-            // UserDefaultsに値を書き込む
-            UserDefaults.standard.set(newValue, forKey: Self.userHasOverwrittenKeyboardHeightSettingKey)
-        }
-    }
-
     private func keyPath(layout: KeyboardLayout, orientation: KeyboardOrientation) -> WritableKeyPath<Self, OneHandedModeSettingItem> {
         switch (layout, orientation) {
         case (.flick, .vertical): return \.flick_vertical
@@ -65,7 +52,12 @@ public struct OneHandedModeSetting: Sendable, Codable, StaticInitialValueAvailab
     mutating func reset(layout: KeyboardLayout, orientation: KeyboardOrientation) {
         // 対応する設定項目に、新しい空のインスタンスを代入して上書きする
         // これにより、hasUsedフラグもfalseに戻るため、setIfFirstが機能するようになる
-        self[keyPath: keyPath(layout: layout, orientation: orientation)] = OneHandedModeSettingItem()
+        // userHasOverwrittenKeyboardHeightSettingについては、明示的なリセット操作が行われている以上、trueにしてしまってよい
+        self[keyPath: keyPath(layout: layout, orientation: orientation)] = OneHandedModeSettingItem(userHasOverwrittenKeyboardHeightSetting: true)
+    }
+
+    mutating func setUserHasOverwrittenKeyboardHeightSetting(layout: KeyboardLayout, orientation: KeyboardOrientation) {
+        self[keyPath: keyPath(layout: layout, orientation: orientation)].userHasOverwrittenKeyboardHeightSetting = true
     }
 
 }
@@ -75,6 +67,9 @@ public struct OneHandedModeSettingItem: Sendable, Codable {
     var isLastOnehandedMode: Bool = false
     // 使われたことがあるか
     var hasUsed: Bool = false
+    // 片手モードの設定を変更したか
+    // v2.5で導入。片手モードの高さスケール設定（v2.4.2まで存在）に対して片手モード上の高さ設定を優先させるか判定するための値。
+    public var userHasOverwrittenKeyboardHeightSetting: Bool = false
     // データ
     var size: CGSize = .zero
     var position: CGPoint = .zero

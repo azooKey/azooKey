@@ -182,9 +182,7 @@ final class KeyboardViewController: UIInputViewController {
 
         guard keyboardHeightScale != 1 else { return }
 
-        let oneHandedModeSetting = KeyboardViewController.variableStates.keyboardInternalSettingManager.oneHandedModeSetting
-
-        let hasOverwritten = oneHandedModeSetting.userHasOverwrittenKeyboardHeightSetting
+        let hasOverwritten = Self.variableStates.keyboardInternalSettingManager.oneHandedModeSetting.item(layout: Self.variableStates.keyboardLayout, orientation: Self.variableStates.keyboardOrientation).userHasOverwrittenKeyboardHeightSetting
 
         let heightScaleToApply = hasOverwritten ? 1.0 : keyboardHeightScale
         KeyboardViewController.variableStates.heightScaleFromKeyboardHeightSetting = heightScaleToApply
