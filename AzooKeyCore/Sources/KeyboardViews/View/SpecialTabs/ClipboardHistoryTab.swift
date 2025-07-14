@@ -20,11 +20,13 @@ private final class ClipboardHistory: ObservableObject {
         process(&copied)
         manager.items = copied + self.notPinnedItems
     }
+
     func updateNotPinnedItems(manager: inout ClipboardHistoryManager, _ process: (inout [ClipboardHistoryItem]) -> Void) {
         var copied = self.notPinnedItems
         process(&copied)
         manager.items = self.pinnedItems + copied
     }
+
     func updateBothItems(manager: inout ClipboardHistoryManager, _ process: (inout [ClipboardHistoryItem], inout [ClipboardHistoryItem]) -> Void) {
         var pinnedItems = self.pinnedItems
         var notPinnedItems = self.notPinnedItems
@@ -33,18 +35,25 @@ private final class ClipboardHistory: ObservableObject {
     }
 
     func reload(manager: ClipboardHistoryManager) {
-        self.pinnedItems = []
-        self.notPinnedItems = []
-        for item in manager.items {
+        let (pinned, notPinned) = partitionItems(manager.items)
+        self.pinnedItems = pinned.sorted(by: >)
+        self.notPinnedItems = notPinned.sorted(by: >)
+        debug("reload", manager.items)
+    }
+
+    private func partitionItems(_ items: [ClipboardHistoryItem]) -> (pinned: [ClipboardHistoryItem], notPinned: [ClipboardHistoryItem]) {
+        var pinnedItems: [ClipboardHistoryItem] = []
+        var notPinnedItems: [ClipboardHistoryItem] = []
+
+        for item in items {
             if item.pinnedDate != nil {
-                self.pinnedItems.append(item)
+                pinnedItems.append(item)
             } else {
-                self.notPinnedItems.append(item)
+                notPinnedItems.append(item)
             }
         }
-        self.pinnedItems.sort(by: >)
-        self.notPinnedItems.sort(by: >)
-        debug("reload", manager.items)
+
+        return (pinnedItems, notPinnedItems)
     }
 }
 
@@ -63,141 +72,66 @@ struct ClipboardHistoryTab<Extension: ApplicationSpecificKeyboardViewExtension>:
     }
 
     @ViewBuilder
-    private func listItemView(_ item: ClipboardHistoryItem, index: Int?, pinned: Bool = false) -> some View {
-        Group {
-            switch item.content {
-            case .text(let string):
-                HStack {
-                    if string.hasPrefix("https://") || string.hasPrefix("http://"), let url = URL(string: string) {
-                        RichLinkView(url: url, options: [.icon], cacheStore: $cacheStore)
-                            .padding(.vertical, 2)
-                    } else {
-                        if pinned {
-                            HStack {
-                                Image(systemName: "pin.circle.fill")
-                                    .foregroundStyle(.orange)
-                                Text(string)
-                                    .lineLimit(2)
-                            }
-                        } else {
-                            Text(string)
-                                .lineLimit(2)
-                        }
-                    }
-                    Spacer()
-                    Button("入力") {
-                        action.registerAction(.input(string), variableStates: variableStates)
-                        variableStates.undoAction = .init(action: .replaceLastCharacters([string: ""]), textChangedCount: variableStates.textChangedCount)
-                        KeyboardFeedback<Extension>.click()
-                    }
-                    .buttonStyle(.bordered)
-                }
-                .contextMenu {
-                    Group {
-                        Button {
-                            action.registerAction(.input(string), variableStates: variableStates)
-                            variableStates.undoAction = .init(action: .replaceLastCharacters([string: ""]), textChangedCount: variableStates.textChangedCount)
-                        } label: {
-                            Label("入力する", systemImage: "text.badge.plus")
-                        }
-                        Button {
-                            UIPasteboard.general.string = string
-                        } label: {
-                            Label("コピーする", systemImage: "doc.on.doc")
-                        }
-                        if pinned {
-                            Button {
-                                guard let index else { return }
-                                self.unpinItem(item: item, at: index)
-                            } label: {
-                                Label("固定を解除", systemImage: "pin.slash")
-                            }
-                        } else {
-                            Button {
-                                guard let index else { return }
-                                self.pinItem(item: item, at: index)
-                            } label: {
-                                Label("ピンで固定する", systemImage: "pin")
-                            }
-                        }
-                        Button(role: .destructive) {
-                            guard let index else { return }
-                            if pinned {
-                                self.target.updatePinnedItems(manager: &variableStates.clipboardHistoryManager) {
-                                    $0.remove(at: index)
-                                }
-                            } else {
-                                self.target.updateNotPinnedItems(manager: &variableStates.clipboardHistoryManager) {
-                                    $0.remove(at: index)
-                                }
-                            }
-                        } label: {
-                            Label("削除", systemImage: "trash")
-                        }
-                    }
-                }
-
-            }
-        }
-        .listRowBackground(
-            Rectangle()
-                .foregroundStyle(listRowBackgroundColor)
+    private func tileView(_ item: ClipboardHistoryItem, index: Int?, pinned: Bool = false) -> some View {
+        ClipboardTileView<Extension>(
+            item: item,
+            index: index,
+            pinned: pinned,
+            backgroundColor: listRowBackgroundColor,
+            cacheStore: $cacheStore,
+            onTap: { handleTileInput(item) },
+            onPin: { pinItem(item: item, at: $0) },
+            onUnpin: { unpinItem(item: item, at: $0) },
+            onDelete: { deleteItem(at: $0, pinned: pinned) }
         )
-        .listRowInsets(EdgeInsets())
-        .padding(.leading, 7)
-        .padding(.trailing, 2)
     }
 
-    private var listView: some View {
-        List {
-            if !self.target.pinnedItems.isEmpty {
-                Section {
-                    ForEach(self.target.pinnedItems.indices, id: \.self) { index in
-                        let item = self.target.pinnedItems[index]
-                        listItemView(item, index: index, pinned: true)
-                            .swipeActions(edge: .leading) {
-                                Button {
-                                    self.unpinItem(item: item, at: index)
-                                } label: {
-                                    Label("固定を解除", systemImage: "pin.slash.fill")
-                                        .labelStyle(.iconOnly)
-                                }
-                                .tint(.orange)
-                            }
-                    }
-                    .onDelete { indices in
-                        self.target.updatePinnedItems(manager: &variableStates.clipboardHistoryManager) {
-                            $0.remove(atOffsets: indices)
-                        }
-                    }
-                }
+    private func handleTileInput(_ item: ClipboardHistoryItem) {
+        switch item.content {
+        case .text(let string):
+            action.registerAction(.input(string), variableStates: variableStates)
+            variableStates.undoAction = .init(action: .replaceLastCharacters([string: ""]), textChangedCount: variableStates.textChangedCount)
+            KeyboardFeedback<Extension>.click()
+        }
+    }
+
+    private func deleteItem(at index: Int, pinned: Bool) {
+        if pinned {
+            self.target.updatePinnedItems(manager: &variableStates.clipboardHistoryManager) {
+                $0.remove(at: index)
             }
-            if self.target.notPinnedItems.isEmpty {
-                listItemView(.init(content: .text("テキストをコピーするとここに追加されます"), createdData: .now), index: nil)
-            } else {
-                Section {
-                    ForEach(self.target.notPinnedItems.indices, id: \.self) { index in
-                        let item = self.target.notPinnedItems[index]
-                        listItemView(item, index: index)
-                            .swipeActions(edge: .leading) {
-                                Button {
-                                    self.pinItem(item: item, at: index)
-                                } label: {
-                                    Label("ピンで固定する", systemImage: "pin.fill")
-                                        .labelStyle(.iconOnly)
-                                }
-                                .tint(.orange)
-                            }
-                    }
-                    .onDelete { indices in
-                        self.target.updateNotPinnedItems(manager: &variableStates.clipboardHistoryManager) {
-                            $0.remove(atOffsets: indices)
-                        }
-                    }
-                }
+        } else {
+            self.target.updateNotPinnedItems(manager: &variableStates.clipboardHistoryManager) {
+                $0.remove(at: index)
             }
         }
-        .scrollContentBackground(.hidden)
+    }
+
+    private var tileGridView: some View {
+        ScrollView {
+            VStack(spacing: 12) {
+                if !self.target.pinnedItems.isEmpty {
+                    ClipboardSection(
+                        title: "ピン留め",
+                        items: self.target.pinnedItems,
+                        isPinned: true,
+                        tileView: tileView
+                    )
+                }
+
+                if self.target.notPinnedItems.isEmpty {
+                    EmptyHistoryView()
+                } else {
+                    ClipboardSection(
+                        title: "履歴",
+                        items: self.target.notPinnedItems,
+                        isPinned: false,
+                        tileView: tileView
+                    )
+                }
+            }
+            .padding(.vertical, 12)
+        }
     }
 
     private func enterKey(_ design: TabDependentDesign) -> some View {
@@ -215,7 +149,7 @@ struct ClipboardHistoryTab<Extension: ApplicationSpecificKeyboardViewExtension>:
             switch variableStates.keyboardOrientation {
             case .vertical:
                 VStack {
-                    listView
+                    tileGridView
                     HStack {
                         let design = TabDependentDesign(width: 3, height: 7, interfaceSize: variableStates.interfaceSize, orientation: .vertical)
                         backTabKey(design)
@@ -225,7 +159,7 @@ struct ClipboardHistoryTab<Extension: ApplicationSpecificKeyboardViewExtension>:
                 }
             case .horizontal:
                 HStack {
-                    listView
+                    tileGridView
                     VStack {
                         let design = TabDependentDesign(width: 8, height: 3, interfaceSize: variableStates.interfaceSize, orientation: .horizontal)
                         backTabKey(design)
@@ -265,10 +199,160 @@ struct ClipboardHistoryTab<Extension: ApplicationSpecificKeyboardViewExtension>:
     }
 }
 
+private struct ClipboardTileView<Extension: ApplicationSpecificKeyboardViewExtension>: View {
+    let item: ClipboardHistoryItem
+    let index: Int?
+    let pinned: Bool
+    let backgroundColor: Color
+    @Binding var cacheStore: MetadataCacheStore
+    let onTap: () -> Void
+    let onPin: (Int) -> Void
+    let onUnpin: (Int) -> Void
+    let onDelete: (Int) -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            switch item.content {
+            case .text(let string):
+                if string.hasPrefix("https://") || string.hasPrefix("http://"), let url = URL(string: string) {
+                    LinkTileContent(url: url, string: string, cacheStore: $cacheStore)
+                } else {
+                    TextTileContent(string: string)
+                }
+            }
+        }
+        .frame(width: 140, height: 120)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(backgroundColor)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(pinned ? Color.orange : Color.clear, lineWidth: pinned ? 2 : 0)
+                )
+        )
+        .onTapGesture {
+            onTap()
+        }
+        .contextMenu {
+            if pinned {
+                Button {
+                    guard let index else {
+                        return
+                    }
+                    onUnpin(index)
+                } label: {
+                    Label("固定解除", systemImage: "pin.slash")
+                }
+            } else {
+                Button {
+                    guard let index else {
+                        return
+                    }
+                    onPin(index)
+                } label: {
+                    Label("固定", systemImage: "pin")
+                }
+            }
+            Button(role: .destructive) {
+                guard let index else {
+                    return
+                }
+                onDelete(index)
+            } label: {
+                Label("削除", systemImage: "trash")
+            }
+        }
+    }
+}
+
+private struct LinkTileContent: View {
+    let url: URL
+    let string: String
+    @Binding var cacheStore: MetadataCacheStore
+
+    var body: some View {
+        VStack(spacing: 0) {
+            RichLinkView(url: url, options: [.image, .icon], cacheStore: $cacheStore)
+                .frame(height: 80)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .clipped()
+                .allowsHitTesting(false)
+
+            Text(string)
+                .font(.system(size: 11))
+                .lineLimit(2)
+                .foregroundColor(.secondary)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 6)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        }
+        .frame(height: 120)
+    }
+}
+
+private struct TextTileContent: View {
+    let string: String
+
+    var body: some View {
+        Text(string)
+            .font(.system(size: 12))
+            .lineLimit(5)
+            .multilineTextAlignment(.leading)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .padding(8)
+            .frame(height: 120)
+    }
+}
+
+private struct ClipboardSection<TileView: View>: View {
+    let title: String
+    let items: [ClipboardHistoryItem]
+    let isPinned: Bool
+    let tileView: (ClipboardHistoryItem, Int?, Bool) -> TileView
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(title)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.secondary)
+                Spacer()
+            }
+            .padding(.horizontal, 12)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(items.indices, id: \.self) { index in
+                        let item = items[index]
+                        tileView(item, index, isPinned)
+                    }
+                }
+                .padding(.horizontal, 12)
+            }
+        }
+    }
+}
+
+private struct EmptyHistoryView: View {
+    var body: some View {
+        VStack {
+            Text("テキストをコピーするとここに追加されます")
+                .font(.system(size: 12))
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(16)
+        }
+        .frame(maxWidth: .infinity, minHeight: 100)
+    }
+}
+
 private struct MetadataCacheStore: Copyable {
     private var cache: [String: LPLinkMetadata] = [:]
     mutating func cache(metadata: LPLinkMetadata) {
-        cache[metadata.url!.absoluteString] = metadata
+        guard let url = metadata.url else {
+            return
+        }
+        cache[url.absoluteString] = metadata
     }
     func get(urlString: String) -> LPLinkMetadata? {
         cache[urlString]
@@ -284,6 +368,11 @@ private struct RichLinkView: UIViewRepresentable {
 
     class UIViewType: LPLinkView {
         override var intrinsicContentSize: CGSize { CGSize(width: 0, height: super.intrinsicContentSize.height) }
+        var currentTask: Task<Void, Never>?
+
+        deinit {
+            currentTask?.cancel()
+        }
     }
 
     enum MetadataOption: Int8, Equatable {
@@ -306,23 +395,43 @@ private struct RichLinkView: UIViewRepresentable {
             uiView.metadata = cachedData
             uiView.sizeToFit()
         } else {
-            Task {
-                let metadata = try await LPMetadataProvider().startFetchingMetadata(for: url)
-                if !options.contains(.video) {
-                    metadata.videoProvider = nil
-                    metadata.remoteVideoURL = nil
+            // 既存のタスクをキャンセル
+            uiView.currentTask?.cancel()
+
+            uiView.currentTask = Task { @MainActor in
+                do {
+                    let metadata = try await LPMetadataProvider().startFetchingMetadata(for: url)
+
+                    // タスクがキャンセルされていないかチェック
+                    guard !Task.isCancelled else {
+                        return
+                    }
+
+                    if !options.contains(.video) {
+                        metadata.videoProvider = nil
+                        metadata.remoteVideoURL = nil
+                    }
+                    if !options.contains(.image) {
+                        metadata.imageProvider = nil
+                    }
+                    if !options.contains(.icon) {
+                        metadata.iconProvider = nil
+                    }
+                    self.cacheStore.cache(metadata: metadata)
+                    // このわずかな遅延を入れると処理が安定する
+                    try await Task.sleep(nanoseconds: 1_000)
+
+                    // タスクがキャンセルされていないか再度チェック
+                    guard !Task.isCancelled else {
+                        return
+                    }
+
+                    uiView.metadata = metadata
+                    uiView.sizeToFit()
+                } catch {
+                    // メタデータの取得に失敗した場合は何もしない
+                    debug("Failed to fetch metadata for URL: \(url)", error)
                 }
-                if !options.contains(.image) {
-                    metadata.imageProvider = nil
-                }
-                if !options.contains(.icon) {
-                    metadata.iconProvider = nil
-                }
-                self.cacheStore.cache(metadata: metadata)
-                // このわずかな遅延を入れると処理が安定する
-                try await Task.sleep(nanoseconds: 1_000)
-                uiView.metadata = metadata
-                uiView.sizeToFit()
             }
         }
     }
