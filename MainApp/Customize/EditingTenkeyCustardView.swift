@@ -736,7 +736,7 @@ extension CustardInterfaceCustomKey {
         self.press_actions = self.press_actions.map(transform)
         self.longpress_actions.start = self.longpress_actions.start.map(transform)
         self.longpress_actions.repeat = self.longpress_actions.repeat.map(transform)
-        self.variations.mutatingForeach { variation in
+        self.variations.mutatingForEach { variation in
             variation.key.press_actions = variation.key.press_actions.map(transform)
             variation.key.longpress_actions.start = variation.key.longpress_actions.start.map(transform)
             variation.key.longpress_actions.repeat = variation.key.longpress_actions.repeat.map(transform)

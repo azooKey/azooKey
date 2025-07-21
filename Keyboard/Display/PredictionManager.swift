@@ -24,7 +24,7 @@ final class PredictionManager {
         result.text += right.text
         result.data += right.data
         result.value += right.value
-        result.correspondingCount += right.correspondingCount
+        result.composingCount = .composite(lhs: result.composingCount, rhs: right.composingCount)
         result.lastMid = right.lastMid == MIDData.EOS.mid ? left.lastMid : right.lastMid
         return result
     }

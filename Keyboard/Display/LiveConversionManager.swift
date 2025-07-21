@@ -48,7 +48,7 @@ final class LiveConversionManager {
             var clause = Candidate.makePrefixClauseCandidate(data: data)
             // ローマ字向けに補正処理を入れる
             if count == 0, let first = firstClauseCandidates.first(where: {$0.text == clause.text}) {
-                clause.correspondingCount = first.correspondingCount
+                clause.composingCount = first.composingCount
             }
             if self.headClauseCandidateHistories.count <= count {
                 self.headClauseCandidateHistories.append([clause])
@@ -69,7 +69,7 @@ final class LiveConversionManager {
         if convertTargetCursorPosition > 1, let firstCandidate = candidates.first(where: {$0.data.map {$0.ruby}.joined().count == convertTarget.count}) {
             candidate = firstCandidate
         } else {
-            candidate = .init(text: convertTarget, value: 0, correspondingCount: composingText.input.count, lastMid: MIDData.一般.mid, data: [.init(ruby: convertTarget.toKatakana(), cid: CIDData.一般名詞.cid, mid: MIDData.一般.mid, value: 0)])
+            candidate = .init(text: convertTarget, value: 0, composingCount: .inputCount(composingText.input.count), lastMid: MIDData.一般.mid, data: [.init(ruby: convertTarget.toKatakana(), cid: CIDData.一般名詞.cid, mid: MIDData.一般.mid, value: 0)])
         }
         self.adjustCandidate(candidate: &candidate)
         debug("Live Conversion:", candidate)
@@ -102,12 +102,12 @@ final class LiveConversionManager {
                 self.updateHistories(newCandidate: candidate, firstClauseCandidates: firstClauseCandidates)
             } else if diff < 0 {
                 // 削除の場合には最後尾のログを1つ落とす。
-                self.headClauseCandidateHistories.mutatingForeach {
+                self.headClauseCandidateHistories.mutatingForEach {
                     _ = $0.popLast()
                 }
             } else {
                 // 置換の場合には更新を追加で入れる。
-                self.headClauseCandidateHistories.mutatingForeach {
+                self.headClauseCandidateHistories.mutatingForEach {
                     _ = $0.popLast()
                 }
                 self.updateHistories(newCandidate: candidate, firstClauseCandidates: firstClauseCandidates)
@@ -123,7 +123,7 @@ final class LiveConversionManager {
         if let last = candidate.data.last, last.ruby.count < 2 {
             let ruby_hira = last.ruby.toHiragana()
             let newElement = DicdataElement(word: ruby_hira, ruby: last.ruby, lcid: last.lcid, rcid: last.rcid, mid: last.mid, value: last.adjustedData(0).value(), adjust: last.adjust)
-            var newCandidate = Candidate(text: candidate.data.dropLast().map {$0.word}.joined() + ruby_hira, value: candidate.value, correspondingCount: candidate.correspondingCount, lastMid: candidate.lastMid, data: candidate.data.dropLast() + [newElement])
+            var newCandidate = Candidate(text: candidate.data.dropLast().map {$0.word}.joined() + ruby_hira, value: candidate.value, composingCount: candidate.composingCount, lastMid: candidate.lastMid, data: candidate.data.dropLast() + [newElement])
             newCandidate.parseTemplate()
             debug(candidate, newCandidate)
             candidate = newCandidate

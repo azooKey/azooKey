@@ -313,7 +313,7 @@ final class InputManager {
     /// 変換を選択した場合に呼ばれる
     @MainActor func complete(candidate: Candidate) {
         self.updateLog(candidate: candidate)
-        self.composingText.prefixComplete(correspondingCount: candidate.correspondingCount)
+        self.composingText.prefixComplete(composingCount: candidate.composingCount)
         if self.displayedTextManager.shouldSkipMarkedTextChange {
             self.previousSystemOperation = .setMarkedText
         }
@@ -382,7 +382,7 @@ final class InputManager {
             candidate = Candidate(
                 text: composingText.convertTarget,
                 value: -18,
-                correspondingCount: composingText.input.count,
+                composingCount: .inputCount(composingText.input.count),
                 lastMid: MIDData.一般.mid,
                 data: [
                     DicdataElement(
@@ -400,7 +400,7 @@ final class InputManager {
         candidate.parseTemplate()
         self.updateLog(candidate: candidate)
         if shouldModifyDisplayedText {
-            self.composingText.prefixComplete(correspondingCount: candidate.correspondingCount)
+            self.composingText.prefixComplete(composingCount: candidate.composingCount)
             if self.displayedTextManager.shouldSkipMarkedTextChange {
                 self.previousSystemOperation = .setMarkedText
             }
