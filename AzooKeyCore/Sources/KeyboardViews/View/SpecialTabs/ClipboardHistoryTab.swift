@@ -6,7 +6,6 @@
 //  Copyright © 2023 ensan. All rights reserved.
 //
 
-@preconcurrency import LinkPresentation
 import SwiftUI
 import SwiftUIUtils
 import SwiftUtils
@@ -64,7 +63,6 @@ struct ClipboardHistoryTab<Extension: ApplicationSpecificKeyboardViewExtension>:
     @Environment(Extension.Theme.self) private var theme
     @Environment(\.userActionManager) private var action
 
-    @State private var cacheStore = MetadataCacheStore()
 
     init() {}
     private var listRowBackgroundColor: Color {
@@ -78,7 +76,6 @@ struct ClipboardHistoryTab<Extension: ApplicationSpecificKeyboardViewExtension>:
             index: index,
             pinned: pinned,
             backgroundColor: listRowBackgroundColor,
-            cacheStore: $cacheStore,
             onTap: { handleTileInput(item) },
             onPin: { pinItem(item: item, at: $0) },
             onUnpin: { unpinItem(item: item, at: $0) },
@@ -204,7 +201,6 @@ private struct ClipboardTileView<Extension: ApplicationSpecificKeyboardViewExten
     let index: Int?
     let pinned: Bool
     let backgroundColor: Color
-    @Binding var cacheStore: MetadataCacheStore
     let onTap: () -> Void
     let onPin: (Int) -> Void
     let onUnpin: (Int) -> Void
@@ -214,20 +210,16 @@ private struct ClipboardTileView<Extension: ApplicationSpecificKeyboardViewExten
         VStack(spacing: 0) {
             switch item.content {
             case .text(let string):
-                if string.hasPrefix("https://") || string.hasPrefix("http://"), let url = URL(string: string) {
-                    LinkTileContent(url: url, string: string, cacheStore: $cacheStore)
-                } else {
-                    TextTileContent(string: string)
-                }
+                TextTileContent(string: string)
             }
         }
-        .frame(width: 140, height: 120)
+        .frame(width: 140, height: 100)
         .background(
             RoundedRectangle(cornerRadius: 8)
                 .fill(backgroundColor)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(pinned ? Color.orange : Color.clear, lineWidth: pinned ? 2 : 0)
+                        .stroke(pinned ? Color.orange : Color.clear, lineWidth: pinned ? 1 : 0)
                 )
         )
         .onTapGesture {
@@ -265,30 +257,6 @@ private struct ClipboardTileView<Extension: ApplicationSpecificKeyboardViewExten
     }
 }
 
-private struct LinkTileContent: View {
-    let url: URL
-    let string: String
-    @Binding var cacheStore: MetadataCacheStore
-
-    var body: some View {
-        VStack(spacing: 0) {
-            RichLinkView(url: url, options: [.image, .icon], cacheStore: $cacheStore)
-                .frame(height: 80)
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                .clipped()
-                .allowsHitTesting(false)
-
-            Text(string)
-                .font(.system(size: 11))
-                .lineLimit(2)
-                .foregroundColor(.secondary)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 6)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        }
-        .frame(height: 120)
-    }
-}
 
 private struct TextTileContent: View {
     let string: String
@@ -300,7 +268,7 @@ private struct TextTileContent: View {
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .padding(8)
-            .frame(height: 120)
+            .frame(height: 100)
     }
 }
 
@@ -346,95 +314,5 @@ private struct EmptyHistoryView: View {
     }
 }
 
-private struct MetadataCacheStore: Copyable {
-    private var cache: [String: LPLinkMetadata] = [:]
-    mutating func cache(metadata: LPLinkMetadata) {
-        guard let url = metadata.url else {
-            return
-        }
-        cache[url.absoluteString] = metadata
-    }
-    func get(urlString: String) -> LPLinkMetadata? {
-        cache[urlString]
-    }
-}
 
-private struct RichLinkView: UIViewRepresentable {
-    init(url: URL, options: [RichLinkView.MetadataOption] = [], cacheStore: Binding<MetadataCacheStore>) {
-        self.url = url
-        self.options = options
-        self._cacheStore = cacheStore
-    }
 
-    class UIViewType: LPLinkView {
-        override var intrinsicContentSize: CGSize { CGSize(width: 0, height: super.intrinsicContentSize.height) }
-        var currentTask: Task<Void, Never>?
-
-        deinit {
-            currentTask?.cancel()
-        }
-    }
-
-    enum MetadataOption: Int8, Equatable {
-        case icon, image, video
-    }
-
-    var url: URL
-    var options: [MetadataOption] = []
-    @Binding var cacheStore: MetadataCacheStore
-
-    func makeUIView(context: UIViewRepresentableContext<Self>) -> UIViewType {
-        if let cachedData = self.cacheStore.get(urlString: url.absoluteString) {
-            return UIViewType(metadata: cachedData)
-        }
-        return UIViewType(url: url)
-    }
-
-    func updateUIView(_ uiView: UIViewType, context: UIViewRepresentableContext<Self>) {
-        if let cachedData = self.cacheStore.get(urlString: url.absoluteString) {
-            uiView.metadata = cachedData
-            uiView.sizeToFit()
-        } else {
-            // 既存のタスクをキャンセル
-            uiView.currentTask?.cancel()
-
-            uiView.currentTask = Task { @MainActor in
-                do {
-                    let metadata = try await LPMetadataProvider().startFetchingMetadata(for: url)
-
-                    // タスクがキャンセルされていないかチェック
-                    guard !Task.isCancelled else {
-                        return
-                    }
-
-                    if !options.contains(.video) {
-                        metadata.videoProvider = nil
-                        metadata.remoteVideoURL = nil
-                    }
-                    if !options.contains(.image) {
-                        metadata.imageProvider = nil
-                    }
-                    if !options.contains(.icon) {
-                        metadata.iconProvider = nil
-                    }
-                    self.cacheStore.cache(metadata: metadata)
-                    // このわずかな遅延を入れると処理が安定する
-                    try await Task.sleep(nanoseconds: 1_000)
-
-                    // タスクがキャンセルされていないか再度チェック
-                    guard !Task.isCancelled else {
-                        return
-                    }
-
-                    uiView.metadata = metadata
-                    uiView.sizeToFit()
-                } catch {
-                    // メタデータの取得に失敗した場合は何もしない
-                    debug("Failed to fetch metadata for URL: \(url)", error)
-                }
-            }
-        }
-    }
-}
-
-extension LPLinkMetadata: @unchecked @retroactive Sendable {}
