@@ -216,10 +216,10 @@ private struct ClipboardTileView<Extension: ApplicationSpecificKeyboardViewExten
         .frame(width: 140, height: 100)
         .background(
             RoundedRectangle(cornerRadius: 8)
-                .fill(backgroundColor)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(pinned ? Color.orange : Color.clear, lineWidth: pinned ? 1 : 0)
+                .strokeAndFill(
+                    fillContent: backgroundColor,
+                    strokeContent: pinned ? Color.orange : Color.clear,
+                    lineWidth: pinned ? 1 : 0
                 )
         )
         .onTapGesture {
