@@ -66,7 +66,7 @@ struct ClipboardHistoryTab<Extension: ApplicationSpecificKeyboardViewExtension>:
 
     init() {}
     private var listRowBackgroundColor: Color {
-        theme.prominentBackgroundColor
+        theme.normalKeyFillColor.color
     }
 
     @ViewBuilder
@@ -205,23 +205,23 @@ private struct ClipboardTileView<Extension: ApplicationSpecificKeyboardViewExten
     let onPin: (Int) -> Void
     let onUnpin: (Int) -> Void
     let onDelete: (Int) -> Void
+    @Environment(Extension.Theme.self) private var theme
 
     var body: some View {
-        VStack(spacing: 0) {
-            switch item.content {
-            case .text(let string):
-                TextTileContent(string: string)
+        RoundedRectangle(cornerRadius: 8)
+            .strokeAndFill(
+                fillContent: backgroundColor,
+                strokeContent: pinned ? Color.orange : Color.clear,
+                lineWidth: pinned ? 2 : 0
+            )
+            .padding(2)
+            .overlay {
+                switch item.content {
+                case .text(let string):
+                    TextTileContent(string: string, textColor: theme.textColor.color)
+                }
             }
-        }
-        .frame(width: 140, height: 100)
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .strokeAndFill(
-                    fillContent: backgroundColor,
-                    strokeContent: pinned ? Color.orange : Color.clear,
-                    lineWidth: pinned ? 1 : 0
-                )
-        )
+            .frame(width: 140, height: 100)
         .onTapGesture {
             onTap()
         }
@@ -260,10 +260,12 @@ private struct ClipboardTileView<Extension: ApplicationSpecificKeyboardViewExten
 
 private struct TextTileContent: View {
     let string: String
+    let textColor: Color
 
     var body: some View {
         Text(string)
             .font(.system(size: 12))
+            .foregroundColor(textColor)
             .lineLimit(5)
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -273,7 +275,7 @@ private struct TextTileContent: View {
 }
 
 private struct ClipboardSection<TileView: View>: View {
-    let title: String
+    let title: LocalizedStringKey
     let items: [ClipboardHistoryItem]
     let isPinned: Bool
     let tileView: (ClipboardHistoryItem, Int?, Bool) -> TileView
@@ -313,6 +315,3 @@ private struct EmptyHistoryView: View {
         .frame(maxWidth: .infinity, minHeight: 100)
     }
 }
-
-
-
