@@ -66,7 +66,12 @@ struct ClipboardHistoryTab<Extension: ApplicationSpecificKeyboardViewExtension>:
 
     init() {}
     private var listRowBackgroundColor: Color {
-        theme.normalKeyFillColor.color
+        // クリアテーマの場合は半透明の暗い背景を使用
+        if case .dynamic(.clear, .normal) = theme.resultBackgroundColor {
+            return Color.black.opacity(0.3)
+        } else {
+            return theme.prominentBackgroundColor
+        }
     }
 
     @ViewBuilder
