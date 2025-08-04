@@ -65,12 +65,22 @@ struct ClipboardHistoryTab<Extension: ApplicationSpecificKeyboardViewExtension>:
 
 
     init() {}
-    private var listRowBackgroundColor: Color {
-        // クリアテーマの場合は半透明の暗い背景を使用
+    // キーボードのキーと同じ配色を使用
+    private var keyBackgroundColor: Color {
+        // クリアテーマの場合は特別な処理
         if case .dynamic(.clear, .normal) = theme.resultBackgroundColor {
-            return Color.black.opacity(0.3)
+            return Color.white.opacity(0.9)
         } else {
-            return theme.prominentBackgroundColor
+            return theme.normalKeyFillColor.color
+        }
+    }
+    
+    private var keyTextColor: Color {
+        // クリアテーマの場合は読みやすい色を使用
+        if case .dynamic(.clear, .normal) = theme.resultBackgroundColor {
+            return Color.black
+        } else {
+            return theme.textColor.color
         }
     }
 
@@ -80,7 +90,8 @@ struct ClipboardHistoryTab<Extension: ApplicationSpecificKeyboardViewExtension>:
             item: item,
             index: index,
             pinned: pinned,
-            backgroundColor: listRowBackgroundColor,
+            backgroundColor: keyBackgroundColor,
+            textColor: keyTextColor,
             onTap: { handleTileInput(item) },
             onPin: { pinItem(item: item, at: $0) },
             onUnpin: { unpinItem(item: item, at: $0) },
@@ -109,8 +120,12 @@ struct ClipboardHistoryTab<Extension: ApplicationSpecificKeyboardViewExtension>:
         }
     }
 
+    @ViewBuilder
     private var tileGridView: some View {
-        ScrollView {
+        // ピン留めがない場合は縦スクロールを無効にする
+        let scrollAxes: Axis.Set = self.target.pinnedItems.isEmpty ? [] : .vertical
+        
+        ScrollView(scrollAxes) {
             VStack(spacing: 12) {
                 if !self.target.pinnedItems.isEmpty {
                     ClipboardSection(
@@ -206,11 +221,11 @@ private struct ClipboardTileView<Extension: ApplicationSpecificKeyboardViewExten
     let index: Int?
     let pinned: Bool
     let backgroundColor: Color
+    let textColor: Color
     let onTap: () -> Void
     let onPin: (Int) -> Void
     let onUnpin: (Int) -> Void
     let onDelete: (Int) -> Void
-    @Environment(Extension.Theme.self) private var theme
 
     var body: some View {
         RoundedRectangle(cornerRadius: 8)
@@ -223,7 +238,7 @@ private struct ClipboardTileView<Extension: ApplicationSpecificKeyboardViewExten
             .overlay {
                 switch item.content {
                 case .text(let string):
-                    TextTileContent(string: string, textColor: theme.textColor.color)
+                    TextTileContent(string: string, textColor: textColor)
                 }
             }
             .frame(width: 140, height: 100)
