@@ -66,22 +66,12 @@ struct ClipboardHistoryTab<Extension: ApplicationSpecificKeyboardViewExtension>:
 
     init() {}
     // キーボードのキーと同じ配色を使用
-    private var keyBackgroundColor: Color {
-        // クリアテーマの場合は特別な処理
-        if case .dynamic(.clear, .normal) = theme.resultBackgroundColor {
-            return Color.white.opacity(0.9)
-        } else {
-            return theme.normalKeyFillColor.color
-        }
+    private var keyBackgroundColor: Extension.Theme.ColorData {
+        theme.normalKeyFillColor
     }
     
     private var keyTextColor: Color {
-        // クリアテーマの場合は読みやすい色を使用
-        if case .dynamic(.clear, .normal) = theme.resultBackgroundColor {
-            return Color.black
-        } else {
-            return theme.textColor.color
-        }
+        return theme.textColor.color
     }
 
     @ViewBuilder
@@ -90,7 +80,7 @@ struct ClipboardHistoryTab<Extension: ApplicationSpecificKeyboardViewExtension>:
             item: item,
             index: index,
             pinned: pinned,
-            backgroundColor: keyBackgroundColor,
+            background: keyBackgroundColor,
             textColor: keyTextColor,
             onTap: { handleTileInput(item) },
             onPin: { pinItem(item: item, at: $0) },
@@ -220,7 +210,7 @@ private struct ClipboardTileView<Extension: ApplicationSpecificKeyboardViewExten
     let item: ClipboardHistoryItem
     let index: Int?
     let pinned: Bool
-    let backgroundColor: Color
+    let background: Extension.Theme.ColorData
     let textColor: Color
     let onTap: () -> Void
     let onPin: (Int) -> Void
@@ -229,10 +219,10 @@ private struct ClipboardTileView<Extension: ApplicationSpecificKeyboardViewExten
 
     var body: some View {
         RoundedRectangle(cornerRadius: 8)
-            .strokeAndFill(
-                fillContent: backgroundColor,
-                strokeContent: pinned ? Color.orange : Color.clear,
-                lineWidth: pinned ? 2 : 0
+            .fill(self.background.color.blendMode(self.background.blendMode))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(pinned ? Color.orange : Color.clear, lineWidth: pinned ? 2 : 0)
             )
             .padding(2)
             .overlay {
@@ -241,7 +231,7 @@ private struct ClipboardTileView<Extension: ApplicationSpecificKeyboardViewExten
                     TextTileContent(string: string, textColor: textColor)
                 }
             }
-            .frame(width: 140, height: 100)
+            .frame(width: 140, height: 80)
         .onTapGesture {
             onTap()
         }
@@ -290,7 +280,7 @@ private struct TextTileContent: View {
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .padding(8)
-            .frame(height: 100)
+            .frame(height: 80)
     }
 }
 
@@ -332,6 +322,6 @@ private struct EmptyHistoryView: View {
                 .multilineTextAlignment(.center)
                 .padding(16)
         }
-        .frame(maxWidth: .infinity, minHeight: 100)
+        .frame(maxWidth: .infinity, minHeight: 80)
     }
 }
