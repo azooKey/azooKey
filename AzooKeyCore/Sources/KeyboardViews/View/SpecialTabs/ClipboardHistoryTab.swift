@@ -301,7 +301,7 @@ private struct ClipboardSection<TileView: View>: View {
             .padding(.horizontal, 12)
 
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
+                LazyHStack(spacing: 10) {
                     ForEach(items.indices, id: \.self) { index in
                         let item = items[index]
                         tileView(item, index, isPinned)
