@@ -219,10 +219,10 @@ private struct ClipboardTileView<Extension: ApplicationSpecificKeyboardViewExten
 
     var body: some View {
         RoundedRectangle(cornerRadius: 8)
-            .fill(self.background.color.blendMode(self.background.blendMode))
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(pinned ? Color.orange : Color.clear, lineWidth: pinned ? 2 : 0)
+            .strokeAndFill(
+                fillContent: self.background.color.blendMode(self.background.blendMode),
+                strokeContent: pinned ? Color.orange : Color.clear,
+                lineWidth: pinned ? 2 : 0
             )
             .padding(2)
             .overlay {
