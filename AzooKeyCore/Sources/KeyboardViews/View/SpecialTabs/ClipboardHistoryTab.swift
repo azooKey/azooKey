@@ -34,25 +34,18 @@ private final class ClipboardHistory: ObservableObject {
     }
 
     func reload(manager: ClipboardHistoryManager) {
-        let (pinned, notPinned) = partitionItems(manager.items)
-        self.pinnedItems = pinned.sorted(by: >)
-        self.notPinnedItems = notPinned.sorted(by: >)
-        debug("reload", manager.items)
-    }
-
-    private func partitionItems(_ items: [ClipboardHistoryItem]) -> (pinned: [ClipboardHistoryItem], notPinned: [ClipboardHistoryItem]) {
-        var pinnedItems: [ClipboardHistoryItem] = []
-        var notPinnedItems: [ClipboardHistoryItem] = []
-
-        for item in items {
+        self.pinnedItems = []
+        self.notPinnedItems = []
+        for item in manager.items {
             if item.pinnedDate != nil {
-                pinnedItems.append(item)
+                self.pinnedItems.append(item)
             } else {
-                notPinnedItems.append(item)
+                self.notPinnedItems.append(item)
             }
         }
-
-        return (pinnedItems, notPinnedItems)
+        self.pinnedItems.sort(by: >)
+        self.notPinnedItems.sort(by: >)
+        debug("reload", manager.items)
     }
 }
 
