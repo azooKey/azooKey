@@ -21,6 +21,7 @@ public struct ResultModel {
     private(set) var results: [ResultData] = []
     private var predictionResults: [ResultData] = []
     private(set) var searchResults: [ResultData] = []
+    private(set) var asyncPredictionCandidate: ResultData? = nil
     private(set) var updateResult: Bool = false
     private(set) var selection: Int?
 
@@ -55,6 +56,7 @@ public struct ResultModel {
     public mutating func setResults(_ results: [any ResultViewItemData]) {
         self.results = results.indices.map {ResultData(id: $0, candidate: results[$0])}
         self.predictionResults = []
+        self.asyncPredictionCandidate = nil // 非同期候補もクリア
         self.selection = nil
         self.updateResult.toggle()
     }
@@ -65,6 +67,11 @@ public struct ResultModel {
     public mutating func setPredictionResults(_ results: [any ResultViewItemData]) {
         self.predictionResults = results.enumerated().map {ResultData(id: $0.offset, candidate: $0.element)}
         self.selection = nil
+        self.updateResult.toggle()
+    }
+    
+    public mutating func setAsyncPredictionCandidate(_ candidate: (any ResultViewItemData)?) {
+        self.asyncPredictionCandidate = candidate.map { ResultData(id: -1, candidate: $0) }
         self.updateResult.toggle()
     }
     public mutating func setSelectionRequest(_ request: CandidateSelection?) {

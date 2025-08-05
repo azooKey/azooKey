@@ -136,6 +136,33 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                         }
                         .padding(.horizontal, 5)
                     }
+                    .overlay(alignment: .trailing) {
+                        if let asyncCandidate = variableStates.resultModel.asyncPredictionCandidate {
+                            Button(action: {
+                                KeyboardFeedback<Extension>.click()
+                                self.pressed(candidate: asyncCandidate.candidate)
+                                variableStates.resultModel.setAsyncPredictionCandidate(nil)
+                            }) {
+                                Text(
+                                    Design.fonts.forceJapaneseFont(
+                                        text: asyncCandidate.candidate.text,
+                                        theme: theme,
+                                        userSizePrefrerence: Extension.SettingProvider.resultViewFontSize
+                                    )
+                                )
+                                .padding(.all, 5)
+                                .background(.thinMaterial)
+                                .cornerRadius(5)
+                            }
+                            .buttonStyle(ResultButtonStyle<Extension>(height: buttonHeight))
+                            .shadow(color: .white, radius: 5)
+                            .transition(.asymmetric(
+                                insertion: .move(edge: .trailing).combined(with: .opacity),
+                                removal: .opacity.combined(with: .scale)
+                            ))
+                        }
+                    }
+                    .animation(.easeOut(duration: 0.2), value: variableStates.resultModel.asyncPredictionCandidate != nil)
                     .zIndex(0)
                     if variableStates.resultModel.displayState == .results {
                         // 候補を展開するボタン

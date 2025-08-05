@@ -263,9 +263,32 @@ final class InputManager {
         var results = self.kanaKanjiConverter.requestPostCompositionPredictionCandidates(leftSideCandidate: candidate, options: options)
         results = self.cleaningEmojiPredictionCandidates(candidates: results, denylist: denylist)
         predictionManager.updateAfterComplete(candidate: candidate, textChangedCount: self.displayedTextManager.getTextChangedCount())
+        
+        // 同期候補を即座に表示
         if let updateResult {
             updateResult {
                 $0.setPredictionResults(results)
+                $0.setAsyncPredictionCandidate(nil) // 非同期候補をクリア
+            }
+        }
+        
+        // 非同期候補を開始
+        let currentTextChangedCount = self.displayedTextManager.getTextChangedCount()
+        let surroundingText = getSurroundingText()
+        let fullLeftContext = surroundingText.leftText.hasSuffix(candidate.text) ? surroundingText.leftText : surroundingText.leftText + candidate.text
+        predictionManager.loadAsyncPrediction(
+            leftContext: fullLeftContext,
+            rightContext: surroundingText.rightText,
+            textChangedCount: currentTextChangedCount
+        ) { [weak self] asyncCandidate in
+            guard let self = self else { return }
+            // コンテキストが変わっていないかチェック
+            if self.displayedTextManager.getTextChangedCount() == currentTextChangedCount {
+                if let updateResult = self.updateResult {
+                    updateResult {
+                        $0.setAsyncPredictionCandidate(asyncCandidate)
+                    }
+                }
             }
         }
     }
@@ -283,9 +306,32 @@ final class InputManager {
         var results = self.kanaKanjiConverter.requestPostCompositionPredictionCandidates(leftSideCandidate: newCandidate, options: options)
         results = self.cleaningEmojiPredictionCandidates(candidates: results, denylist: denylist)
         predictionManager.update(candidate: newCandidate, textChangedCount: self.displayedTextManager.getTextChangedCount())
+        
+        // 同期候補を即座に表示
         if let updateResult {
             updateResult {
                 $0.setPredictionResults(results)
+                $0.setAsyncPredictionCandidate(nil) // 非同期候補をクリア
+            }
+        }
+        
+        // 非同期候補を開始
+        let currentTextChangedCount = self.displayedTextManager.getTextChangedCount()
+        let surroundingText = getSurroundingText()
+        let fullLeftContext = surroundingText.leftText + newCandidate.text
+        predictionManager.loadAsyncPrediction(
+            leftContext: fullLeftContext,
+            rightContext: surroundingText.rightText,
+            textChangedCount: currentTextChangedCount
+        ) { [weak self] asyncCandidate in
+            guard let self = self else { return }
+            // コンテキストが変わっていないかチェック
+            if self.displayedTextManager.getTextChangedCount() == currentTextChangedCount {
+                if let updateResult = self.updateResult {
+                    updateResult {
+                        $0.setAsyncPredictionCandidate(asyncCandidate)
+                    }
+                }
             }
         }
     }
@@ -294,6 +340,7 @@ final class InputManager {
         if let updateResult {
             updateResult {
                 $0.setPredictionResults([])
+                $0.setAsyncPredictionCandidate(nil)
             }
         }
     }
@@ -949,6 +996,9 @@ final class InputManager {
             }
         }
 
+        // 通常の変換結果モードに移行するため、非同期予測をキャンセル
+        predictionManager.shouldResetPrediction(textChangedCount: self.displayedTextManager.getTextChangedCount())
+        
         if let updateResult {
             updateResult {
                 $0.setResults(results.mainResults)
