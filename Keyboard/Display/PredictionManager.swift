@@ -89,8 +89,12 @@ final class PredictionManager {
         cancelAsyncPrediction()
         #if canImport(FoundationModels)
         if #available(iOS 26, *) {
+            let model = SystemLanguageModel(useCase: .general)
+            guard model.isAvailable else {
+                print(#function, "model is not available", model.availability)
+                return
+            }
             self.asyncTask = Task {
-                let model = SystemLanguageModel(useCase: .general)
                 let session = LanguageModelSession(model: model, instructions: "Predict the completed version of input text. For example, if the input is '今日は朝', then the completion could be '今日は朝早く起きた' or something similar.")
                 let predictionPattern = Regex {
                     Regex<Substring>(verbatim: leftContext)
@@ -101,7 +105,7 @@ final class PredictionManager {
                     properties: [
                         DynamicGenerationSchema.Property(
                             name: "completion",
-                            description: "The completion of the input. You must first repeat the input, followed by the completion. At most 30 additional characters.",
+                            description: "The completion of the input. You must first repeat the input, followed by the completion. At most 10 additional characters.",
                             schema: DynamicGenerationSchema(type: String.self, guides: [.pattern(predictionPattern)])
                         )
                     ]
@@ -112,12 +116,15 @@ final class PredictionManager {
                 guard content.hasPrefix(leftContext) else {
                     return
                 }
-                let predidctionText = String(content.dropFirst(leftContext.count))
+                let predictionText = String(content.dropFirst(leftContext.count).split(separator: #/[,.!?、。！？\n]/#).first ?? "")
+                guard !predictionText.isEmpty else {
+                    return
+                }
                 await MainActor.run {
                     // モック候補を作成 - 簡単なDicdataElementを使用
-                    let mockData = DicdataElement(word: predidctionText, ruby: predidctionText, cid: CIDData.固有名詞.cid, mid: MIDData.一般.mid, value: -1000)
+                    let mockData = DicdataElement(word: predictionText, ruby: predictionText, cid: CIDData.固有名詞.cid, mid: MIDData.一般.mid, value: -1000)
                     let mockCandidate = PostCompositionPredictionCandidate(
-                        text: predidctionText,
+                        text: predictionText,
                         value: -1000,
                         type: .additional(data: [mockData])
                     )

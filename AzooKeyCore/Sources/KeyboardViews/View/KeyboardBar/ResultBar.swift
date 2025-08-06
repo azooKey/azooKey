@@ -137,7 +137,8 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                         .padding(.horizontal, 5)
                     }
                     .overlay(alignment: .trailing) {
-                        if let asyncCandidate = variableStates.resultModel.asyncPredictionCandidate {
+                        if let asyncCandidate = variableStates.resultModel.asyncPredictionCandidate,
+                           variableStates.resultModel.displayState == .predictions {
                             Button(action: {
                                 KeyboardFeedback<Extension>.click()
                                 self.pressed(candidate: asyncCandidate.candidate)
