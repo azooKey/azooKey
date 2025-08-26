@@ -24,21 +24,41 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
         self.defaultTab = defaultTab
     }
 
+    private var backgroundColor: Color {
+        if theme.picture.image != nil {
+            Color.white.opacity(0.001)
+        } else {
+            theme.backgroundColor.color
+        }
+    }
+
+
+
+    @ViewBuilder
+    private var backgroundCore: some View {
+        Rectangle()
+            .foregroundStyle(self.backgroundColor)
+            .frame(maxWidth: .infinity)
+            .overlay {
+                if let image = theme.picture.image {
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: SemiStaticStates.shared.screenWidth, height: Design.keyboardScreenHeight(upsideComponent: variableStates.upsideComponent, orientation: variableStates.keyboardOrientation))
+                }
+            }
+    }
+
     @MainActor
     public var body: some View {
         ZStack { [unowned variableStates] in
-            Rectangle()
-                .foregroundStyle(theme.backgroundColor.color)
-                .frame(maxWidth: .infinity)
-                .overlay {
-                    if let image = theme.picture.image {
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: SemiStaticStates.shared.screenWidth, height: Design.keyboardScreenHeight(upsideComponent: variableStates.upsideComponent, orientation: variableStates.keyboardOrientation))
-                            .clipped()
-                    }
-                }
+            if #available(iOS 26, *), variableStates.keyboardOrientation == .vertical {
+                backgroundCore.clipShape(
+                    UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28)
+                )
+            } else {
+                backgroundCore.clipped()
+            }
             VStack(spacing: 0) {
                 if let upsideComponent = variableStates.upsideComponent {
                     Group {
