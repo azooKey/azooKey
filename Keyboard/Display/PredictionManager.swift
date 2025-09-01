@@ -8,6 +8,10 @@
 
 import KanaKanjiConverterModule
 import KeyboardViews
+#if canImport(FoundationModels)
+import RegexBuilder
+import FoundationModels
+#endif
 
 final class PredictionManager {
     private struct State {
@@ -16,6 +20,8 @@ final class PredictionManager {
     }
 
     private var lastState: State?
+    private var asyncTask: Task<Void, any Error>?
+    private var asyncCandidate: PostCompositionPredictionCandidate?
 
     // TODO: `KanaKanjiConverter.mergeCandidates`を呼んだほうが適切
     private func mergeCandidates(_ left: Candidate, _ right: Candidate) -> Candidate {
@@ -59,11 +65,78 @@ final class PredictionManager {
     func shouldResetPrediction(textChangedCount: Int) -> Bool {
         if let lastState, lastState.textChangedCount != textChangedCount {
             self.lastState = nil
+            self.cancelAsyncPrediction()
             return true
         }
         return false
     }
+
+    func getAsyncCandidate() -> PostCompositionPredictionCandidate? {
+        asyncCandidate
+    }
+
+    func clearAsyncCandidate() {
+        asyncCandidate = nil
+    }
+
+    private func cancelAsyncPrediction() {
+        asyncTask?.cancel()
+        asyncTask = nil
+        asyncCandidate = nil
+    }
+
+    @MainActor func loadAsyncPrediction(leftContext: String, rightContext: String, textChangedCount: Int, onUpdate: @escaping @MainActor (PostCompositionPredictionCandidate) -> Void) {
+        cancelAsyncPrediction()
+        #if canImport(FoundationModels)
+        if #available(iOS 26, *) {
+            let model = SystemLanguageModel(useCase: .general)
+            guard model.isAvailable else {
+                print(#function, "model is not available", model.availability)
+                return
+            }
+            self.asyncTask = Task {
+                let session = LanguageModelSession(model: model, instructions: "Predict the completed version of input text. For example, if the input is '今日は朝', then the completion could be '今日は朝早く起きた' or something similar.")
+                let predictionPattern = Regex {
+                    Regex<Substring>(verbatim: leftContext)
+                    /.+/
+                }
+                let predictionSchema = DynamicGenerationSchema(
+                    name: "FollowingWordPrediction",
+                    properties: [
+                        DynamicGenerationSchema.Property(
+                            name: "completion",
+                            description: "The completion of the input. You must first repeat the input, followed by the completion. At most 10 additional characters.",
+                            schema: DynamicGenerationSchema(type: String.self, guides: [.pattern(predictionPattern)])
+                        )
+                    ]
+                )
+                let schema = try GenerationSchema(root: predictionSchema, dependencies: [])
+                let response = try await session.respond(to: leftContext, schema: schema)
+                let content = try response.content.value(String.self, forProperty: "completion")
+                guard content.hasPrefix(leftContext) else {
+                    return
+                }
+                let predictionText = String(content.dropFirst(leftContext.count).split(separator: #/[,.!?、。！？\n]/#).first ?? "")
+                guard !predictionText.isEmpty else {
+                    return
+                }
+                await MainActor.run {
+                    // モック候補を作成 - 簡単なDicdataElementを使用
+                    let mockData = DicdataElement(word: predictionText, ruby: predictionText, cid: CIDData.固有名詞.cid, mid: MIDData.一般.mid, value: -1000)
+                    let mockCandidate = PostCompositionPredictionCandidate(
+                        text: predictionText,
+                        value: -1000,
+                        type: .additional(data: [mockData])
+                    )
+                    self.asyncCandidate = mockCandidate
+                    onUpdate(mockCandidate)
+                }
+            }
+        }
+        #endif
+    }
 }
+
 
 extension PostCompositionPredictionCandidate: @retroactive ResultViewItemData {
     public var inputable: Bool {
