@@ -47,16 +47,8 @@ struct AzooKeyUserDictionaryView: View {
     @EnvironmentObject private var appStates: MainAppStates
 
     var body: some View {
-        Group {
-            switch variables.mode {
-            case .list:
-                UserDictionaryDataListView(variables: variables)
-            case .details:
-                if let item = self.variables.selectedItem {
-                    UserDictionaryDataEditor(item, variables: variables)
-                }
-            }
-        }
+        // Use NavigationLink-based navigation; always show list here.
+        UserDictionaryDataListView(variables: variables)
         .onDisappear {
             appStates.requestReviewManager.shouldTryRequestReview = true
         }
@@ -79,15 +71,6 @@ private struct UserDictionaryDataListView: View {
             Section {
                 Text("変換候補に単語を追加することができます。iOSの標準のユーザ辞書とは異なります。")
             }
-
-            Section {
-                Button("\(systemImage: "plus")追加する") {
-                    let id = variables.items.map {$0.id}.max()
-                    self.variables.selectedItem = UserDictionaryData.emptyData(id: (id ?? -1) + 1).makeEditableData()
-                    self.variables.mode = .details
-                }
-            }
-
             let currentGroupedItems: [String: [UserDictionaryData]] = Dictionary(grouping: variables.items, by: {$0.ruby.first.map {String($0)} ?? exceptionKey}).mapValues {$0.sorted {$0.id < $1.id}}
             let keys = currentGroupedItems.keys
             let currentKeys: [String] = keys.contains(exceptionKey) ? [exceptionKey] + keys.filter {$0 != exceptionKey}.sorted() : keys.sorted()
@@ -95,9 +78,8 @@ private struct UserDictionaryDataListView: View {
                 ForEach(currentKeys, id: \.self) {key in
                     Section(header: Text(key)) {
                         ForEach(currentGroupedItems[key]!) {data in
-                            Button {
-                                self.variables.selectedItem = data.makeEditableData()
-                                self.variables.mode = .details
+                            NavigationLink {
+                                UserDictionaryDataEditor(data.makeEditableData(), variables: variables)
                             } label: {
                                 LabeledContent {
                                     Text(data.ruby)
@@ -122,6 +104,19 @@ private struct UserDictionaryDataListView: View {
             variables.templates = TemplateData.load()
         }
         .navigationBarTitle(Text("ユーザ辞書"), displayMode: .inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                NavigationLink {
+                    let id = variables.items.map { $0.id }.max()
+                    UserDictionaryDataEditor(
+                        UserDictionaryData.emptyData(id: (id ?? -1) + 1).makeEditableData(),
+                        variables: variables
+                    )
+                } label: {
+                    Text("追加する")
+                }
+            }
+        }
     }
 
     private func delete(section: String) -> (IndexSet) -> Void {
@@ -146,6 +141,7 @@ private struct UserDictionaryDataEditor: CancelableEditor {
     @ObservedObject private var item: EditableUserDictionaryData
     @ObservedObject private var variables: UserDictManagerVariables
     @State private var selectedTemplate: (name: String, index: Int)?
+    @Environment(\.dismiss) private var dismiss
 
     // CancelableEditor Conformance
     typealias EditTarget = (EditableUserDictionaryData, [TemplateData])
@@ -398,14 +394,14 @@ private struct UserDictionaryDataEditor: CancelableEditor {
 
     private func saveAndDismiss() {
         self.save()
-        variables.mode = .list
+        dismiss()
         MainAppFeedback.success()
     }
 
     fileprivate func cancel() {
         item.reset(from: base.0)
         variables.templates = base.1
-        variables.mode = .list
+        dismiss()
     }
 
     @MainActor
