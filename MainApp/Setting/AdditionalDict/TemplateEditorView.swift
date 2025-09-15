@@ -56,7 +56,7 @@ struct RandomTemplateLiteralSettingView: View {
     @State private var doubleStringRange = (left: "0", right: "1")
     @State private var stringsString: String = "グー,チョキ,パー"
 
-    fileprivate init(_ template: Binding<TemplateData>, showPreview: Bool = true, onUpdate: ((TemplateData) -> Void)? = nil) {
+    fileprivate init(_ template: Binding<TemplateData>, onUpdate: ((TemplateData) -> Void)? = nil) {
         self._template = template
         self.onUpdate = onUpdate
         if let template = template.wrappedValue.literal as? RandomTemplateLiteral {

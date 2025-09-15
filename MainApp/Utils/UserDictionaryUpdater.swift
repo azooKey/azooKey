@@ -84,9 +84,6 @@ struct UserDictionaryUpdater {
         return (paths, useradds, hotfix)
     }
 
-    // 旧来のテンプレート名展開は無効化
-    func parseTemplate(_ word: some StringProtocol) -> String { String(word) }
-
     func makeDictionaryForm(_ data: UserDictionaryData) -> [String] {
         let katakanaRuby = data.ruby.toKatakana()
         if data.isVerb {
