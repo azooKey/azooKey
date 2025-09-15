@@ -60,7 +60,7 @@ final class EditableUserDictionaryData: ObservableObject {
     }
 
     var error: AppendError? {
-        if self.data.word.isEmpty {
+        if !self.data.isTemplateMode && self.data.word.isEmpty {
             return .wordEmpty
         }
         if self.data.ruby.isEmpty {
@@ -95,7 +95,17 @@ struct UserDictionary: Codable {
     init(items: [UserDictionaryData]) {
         self.items = items.indices.map {i in
             let item = items[i]
-            return UserDictionaryData(ruby: item.ruby.toHiragana(), word: item.word, isVerb: item.isVerb, isPersonName: item.isPersonName, isPlaceName: item.isPlaceName, id: i)
+            return UserDictionaryData(
+                ruby: item.ruby.toHiragana(),
+                word: item.word,
+                isVerb: item.isVerb,
+                isPersonName: item.isPersonName,
+                isPlaceName: item.isPlaceName,
+                id: i,
+                shared: item.shared,
+                isTemplateMode: item.isTemplateMode,
+                formatLiteral: item.formatLiteral
+            )
         }
     }
 
@@ -128,12 +138,47 @@ struct UserDictionaryData: Equatable, Identifiable, Codable {
     var isPlaceName: Bool
     let id: Int
     var shared: Bool? = false
+    var isTemplateMode: Bool = false
+    var formatLiteral: String? = nil
 
     func makeEditableData() -> EditableUserDictionaryData {
         EditableUserDictionaryData(data: self)
     }
 
     static func emptyData(id: Int) -> Self {
-        UserDictionaryData(ruby: "", word: "", isVerb: false, isPersonName: false, isPlaceName: false, id: id)
+        UserDictionaryData(ruby: "", word: "", isVerb: false, isPersonName: false, isPlaceName: false, id: id, shared: false, isTemplateMode: false, formatLiteral: nil)
+    }
+}
+
+// Codable 後方互換: 追加フィールドがない古い保存データを読み込めるようにする
+extension UserDictionaryData {
+    private enum CodingKeys: String, CodingKey {
+        case ruby, word, isVerb, isPersonName, isPlaceName, id, shared, isTemplateMode, formatLiteral
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.ruby = try container.decode(String.self, forKey: .ruby)
+        self.word = try container.decode(String.self, forKey: .word)
+        self.isVerb = (try? container.decode(Bool.self, forKey: .isVerb)) ?? false
+        self.isPersonName = (try? container.decode(Bool.self, forKey: .isPersonName)) ?? false
+        self.isPlaceName = (try? container.decode(Bool.self, forKey: .isPlaceName)) ?? false
+        self.id = try container.decode(Int.self, forKey: .id)
+        self.shared = try? container.decode(Bool.self, forKey: .shared)
+        self.isTemplateMode = (try? container.decode(Bool.self, forKey: .isTemplateMode)) ?? false
+        self.formatLiteral = try? container.decode(String.self, forKey: .formatLiteral)
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(ruby, forKey: .ruby)
+        try container.encode(word, forKey: .word)
+        try container.encode(isVerb, forKey: .isVerb)
+        try container.encode(isPersonName, forKey: .isPersonName)
+        try container.encode(isPlaceName, forKey: .isPlaceName)
+        try container.encode(id, forKey: .id)
+        try container.encode(shared, forKey: .shared)
+        try container.encode(isTemplateMode, forKey: .isTemplateMode)
+        try container.encode(formatLiteral, forKey: .formatLiteral)
     }
 }

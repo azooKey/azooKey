@@ -187,13 +187,6 @@ struct SettingTabView: View {
                 }
                 .inheritSearchKeys()
 
-                Section("テンプレート") {
-                    NavigationLink("テンプレートの管理") {
-                        TemplateListView()
-                    }
-                }
-                .searchKeys("テンプレート", "時間", "乱数", "ランダム")
-
                 Section("学習機能") {
                     LearningTypeSettingView()
                         .searchKeys("学習", "履歴")
