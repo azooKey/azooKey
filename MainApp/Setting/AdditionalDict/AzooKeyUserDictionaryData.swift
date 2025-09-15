@@ -139,7 +139,7 @@ struct UserDictionaryData: Equatable, Identifiable, Codable {
     let id: Int
     var shared: Bool? = false
     var isTemplateMode: Bool = false
-    var formatLiteral: String? = nil
+    var formatLiteral: String?
 
     func makeEditableData() -> EditableUserDictionaryData {
         EditableUserDictionaryData(data: self)

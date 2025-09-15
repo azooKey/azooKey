@@ -1,5 +1,5 @@
-import Foundation
 import AzooKeyUtils
+import Foundation
 import struct KanaKanjiConverterModule.TemplateData
 
 enum UserDictionaryMigrationRunner {

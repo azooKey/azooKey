@@ -1,6 +1,6 @@
-import XCTest
 import AzooKeyUtils
 import KanaKanjiConverterModule
+import XCTest
 
 final class UserDictionaryMigrationTests: XCTestCase {
     func makeEntry(id: Int, word: String) -> UserDictionaryEntryCore {

@@ -42,7 +42,7 @@ struct TipsTabView: View {
                         CapsLockTipsView()
                     }
                     IconNavigationLink("タイムスタンプを使う", systemImage: "clock", imageColor: imageColor) {
-                        TemplateSettingTipsView()
+                        DateLiteralSettingTipsView()
                     }
                     IconNavigationLink("キーをカスタマイズする", systemImage: "hammer", imageColor: imageColor) {
                         CustomKeyTipsView()

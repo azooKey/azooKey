@@ -1,6 +1,6 @@
-import XCTest
 @testable import AzooKeyUtils
 import KanaKanjiConverterModule
+import XCTest
 
 private final class FakeStore: KeyValueBoolDataStore {
     var dataStore: [String: Data] = [:]
@@ -48,4 +48,3 @@ final class UserDictionaryMigrationCoordinatorTests: XCTestCase {
         XCTAssertTrue(store.bool(forKey: flagKey))
     }
 }
-

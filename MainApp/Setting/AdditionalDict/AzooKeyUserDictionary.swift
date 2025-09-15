@@ -8,8 +8,8 @@
 
 import AzooKeyUtils
 import Foundation
-import SwiftUI
 import KeyboardViews
+import SwiftUI
 import struct KanaKanjiConverterModule.Candidate
 import struct KanaKanjiConverterModule.TemplateData
 import struct KanaKanjiConverterModule.DateTemplateLiteral
@@ -106,14 +106,14 @@ private struct UserDictionaryDataListView: View {
                     }.environment(\.editMode, $editMode)
                 }
             }
-#if DEBUG
+            #if DEBUG
             Section("デバッグ") {
                 Button("マイグレーション状態をリセット") {
                     UserDictionaryMigrationRunner.resetFlagForDebug()
                 }
                 .foregroundStyle(.red)
             }
-#endif
+            #endif
         }
         .onAppear {
             variables.templates = TemplateData.load()
@@ -133,8 +133,6 @@ private struct UserDictionaryDataListView: View {
             }
         }
     }
-
-
 
     private func delete(section: String) -> (IndexSet) -> Void {
         {(offsets: IndexSet) in
@@ -176,13 +174,10 @@ private struct UserDictionaryDataEditor: CancelableEditor {
         }
     }
 
-
     @State private var shareThisWord = false
     @State private var showConfirmationDialogue = false
     @State private var sending = false
     @FocusState private var focusOnWordField: Bool?
-
-
 
     @ViewBuilder
     private var wordField: some View {
@@ -198,8 +193,6 @@ private struct UserDictionaryDataEditor: CancelableEditor {
                 .submitLabel(.done)
         }
     }
-
-
 
     var body: some View {
         Form {
