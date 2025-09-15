@@ -45,6 +45,7 @@ final class EditableUserDictionaryData: ObservableObject {
         case rubyEmpty
         case wordEmpty
         case unavailableCharacter
+        case templateFormatEmpty
 
         var message: LocalizedStringKey {
             switch self {
@@ -54,13 +55,19 @@ final class EditableUserDictionaryData: ObservableObject {
                 return "単語が空です"
             case .unavailableCharacter:
                 return "読みに使用できない文字が含まれます。ひらがな、英字、数字を指定してください"
+            case .templateFormatEmpty:
+                return "時刻・ランダム変換の書式が未設定です"
             }
         }
 
     }
 
     var error: AppendError? {
-        if !self.data.isTemplateMode && self.data.word.isEmpty {
+        if self.data.isTemplateMode {
+            if (self.data.formatLiteral?.isEmpty ?? true) {
+                return .templateFormatEmpty
+            }
+        } else if self.data.word.isEmpty {
             return .wordEmpty
         }
         if self.data.ruby.isEmpty {
