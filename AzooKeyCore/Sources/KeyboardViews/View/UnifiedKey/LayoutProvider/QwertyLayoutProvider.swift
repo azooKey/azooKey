@@ -30,23 +30,8 @@ struct QwertyLayoutProvider<Extension: ApplicationSpecificKeyboardViewExtension>
         symbolsKey: any UnifiedKeyModelProtocol<Extension>,
         changeKeyboardKey: any UnifiedKeyModelProtocol<Extension>
     ) {
-        let preferred = Extension.SettingProvider.preferredLanguage
         // language key
-        let languageKey: any UnifiedKeyModelProtocol<Extension> = {
-            if let second = preferred.second {
-                return QwertyLanguageSwitchKeyModel<Extension>(languages: (preferred.first, second))
-            }
-            let target: TabData = switch preferred.first {
-            case .en_US: .system(.user_english)
-            case .ja_JP, .none, .el_GR: .system(.user_japanese)
-            }
-            return QwertyGeneralKeyModel(
-                labelType: .text(preferred.first.symbol),
-                pressActions: { _ in [.moveTab(target)] },
-                longPressActions: { _ in .none },
-                variations: [], direction: .right, showsTapBubble: false, role: .special
-            )
-        }()
+        let languageKey: any UnifiedKeyModelProtocol<Extension> = QwertyLanguageSwitchKeyModel<Extension>(languages: (.ja_JP, .en_US))
         // numbers key
         let numbersKey: any UnifiedKeyModelProtocol<Extension> = QwertyGeneralKeyModel(
             labelType: .image("textformat.123"),
@@ -112,7 +97,7 @@ struct QwertyLayoutProvider<Extension: ApplicationSpecificKeyboardViewExtension>
                 (name: ",", actions: [ActionType.input(",")], vars: [] as [String]),
                 (name: "?", actions: [ActionType.input("?")], vars: [] as [String]),
                 (name: "!", actions: [ActionType.input("!")], vars: [] as [String]),
-                (name: "…", actions: [ActionType.input("…")], vars: [] as [String])
+                (name: "…", actions: [ActionType.input("…")], vars: [] as [String]),
             ]
             let custom = Extension.SettingProvider.numberTabCustomKeysSetting.keys
             if !custom.isEmpty {
@@ -133,9 +118,9 @@ struct QwertyLayoutProvider<Extension: ApplicationSpecificKeyboardViewExtension>
                 }
             } else {
                 for (i, d) in defaults.enumerated() {
-                    let x = 1.5 + Double(i) * (7.0/5.0)
+                    let x = 1.5 + Double(i) * (7.0 / 5.0)
                     let vars = d.vars.map { QwertyVariationsModel.VariationElement(label: .text($0), actions: [.input($0)]) }
-                    dict[.init(x: x, y: 2, width: 7.0/5.0)] = QwertyGeneralKeyModel(
+                    dict[.init(x: x, y: 2, width: 7.0 / 5.0)] = QwertyGeneralKeyModel(
                         labelType: .text(d.name),
                         pressActions: { _ in d.actions },
                         longPressActions: { _ in .none },
@@ -188,12 +173,12 @@ struct QwertyLayoutProvider<Extension: ApplicationSpecificKeyboardViewExtension>
         }
         var dict: [UnifiedPositionSpecifier: any UnifiedKeyModelProtocol<Extension>] = [:]
         // Row 0
-        for (i, c) in ["q","w","e","r","t","y","u","i","o","p"].enumerated() {
+        for (i, c) in ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"].enumerated() {
             let (pos, mdl) = key(Double(i), 0, c)
             dict[pos] = mdl
         }
         // Row 1 letters + bar key at end
-        for (i, c) in ["a","s","d","f","g","h","j","k","l"].enumerated() {
+        for (i, c) in ["a", "s", "d", "f", "g", "h", "j", "k", "l"].enumerated() {
             let (pos, mdl) = key(Double(i), 1, c)
             dict[pos] = mdl
         }
@@ -202,7 +187,7 @@ struct QwertyLayoutProvider<Extension: ApplicationSpecificKeyboardViewExtension>
         // Row 2: language key at left, then letters, and delete
         let tabs = tabKeys()
         dict[.init(x: 0, y: 2, width: 1.4)] = tabs.languageKey
-        for (i, c) in ["z","x","c","v","b","n","m"].enumerated() {
+        for (i, c) in ["z", "x", "c", "v", "b", "n", "m"].enumerated() {
             let (pos, mdl) = key(1.5 + Double(i), 2, c)
             dict[pos] = mdl
         }
@@ -240,15 +225,15 @@ struct QwertyLayoutProvider<Extension: ApplicationSpecificKeyboardViewExtension>
                 role: .normal
             )
         }
-        
+
         var dict: [UnifiedPositionSpecifier: any UnifiedKeyModelProtocol<Extension>] = [:]
         // Row 0
-        for (i, c) in ["q","w","e","r","t","y","u","i","o","p"].enumerated() {
+        for (i, c) in ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"].enumerated() {
             let (pos, mdl) = key(Double(i), 0, c)
             dict[pos] = mdl
         }
         // Row 1 core letters
-        let core = ["a","s","d","f","g","h","j","k","l"].enumerated()
+        let core = ["a", "s", "d", "f", "g", "h", "j", "k", "l"].enumerated()
         switch shiftBehaviorPreference() {
         case .leftbottom:
             // No shift on row1; place core letters and dot key at end
@@ -260,7 +245,7 @@ struct QwertyLayoutProvider<Extension: ApplicationSpecificKeyboardViewExtension>
         case .left:
             dict[.init(x: 0, y: 1)] = QwertyShiftKeyModel<Extension>()
             for (i, c) in core {
-                let (pos, mdl) = key(Double(i+1), 1, c)
+                let (pos, mdl) = key(Double(i + 1), 1, c)
                 dict[pos] = mdl
             }
         case .off:
@@ -273,7 +258,7 @@ struct QwertyLayoutProvider<Extension: ApplicationSpecificKeyboardViewExtension>
         // Row 2: language key at left, then letters, and delete
         let tabsAbc = tabKeys()
         dict[.init(x: 0, y: 2, width: 1.4)] = tabsAbc.languageKey
-        for (i, c) in ["z","x","c","v","b","n","m"].enumerated() {
+        for (i, c) in ["z", "x", "c", "v", "b", "n", "m"].enumerated() {
             let (pos, mdl) = key(1.5 + Double(i), 2, c)
             dict[pos] = mdl
         }
@@ -304,13 +289,13 @@ struct QwertyLayoutProvider<Extension: ApplicationSpecificKeyboardViewExtension>
         var dict: [UnifiedPositionSpecifier: any UnifiedKeyModelProtocol<Extension>] = [:]
         // Row 0
         for (i, spec) in [
-            ("[", ["［"]), ("]", ["］"]), ("{", ["｛"]), ("}", ["｝"]), ("#", ["＃"]), ("%", ["％"]), ("^", ["＾"]), ("*", ["＊"]), ("+", ["＋","±"]), ("=", ["＝","≡","≒","≠"])].enumerated() {
+            ("[", ["［"]), ("]", ["］"]), ("{", ["｛"]), ("}", ["｝"]), ("#", ["＃"]), ("%", ["％"]), ("^", ["＾"]), ("*", ["＊"]), ("+", ["＋", "±"]), ("=", ["＝", "≡", "≒", "≠"])].enumerated() {
             let (pos, mdl) = uni(Double(i), 0, spec.0, vars: spec.1, dir: i == 9 ? .left : .right)
             dict[pos] = mdl
         }
         // Row 1
         let row1 = [
-            (0.0, "_", []), (1.0, "\\", ["/","\\"]), (2.0, ";", [":","：",";","；"]), (3.0, "|", ["｜"]), (4.0, "<", ["＜"]), (5.0, ">", ["＞"]), (6.0, "\"", ["＂","“","”"]), (7.0, "'", ["`"]), (8.0, "$", ["＄"]), (9.0, "€", ["¥","￥","$","＄","€","₿","£","¤"]) ]
+            (0.0, "_", []), (1.0, "\\", ["/", "\\"]), (2.0, ";", [":", "：", ";", "；"]), (3.0, "|", ["｜"]), (4.0, "<", ["＜"]), (5.0, ">", ["＞"]), (6.0, "\"", ["＂", "“", "”"]), (7.0, "'", ["`"]), (8.0, "$", ["＄"]), (9.0, "€", ["¥", "￥", "$", "＄", "€", "₿", "£", "¤"]) ]
         for item in row1 {
             let (pos, mdl) = uni(item.0, 1, item.1, vars: item.2, dir: item.0 == 9.0 ? .left : .right)
             dict[pos] = mdl
@@ -323,12 +308,12 @@ struct QwertyLayoutProvider<Extension: ApplicationSpecificKeyboardViewExtension>
             (",", ["、", ","]),
             ("?", ["？", "?"]),
             ("!", ["！", "!"]),
-            ("…", [])
+            ("…", []),
         ]
         for (i, spec) in punctSpecs.enumerated() {
-            let x = 1.5 + Double(i) * (7.0/5.0)
+            let x = 1.5 + Double(i) * (7.0 / 5.0)
             let vars = spec.1.map { QwertyVariationsModel.VariationElement(label: .text($0), actions: [.input($0)]) }
-            dict[.init(x: x, y: 2, width: 7.0/5.0)] = QwertyGeneralKeyModel(labelType: .text(spec.0), pressActions: { _ in [.input(spec.0)] }, longPressActions: { _ in .none }, variations: vars, direction: .center, showsTapBubble: !vars.isEmpty, role: .normal)
+            dict[.init(x: x, y: 2, width: 7.0 / 5.0)] = QwertyGeneralKeyModel(labelType: .text(spec.0), pressActions: { _ in [.input(spec.0)] }, longPressActions: { _ in .none }, variations: vars, direction: .center, showsTapBubble: !vars.isEmpty, role: .normal)
         }
         dict[.init(x: 8.6, y: 2, width: 1.4)] = QwertyGeneralKeyModel(labelType: .image("delete.left"), pressActions: { _ in [.delete(1)] }, longPressActions: { _ in .init(repeat: [.delete(1)]) }, variations: [], direction: .right, showsTapBubble: false, role: .special)
         // Row 3

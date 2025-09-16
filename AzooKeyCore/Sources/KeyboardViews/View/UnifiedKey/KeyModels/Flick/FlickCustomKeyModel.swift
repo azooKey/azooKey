@@ -1,7 +1,7 @@
-import Foundation
-import SwiftUI
 import CustardKit
+import Foundation
 import KeyboardThemes
+import SwiftUI
 
 struct FlickCustomKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: UnifiedKeyModelProtocol {
     enum ColorRole {
@@ -35,12 +35,12 @@ struct FlickCustomKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>:
 
     func isFlickAble(to direction: FlickDirection, variableStates _: VariableStates) -> Bool { flickMap.keys.contains(direction) }
 
-    func label<ThemeExtension>(width: CGFloat, theme _: ThemeData<ThemeExtension>, states _: VariableStates, color _: Color?) -> KeyLabel<Extension> where ThemeExtension : ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable {
+    func label<ThemeExtension>(width: CGFloat, theme _: ThemeData<ThemeExtension>, states _: VariableStates, color _: Color?) -> KeyLabel<Extension> where ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable {
         KeyLabel(labelType, width: width)
     }
 
     @MainActor
-    func backgroundStyleWhenUnpressed<ThemeExtension>(states: VariableStates, theme: ThemeData<ThemeExtension>) -> UnifiedKeyBackgroundStyleValue where ThemeExtension : ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable {
+    func backgroundStyleWhenUnpressed<ThemeExtension>(states: VariableStates, theme: ThemeData<ThemeExtension>) -> UnifiedKeyBackgroundStyleValue where ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable {
         // If this key's primary action is a tab move, highlight when it targets the current tab
         if let isTabMoveSelected = isMoveTabTargetSelected(states: states), isTabMoveSelected {
             return (theme.pushedKeyFillColor.color, theme.pushedKeyFillColor.blendMode)

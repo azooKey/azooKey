@@ -64,7 +64,7 @@ final class EditableUserDictionaryData: ObservableObject {
 
     var error: AppendError? {
         if self.data.isTemplateMode {
-            if (self.data.formatLiteral?.isEmpty ?? true) {
+            if self.data.formatLiteral?.isEmpty ?? true {
                 return .templateFormatEmpty
             }
         } else if self.data.word.isEmpty {

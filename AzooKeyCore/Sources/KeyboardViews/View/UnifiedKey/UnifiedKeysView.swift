@@ -42,4 +42,3 @@ public struct UnifiedKeysView<Extension: ApplicationSpecificKeyboardViewExtensio
         .frame(width: tabDesign.keysWidth, height: tabDesign.keysHeight)
     }
 }
-

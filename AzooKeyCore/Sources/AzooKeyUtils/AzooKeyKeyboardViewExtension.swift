@@ -18,10 +18,6 @@ public enum AzooKeyKeyboardViewExtension: ApplicationSpecificKeyboardViewExtensi
 }
 
 @MainActor public enum AzooKeySettingProvider: ApplicationSpecificKeyboardViewSettingProvider {
-    public static var preferredLanguage: KeyboardViews.PreferredLanguage {
-        PreferredLanguageSetting.value
-    }
-
     public static var japaneseKeyboardLayout: KeyboardViews.LanguageLayout {
         JapaneseKeyboardLayout.value
     }
@@ -150,10 +146,6 @@ public struct ClipboardHistoryManagerConfig: ClipboardHistoryManagerConfiguratio
 
 public struct TabManagerConfig: TabManagerConfiguration {
     public init() {}
-
-    public var preferredLanguage: KeyboardViews.PreferredLanguage {
-        AzooKeySettingProvider.preferredLanguage
-    }
 
     public var japaneseLayout: KeyboardViews.LanguageLayout {
         AzooKeySettingProvider.japaneseKeyboardLayout

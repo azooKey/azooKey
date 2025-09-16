@@ -49,9 +49,9 @@ struct UnifiedFlickSuggestView<Extension: ApplicationSpecificKeyboardViewExtensi
             switch (colorScheme, theme) {
             case
                 (.dark, defaultTheme):
-                    .systemGray4
+                .systemGray4
             case (.dark, nativeTheme):
-                    .systemGray3
+                .systemGray3
             default:
                 .white
             }
@@ -61,7 +61,7 @@ struct UnifiedFlickSuggestView<Extension: ApplicationSpecificKeyboardViewExtensi
             case
                 (_, defaultTheme),
                 (.dark, nativeTheme):
-                    .systemGray5
+                .systemGray5
             default:
                 .white
             }
@@ -71,7 +71,7 @@ struct UnifiedFlickSuggestView<Extension: ApplicationSpecificKeyboardViewExtensi
             case
                 (.light, defaultTheme),
                 (.light, nativeTheme):
-                    .gray
+                .gray
             default:
                 .clear
             }
@@ -292,7 +292,7 @@ private struct RoundedPentagonBottom: Shape {
             CGPoint(x: 0, y: rect.height / 3),
             CGPoint(x: 0, y: rect.height),
             CGPoint(x: rect.width, y: rect.height),
-            CGPoint(x: rect.width, y: rect.height / 3)
+            CGPoint(x: rect.width, y: rect.height / 3),
         ]
         path.addRoundedPentagon(using: points)
         return path

@@ -155,11 +155,6 @@ struct SettingTabView: View {
                 }
                 .inheritSearchKeys()
 
-                Section("言語") {
-                    PreferredLanguageSettingView()
-                }
-                .searchKeys("言語", "第一言語", "第二言語")
-
                 Section("ユーザ辞書") {
                     BoolSettingView(.useOSUserDict)
                         .searchKeys("ユーザ辞書", "追加辞書")

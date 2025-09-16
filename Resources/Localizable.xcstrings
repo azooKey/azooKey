@@ -33,23 +33,6 @@
         }
       }
     },
-    "・'year='yyyy → year=2020（固定文字は'で囲みます）" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "・'year='yyyy → year=2020 (wrap fixed text in single quotes)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "・%@" : {
       "localizations" : {
         "en" : {
@@ -88,23 +71,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "・yyyy/MM/dd HH:mm → 1234/01/23 01:23"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "・yyyy/MM/dd HH:mm → 2020/01/23 01:23" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "・yyyy/MM/dd HH:mm → 2020/01/23 01:23"
           }
         },
         "ja" : {
@@ -7677,22 +7643,6 @@
         }
       }
     },
-    "指定しない" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Don't use"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "指定なし" : {
       "localizations" : {
         "en" : {
@@ -8284,6 +8234,9 @@
         }
       }
     },
+    "時刻・ランダム変換の書式が未設定です" : {
+
+    },
     "時間" : {
       "localizations" : {
         "en" : {
@@ -8832,23 +8785,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Incorrectly formatted file"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "注: ランダムに前後の固定文字（prefix/suffix）を付ける形式は現在サポートしていません。" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Note: Random with prefix/suffix fixed text is not supported."
           }
         },
         "ja" : {
@@ -9486,38 +9422,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Space key"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "第1言語" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "First language"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "第2言語" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Second language"
           }
         },
         "ja" : {

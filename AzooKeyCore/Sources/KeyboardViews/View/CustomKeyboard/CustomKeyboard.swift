@@ -158,10 +158,10 @@ fileprivate extension CustardInterface {
                     }
                     let needSuggest = val.longpress_actions.isEmpty
                     let colorRole: QwertyGeneralKeyModel<Extension>.UnpressedRole = switch val.design.color {
-                        case .normal: .normal
-                        case .special: .special
-                        case .selected: .selected
-                        case .unimportant: .unimportant
+                    case .normal: .normal
+                    case .special: .special
+                    case .selected: .selected
+                    case .unimportant: .unimportant
                     }
                     let model = QwertyGeneralKeyModel<Extension>(
                         labelType: val.design.label.keyLabelType,

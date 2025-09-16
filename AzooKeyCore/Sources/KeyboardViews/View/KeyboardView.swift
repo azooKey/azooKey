@@ -111,7 +111,6 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
         .frame(height: Design.keyboardScreenHeight(upsideComponent: variableStates.upsideComponent, orientation: variableStates.keyboardOrientation))
     }
 
-
     @MainActor @ViewBuilder
     func renderUnified(
         modelsDict: [UnifiedPositionSpecifier: any UnifiedKeyModelProtocol<Extension>],

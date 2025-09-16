@@ -10,4 +10,3 @@ public struct FlickedKeyModel {
         self.longPressActions = longPressActions
     }
 }
-

@@ -1,7 +1,7 @@
 import CustardKit
 import Foundation
-import SwiftUI
 import KeyboardThemes
+import SwiftUI
 
 // Unified press lifecycle to support both Flick and Linear interactions (scaffolding)
 private struct PressLifecycle: Sendable {

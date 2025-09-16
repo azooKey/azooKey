@@ -25,4 +25,3 @@ struct QwertySuggestState: Equatable, Hashable, Sendable {
         }
     }
 }
-

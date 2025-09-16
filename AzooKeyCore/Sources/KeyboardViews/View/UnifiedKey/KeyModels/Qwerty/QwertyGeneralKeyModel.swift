@@ -28,7 +28,7 @@ struct QwertyGeneralKeyModel<Extension: ApplicationSpecificKeyboardViewExtension
          showsTapBubble: Bool,
          role: UnpressedRole,
          shouldUppercaseForEnglish: Bool = true
-     ) {
+    ) {
         self.labelType = labelType
         self.press = pressActions
         self.longpress = longPressActions
@@ -37,7 +37,7 @@ struct QwertyGeneralKeyModel<Extension: ApplicationSpecificKeyboardViewExtension
         self.showsBubbleFlag = showsTapBubble
         self.role = role
         self.shouldUppercaseForEnglish = shouldUppercaseForEnglish
-     }
+    }
 
     // 静的アクション版（LinearCustomの置き換え用）
     init(labelType: KeyLabelType,
@@ -48,28 +48,28 @@ struct QwertyGeneralKeyModel<Extension: ApplicationSpecificKeyboardViewExtension
          showsTapBubble: Bool,
          role: UnpressedRole,
          shouldUppercaseForEnglish: Bool = true
-     ) {
-         self.init(
-             labelType: labelType,
-             pressActions: { _ in pressActions },
-             longPressActions: { _ in longPressActions },
-             variations: variations,
-             direction: direction,
-             showsTapBubble: showsTapBubble,
+    ) {
+        self.init(
+            labelType: labelType,
+            pressActions: { _ in pressActions },
+            longPressActions: { _ in longPressActions },
+            variations: variations,
+            direction: direction,
+            showsTapBubble: showsTapBubble,
             role: role,
-             shouldUppercaseForEnglish: shouldUppercaseForEnglish
-         )
-     }
+            shouldUppercaseForEnglish: shouldUppercaseForEnglish
+        )
+    }
 
     func pressActions(variableStates: VariableStates) -> [ActionType] { press(variableStates) }
     func longPressActions(variableStates: VariableStates) -> LongpressActionType { longpress(variableStates) }
     func variationSpace(variableStates _: VariableStates) -> UnifiedVariationSpace { .linear(variations, direction: direction) }
-     @MainActor func showsTapBubble(variableStates _: VariableStates) -> Bool { showsBubbleFlag }
+    @MainActor func showsTapBubble(variableStates _: VariableStates) -> Bool { showsBubbleFlag }
 
-    func label<ThemeExtension>(width: CGFloat, theme _: ThemeData<ThemeExtension>, states: VariableStates, color: Color?) -> KeyLabel<Extension> where ThemeExtension : ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable {
+    func label<ThemeExtension>(width: CGFloat, theme _: ThemeData<ThemeExtension>, states: VariableStates, color: Color?) -> KeyLabel<Extension> where ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable {
         // Emulate QwertyKeyModel: uppercase for en_US when shifted or caps（必要時のみ）
         if shouldUppercaseForEnglish,
-           (states.boolStates.isCapsLocked || states.boolStates.isShifted),
+           states.boolStates.isCapsLocked || states.boolStates.isShifted,
            states.keyboardLanguage == .en_US,
            case let .text(text) = labelType {
             return KeyLabel(.text(text.uppercased()), width: width, textColor: color)
@@ -77,8 +77,7 @@ struct QwertyGeneralKeyModel<Extension: ApplicationSpecificKeyboardViewExtension
         return KeyLabel(labelType, width: width, textColor: color)
     }
 
-
-    func backgroundStyleWhenUnpressed<ThemeExtension>(states _: VariableStates, theme: ThemeData<ThemeExtension>) -> UnifiedKeyBackgroundStyleValue where ThemeExtension : ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable {
+    func backgroundStyleWhenUnpressed<ThemeExtension>(states _: VariableStates, theme: ThemeData<ThemeExtension>) -> UnifiedKeyBackgroundStyleValue where ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable {
         switch role {
         case .normal: (theme.normalKeyFillColor.color, theme.normalKeyFillColor.blendMode)
         case .special: (theme.specialKeyFillColor.color, theme.specialKeyFillColor.blendMode)

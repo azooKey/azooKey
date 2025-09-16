@@ -55,11 +55,9 @@ struct UnifiedQwertySuggestView<Extension: ApplicationSpecificKeyboardViewExtens
         return Path { path in
             var points = [CGPoint]()
             points.append(contentsOf: [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: BC)])
-            if ldw > 0 { points.append(CGPoint(x: ldw + _CD.width, y: BC)) }
-            else { points.append(CGPoint(x: ldw + _CD.width, y: BC + _CD.height)) }
+            if ldw > 0 { points.append(CGPoint(x: ldw + _CD.width, y: BC)) } else { points.append(CGPoint(x: ldw + _CD.width, y: BC + _CD.height)) }
             points.append(contentsOf: [CGPoint(x: ldw + _CD.width, y: height), CGPoint(x: ldw + _CD.width + EF, y: height)])
-            if rdw > 0 { points.append(CGPoint(x: ldw + _CD.width + EF, y: BC)) }
-            else { points.append(CGPoint(x: ldw + _CD.width + EF, y: BC + _CD.height)) }
+            if rdw > 0 { points.append(CGPoint(x: ldw + _CD.width + EF, y: BC)) } else { points.append(CGPoint(x: ldw + _CD.width + EF, y: BC + _CD.height)) }
             points.append(contentsOf: [CGPoint(x: width, y: BC), CGPoint(x: width, y: 0)])
             path.addPoints(points, cornerRadius: 4)
         }.offsetBy(dx: -(ldw + _CD.width), dy: 0)
@@ -76,7 +74,7 @@ struct UnifiedQwertySuggestView<Extension: ApplicationSpecificKeyboardViewExtens
         let dw = keyViewSize.width * CGFloat(variationsCount - 1) + tabDesign.horizontalSpacing * CGFloat(variationsCount - 1)
         switch direction {
         case .center:
-            return expandedPath(rdw: dw/2, ldw: dw/2, keyWidth: keyWidth, tabDesign: tabDesign)
+            return expandedPath(rdw: dw / 2, ldw: dw / 2, keyWidth: keyWidth, tabDesign: tabDesign)
                 .strokeAndFill(fillContent: color, strokeContent: borderColor, lineWidth: borderWidth)
                 .frame(width: keyWidth, height: height)
         case .right:

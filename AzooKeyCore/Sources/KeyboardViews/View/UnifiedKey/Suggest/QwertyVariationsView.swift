@@ -25,7 +25,7 @@ struct QwertyVariationsView<Extension: ApplicationSpecificKeyboardViewExtension>
         // ポインテッド時の色を定義
         return switch (colorScheme, theme) {
         case (.dark, nativeTheme):
-                .white
+            .white
         default:
             theme.suggestLabelTextColor?.color ?? .black
         }
@@ -53,4 +53,3 @@ struct QwertyVariationsView<Extension: ApplicationSpecificKeyboardViewExtension>
         KeyLabel(labelType, width: tabDesign.keyViewWidth, textColor: textColor)
     }
 }
-

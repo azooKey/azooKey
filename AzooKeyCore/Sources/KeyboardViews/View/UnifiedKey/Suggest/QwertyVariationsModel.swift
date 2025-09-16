@@ -43,4 +43,3 @@ public struct QwertyVariationsModel {
         return min(max(Int(selection), 0), Int(count) - 1)
     }
 }
-

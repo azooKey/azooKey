@@ -14,4 +14,3 @@ extension FlickDirection: @retroactive CustomStringConvertible {
         }
     }
 }
-

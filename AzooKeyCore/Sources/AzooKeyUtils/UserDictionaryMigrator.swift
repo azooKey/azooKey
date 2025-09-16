@@ -177,7 +177,7 @@ protocol KeyValueBoolDataStore {
 }
 
 public struct UserDictionaryMigrationCoordinator {
-    static func runIfNeeded(store: any KeyValueBoolDataStore, flagKey: String = "user_dict_migration_v1_done", backupKey: String = "user_dict_backup_v1", currentRawData: Data?, currentEntries: [UserDictionaryEntryCore], templates: [TemplateData]) -> (entries: [UserDictionaryEntryCore], didMigrate: Bool) {
+    @MainActor static func runIfNeeded(store: any KeyValueBoolDataStore, flagKey: String = "user_dict_migration_v1_done", backupKey: String = "user_dict_backup_v1", currentRawData: Data?, currentEntries: [UserDictionaryEntryCore], templates: [TemplateData]) -> (entries: [UserDictionaryEntryCore], didMigrate: Bool) {
         if store.bool(forKey: flagKey) {
             return (currentEntries, false)
         }
@@ -207,7 +207,7 @@ struct KeyValueBoolDataStoreWrapper: KeyValueBoolDataStore {
 }
 
 public extension UserDictionaryMigrationCoordinator {
-    static func runIfNeeded(userDefaults: UserDefaults, flagKey: String = "user_dict_migration_v1_done", backupKey: String = "user_dict_backup_v1", currentRawData: Data?, currentEntries: [UserDictionaryEntryCore], templates: [TemplateData]) -> (entries: [UserDictionaryEntryCore], didMigrate: Bool) {
+    @MainActor static func runIfNeeded(userDefaults: UserDefaults, flagKey: String = "user_dict_migration_v1_done", backupKey: String = "user_dict_backup_v1", currentRawData: Data?, currentEntries: [UserDictionaryEntryCore], templates: [TemplateData]) -> (entries: [UserDictionaryEntryCore], didMigrate: Bool) {
         let wrapper = KeyValueBoolDataStoreWrapper(defaults: userDefaults)
         return runIfNeeded(store: wrapper, flagKey: flagKey, backupKey: backupKey, currentRawData: currentRawData, currentEntries: currentEntries, templates: templates)
     }

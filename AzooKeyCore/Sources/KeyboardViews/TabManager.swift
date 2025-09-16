@@ -152,17 +152,7 @@ public struct TabManager {
     @MainActor mutating func initialize(variableStates: VariableStates) {
         switch lastTab {
         case .none:
-            let targetTab: KeyboardTab = {
-                switch config.preferredLanguage.first {
-                case .en_US:
-                    return .user_dependent(.english)
-                case .ja_JP:
-                    return .user_dependent(.japanese)
-                case .none, .el_GR:
-                    return .user_dependent(.japanese)
-                }
-            }()
-            self.moveTab(to: targetTab, variableStates: variableStates)
+            self.moveTab(to: .user_dependent(.japanese), variableStates: variableStates)
         case let .existential(tab):
             self.moveTab(to: tab, variableStates: variableStates)
         case let .user_dependent(tab):
@@ -196,14 +186,7 @@ public struct TabManager {
     }
 
     @MainActor private static func getDefaultTab(config: any TabManagerConfiguration) -> (existentialTab: KeyboardTab.ExistentialTab, managerTab: ManagerTab) {
-        switch config.preferredLanguage.first {
-        case .ja_JP:
-            return (actualTab(of: KeyboardTab.UserDependentTab.japanese, config: config), .user_dependent(.japanese))
-        case .en_US:
-            return (actualTab(of: KeyboardTab.UserDependentTab.english, config: config), .user_dependent(.english))
-        default:
-            return (actualTab(of: KeyboardTab.UserDependentTab.japanese, config: config), .user_dependent(.japanese))
-        }
+        (actualTab(of: KeyboardTab.UserDependentTab.japanese, config: config), .user_dependent(.japanese))
     }
 
     @MainActor mutating func setTemporalTab(_ destination: KeyboardTab, variableStates: VariableStates) {
@@ -265,7 +248,6 @@ public struct TabManager {
 }
 
 public protocol TabManagerConfiguration {
-    @MainActor var preferredLanguage: PreferredLanguage { get }
     @MainActor var japaneseLayout: LanguageLayout { get }
     @MainActor var englishLayout: LanguageLayout { get }
     var custardManager: any CustardManagerProtocol { get }

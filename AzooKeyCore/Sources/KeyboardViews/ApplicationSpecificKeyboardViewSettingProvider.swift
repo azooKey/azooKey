@@ -16,8 +16,6 @@ import Foundation
 
     static var numberTabCustomKeysSetting: QwertyCustomKeysValue { get }
 
-    static var preferredLanguage: PreferredLanguage { get }
-
     static var japaneseKeyboardLayout: LanguageLayout { get }
     static var englishKeyboardLayout: LanguageLayout { get }
 

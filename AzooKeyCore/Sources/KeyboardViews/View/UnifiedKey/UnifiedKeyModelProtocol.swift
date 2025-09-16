@@ -1,7 +1,7 @@
+import CustardKit
 import Foundation
 import KeyboardThemes
 import SwiftUI
-import CustardKit
 
 public typealias UnifiedKeyBackgroundStyleValue = (color: Color, blendMode: BlendMode)
 
@@ -36,10 +36,10 @@ public protocol UnifiedKeyModelProtocol<Extension> {
 
 public extension UnifiedKeyModelProtocol {
     @MainActor func doublePressActions(variableStates _: VariableStates) -> [ActionType] { [] }
-    @MainActor func isFlickAble(to direction : FlickDirection, variableStates _: VariableStates) -> Bool { false }
-    @MainActor func flickSensitivity(to direction : FlickDirection) -> CGFloat { 25 / Extension.SettingProvider.flickSensitivity }
+    @MainActor func isFlickAble(to direction: FlickDirection, variableStates _: VariableStates) -> Bool { false }
+    @MainActor func flickSensitivity(to direction: FlickDirection) -> CGFloat { 25 / Extension.SettingProvider.flickSensitivity }
     @MainActor func showsTapBubble(variableStates _: VariableStates) -> Bool { false }
-    @MainActor func backgroundStyleWhenPressed<ThemeExtension>(theme: ThemeData<ThemeExtension>) -> UnifiedKeyBackgroundStyleValue where ThemeExtension : ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable {
+    @MainActor func backgroundStyleWhenPressed<ThemeExtension>(theme: ThemeData<ThemeExtension>) -> UnifiedKeyBackgroundStyleValue where ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable {
         (theme.pushedKeyFillColor.color, theme.pushedKeyFillColor.blendMode)
     }
 }

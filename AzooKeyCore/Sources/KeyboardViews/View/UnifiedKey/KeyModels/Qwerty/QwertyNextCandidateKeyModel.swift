@@ -21,7 +21,7 @@ struct QwertyNextCandidateKeyModel<Extension: ApplicationSpecificKeyboardViewExt
         .none
     }
 
-    func label<ThemeExtension>(width: CGFloat, theme _: ThemeData<ThemeExtension>, states: VariableStates, color: Color?) -> KeyLabel<Extension> where ThemeExtension : ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable {
+    func label<ThemeExtension>(width: CGFloat, theme _: ThemeData<ThemeExtension>, states: VariableStates, color: Color?) -> KeyLabel<Extension> where ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable {
         if states.resultModel.results.isEmpty {
             switch states.keyboardLanguage {
             case .el_GR:
@@ -36,13 +36,12 @@ struct QwertyNextCandidateKeyModel<Extension: ApplicationSpecificKeyboardViewExt
         }
     }
 
-    func backgroundStyleWhenUnpressed<ThemeExtension>(states _: VariableStates, theme: ThemeData<ThemeExtension>) -> UnifiedKeyBackgroundStyleValue where ThemeExtension : ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable {
+    func backgroundStyleWhenUnpressed<ThemeExtension>(states _: VariableStates, theme: ThemeData<ThemeExtension>) -> UnifiedKeyBackgroundStyleValue where ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable {
         // QwertyNextCandidateKeyModel uses normal background by default
         (theme.normalKeyFillColor.color, theme.normalKeyFillColor.blendMode)
     }
 
     func feedback(variableStates: VariableStates) {
-        if variableStates.resultModel.results.isEmpty { KeyboardFeedback<Extension>.click() }
-        else { KeyboardFeedback<Extension>.tabOrOtherKey() }
+        if variableStates.resultModel.results.isEmpty { KeyboardFeedback<Extension>.click() } else { KeyboardFeedback<Extension>.tabOrOtherKey() }
     }
 }
