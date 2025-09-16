@@ -56,6 +56,7 @@ struct ContentView: View {
                 } catch {
                     print(error)
                 }
+                UserDictionaryMigrationRunner.runIfNeeded()
             }
             .fullScreenCover(isPresented: $appStates.requireFirstOpenView, content: {
                 // キーボードは有効化されているが正しく終了していない場合

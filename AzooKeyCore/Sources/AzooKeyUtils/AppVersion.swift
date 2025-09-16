@@ -77,4 +77,7 @@ public extension AppVersion {
     static let azooKey_v1_8 = AppVersion("1.8")!
     static let azooKey_v1_7_2 = AppVersion("1.7.2")!
     static let azooKey_v1_7_1 = AppVersion("1.7.1")!
+    /// The next app version used for feature gates before finalizing the release version.
+    /// Adjust this to the decided version (e.g., "3.1.0" or "3.0.1") before release.
+    public static var nextVersion: AppVersion = AppVersion("3.1.0")!
 }

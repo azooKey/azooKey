@@ -84,30 +84,13 @@ struct UserDictionaryUpdater {
         return (paths, useradds, hotfix)
     }
 
-    func parseTemplate(_ word: some StringProtocol) -> String {
-        if let range = word.range(of: "\\{\\{.*?\\}\\}", options: .regularExpression) {
-            let center: String
-            if let data = templateData.first(where: {$0.name == word[range].dropFirst(2).dropLast(2)}) {
-                center = data.literal.export()
-            } else {
-                center = String(word[range])
-            }
-
-            let left = word[word.startIndex..<range.lowerBound]
-            let right = word[range.upperBound..<word.endIndex]
-            return parseTemplate(left) + center + parseTemplate(right)
-        } else {
-            return String(word)
-        }
-    }
-
     func makeDictionaryForm(_ data: UserDictionaryData) -> [String] {
         let katakanaRuby = data.ruby.toKatakana()
         if data.isVerb {
             let cid = 772
             let conjunctions = ConjunctionBuilder.getConjugations(data: (word: data.word, ruby: katakanaRuby, cid: cid), addStandardForm: true)
             return conjunctions.map {
-                "\($0.ruby)\t\(parseTemplate($0.word))\t\($0.cid)\t\($0.cid)\t\(501)\t-5.0000"
+                "\($0.ruby)\t\($0.word)\t\($0.cid)\t\($0.cid)\t\(501)\t-5.0000"
             }
         }
         let cid: Int
@@ -118,7 +101,14 @@ struct UserDictionaryUpdater {
         } else {
             cid = CIDData.固有名詞.cid
         }
-        return ["\(katakanaRuby)\t\(parseTemplate(data.word))\t\(cid)\t\(cid)\t\(501)\t-5.0000"]
+        // 変換モード: 直接リテラル（<date …> / <random …> など）を埋め込む
+        let exportedWord: String
+        if data.isTemplateMode, let literal = data.formatLiteral, !literal.isEmpty {
+            exportedWord = literal
+        } else {
+            exportedWord = data.word
+        }
+        return ["\(katakanaRuby)\t\(exportedWord)\t\(cid)\t\(cid)\t\(501)\t-5.0000"]
     }
 
     func makeDictionaryForm(_ data: HotfixDictionaryV1.Entry) -> [String] {

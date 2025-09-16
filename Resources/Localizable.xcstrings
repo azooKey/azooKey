@@ -17,6 +17,39 @@
         }
       }
     },
+    "・'year='yyyy → year=1234（固定文字は'で囲みます）" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "・'year='yyyy → year=1234 (wrap fixed text in single quotes)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
+    },
+    "・'year='yyyy → year=2020（固定文字は'で囲みます）" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "・'year='yyyy → year=2020 (wrap fixed text in single quotes)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
+    },
     "・%@" : {
       "localizations" : {
         "en" : {
@@ -33,12 +66,12 @@
         }
       }
     },
-    "・カスタム書式に「yyyy/MM/dd hh:mm」と入力" : {
+    "・EEE a HH:mm → 木 午前 01:23" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Input custom format as 'yyyy/MM/dd hh:mm'."
+            "value" : "・EEE a HH:mm → Thu AM 01:23"
           }
         },
         "ja" : {
@@ -49,12 +82,12 @@
         }
       }
     },
-    "・名前を「タイムスタンプ」に設定" : {
+    "・yyyy/MM/dd HH:mm → 1234/01/23 01:23" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Set 'Name' as 'TimeStamp'."
+            "value" : "・yyyy/MM/dd HH:mm → 1234/01/23 01:23"
           }
         },
         "ja" : {
@@ -65,92 +98,13 @@
         }
       }
     },
-    "・書式で「カスタム」を選択" : {
+    "・yyyy/MM/dd HH:mm → 2020/01/23 01:23" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select 'カスタム' for 'Format'."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "{{%@}}というテンプレートが見つかりません。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Template {{%@}} is not found"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "{{%@}}を新規作成" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Create {{%@}}"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "{{%@}}を編集できます" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can edit {{%@}}"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "{{タイムスタンプ}}" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "{{TimeStamp}}"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "{{テンプレート名}}" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "{{TemplateName}}"
+            "value" : "・yyyy/MM/dd HH:mm → 2020/01/23 01:23"
           }
         },
         "ja" : {
@@ -250,22 +204,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Converts an entered Unicode code point to the corresponding character, e.g., 'u3042' → 'あ'. Prefixes u, u+, U, and U+ are supported."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "「yyyy/MM/dd hh:mm」というのは日付の書式の書き方で、「yyyy」が4桁の年、「MM」が2桁の月、「dd」は2桁の日付を指しています。「hh」と「mm」も同様に時間と分です。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "'yyyy/MM/dd hh:mm' is a date format: 'yyyy' is the 4-digit year, 'MM' the 2-digit month, 'dd' the 2-digit day. 'hh' and 'mm' are the hour and minute."
           }
         },
         "ja" : {
@@ -953,6 +891,22 @@
         }
       }
     },
+    "1. 設定 → ユーザ辞書 → azooKeyユーザ辞書 を開く" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1. Open Settings → User Dictionary → azooKey User Dictionary"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
+    },
     "1文字ずつ移動したい場合は%@の%@部分または%@部分をタップすることでそれぞれの方向に1文字ずつ移動します。" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -960,6 +914,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "To move one character at a time, tap the %1$@’s %2$@ section or the %3$@ section; the cursor moves one character in each direction."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
+    },
+    "2. 右上の「追加する」を押す" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2. Tap Add in the top right"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
+    },
+    "3. 編集画面で「時刻・ランダム変換」をオンにする" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3. Turn on 'Time/Random Conversion' in the editor"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
+    },
+    "4. 「時刻」を選び、プリセット（yyyy/MM/dd, HH:mm など）かカスタム書式を入力する" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4. Choose 'Time' and select a preset (e.g. yyyy/MM/dd, HH:mm) or enter a custom format"
           }
         },
         "ja" : {
@@ -1028,44 +1030,12 @@
         }
       }
     },
-    "azooKeyでは「テンプレート」という機能を使うことで、時刻や乱数などを用いた高度な変換を定義することが可能です。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Using the 'Template' feature, you can define special conversions relating to dates and random values."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "azooKeyではキーボード上で文字を拡大して表示することができます。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "On azooKey, you can zoom letters and check them."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "azooKeyではこの他にも、「ズレ」を設定することで昨日や明日の日付を表示したり、乱数を用いるテンプレートを設定したりすることができます。お試しください。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "In azooKey, you can also set yesterday or tomorrow's date using 'delta' and templates that use random values. Let's try!"
           }
         },
         "ja" : {
@@ -1403,17 +1373,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
-          }
-        }
-      }
-    },
-    "Hotfix not found" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hotfix not found"
           }
         }
       }
@@ -3133,18 +3092,12 @@
         }
       }
     },
-    "ここでは「2020/01/23 01:23」という形式のタイムスタンプを作ってみます。" : {
+    "ここでは「1234/01/23 01:23」という形式のタイムスタンプを作ってみます。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Here we make '2020/01/23 01:23' style time stamp."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
+            "value" : "Here, we'll create a timestamp in the 1234/01/23 01:23 format."
           }
         }
       }
@@ -3394,6 +3347,16 @@
         }
       }
     },
+    "このテンプレートのサポートは廃止されました。エントリを削除してください。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This template is no longer supported. Please delete the entry."
+          }
+        }
+      }
+    },
     "このとき、実際のキーボードでは「(」を入力し、「)」を入力し、ついで「確定」を押します。azooKeyは自動でカーソルを移動するので、これで実現したい操作が完了します。" : {
       "localizations" : {
         "en" : {
@@ -3452,22 +3415,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "This operation cannot be canceled."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "この書式を使って他にもカスタマイズが可能です。「hh」ではなく「HH」を使うことで24時間表記にすることができます。また「M」一文字を使った場合は「01」月ではなく「1」月と表示されます。「ss」で秒を、「EEE」で曜日を、「a」で午前/午後を表示することもできます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Using this format, you can define other styles. Using 'HH' instead of 'hh', you can get 24-hour notation. Using only 'M', it displays '1月', not '01月'. 'ss' represents the current second, 'EEE' represents the current day, 'a' represents AM or PM."
           }
         },
         "ja" : {
@@ -4423,112 +4370,6 @@
         }
       }
     },
-    "テンプレート" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Templates"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "テンプレートの管理" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Manage templates"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "テンプレートの設定" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Setting Templates"
-          }
-        }
-      }
-    },
-    "テンプレートを編集" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit template"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "テンプレートを編集する" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit template"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "テンプレートを選ぶ" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select template"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "テンプレート名" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Name of template"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "どちらの入力方式でも%@は大文字固定になっていることを意味します。" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4717,6 +4558,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hiragana"
+          }
+        }
+      }
+    },
+    "ヒント: 「M」を1文字にすると先頭ゼロなし（1月→1）になります。「HH」は24時間表記、「ss」は秒、「EEE」は曜日、「a」は午前/午後を表します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: A single 'M' removes the leading zero (Jan → 1). 'HH' is 24-hour, 'ss' seconds, 'EEE' weekday, and 'a' AM/PM."
           }
         }
       }
@@ -5256,17 +5107,6 @@
         }
       }
     },
-    "ホットフィックス" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hotfix"
-          }
-        }
-      }
-    },
     "まず「テンプレートの管理」から新しいテンプレートを作成します。画面右上の%@を押して、テンプレートを追加しましょう。" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5434,6 +5274,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "When you use the template in the text replacement, input as '%@'."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
+    },
+    "ユーザ辞書の編集画面で「時刻・ランダム変換」を使うと、現在の日時やランダム値を自動生成できます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Using 'Time/Random Conversion' in the user dictionary editor automatically generates the current date/time or a random value."
           }
         },
         "ja" : {
@@ -5634,6 +5490,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        }
+      }
+    },
+    "ランダム値を使う場合は「ランダム」を選んで、整数/小数/文字列から選び範囲や内容を設定します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For random values, choose 'Random' and configure Integer/Double/String and the range or items."
           }
         }
       }
@@ -5961,22 +5827,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "We created 'Timestamp' template, so input %@."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "以上で設定が完了です。あとは実際に使ってみましょう。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "All the settings are now done. Let's use it."
           }
         },
         "ja" : {
@@ -6877,6 +6727,22 @@
         }
       }
     },
+    "単語欄にプレビューが表示され、現在時刻での結果を確認できます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A preview appears in the Word field so you can check the current-time result."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
+    },
     "参考情報" : {
       "localizations" : {
         "en" : {
@@ -6993,44 +6859,12 @@
         }
       }
     },
-    "名前" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Name"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "名前が重複しています" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "This name is already used"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "名前を入力してください" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Please input name"
           }
         },
         "ja" : {
@@ -7736,6 +7570,16 @@
         }
       }
     },
+    "手順" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Steps"
+          }
+        }
+      }
+    },
     "手順を見る" : {
       "localizations" : {
         "en" : {
@@ -8430,6 +8274,16 @@
         }
       }
     },
+    "時刻・ランダム変換" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time/Random Conversion"
+          }
+        }
+      }
+    },
     "時間" : {
       "localizations" : {
         "en" : {
@@ -8550,6 +8404,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        }
+      }
+    },
+    "書式の例" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format examples"
           }
         }
       }
@@ -8930,22 +8794,6 @@
         }
       }
     },
-    "次にユーザ辞書でテンプレートを使います。「追加する」から新規に単語を登録し、編集画面が開きます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Next, let's use this template in the text replacement. Tap 'Add' and new text replacement editing view opens."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "次候補キー" : {
       "localizations" : {
         "en" : {
@@ -8984,6 +8832,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Incorrectly formatted file"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
+    },
+    "注: ランダムに前後の固定文字（prefix/suffix）を付ける形式は現在サポートしていません。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note: Random with prefix/suffix fixed text is not supported."
           }
         },
         "ja" : {
@@ -9789,22 +9654,6 @@
         }
       }
     },
-    "編集が終わったら完了ボタンを押してください。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "When you finish editing, push the 'Done' button."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "編集したいキーを選択してください。" : {
       "localizations" : {
         "en" : {
@@ -9871,22 +9720,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancel editing"
-          }
-        }
-      }
-    },
-    "編集画面で次のように設定します。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "On the editing view, set as follows:"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
           }
         }
       }
@@ -10485,16 +10318,6 @@
         }
       }
     },
-    "設定方法" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hint"
-          }
-        }
-      }
-    },
     "詳しい設定" : {
       "localizations" : {
         "en" : {
@@ -10800,22 +10623,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "追加したテンプレートを選ぶと編集画面が開きます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select the template you added, and the editing view opens."
           }
         },
         "ja" : {

@@ -1,62 +1,22 @@
-//
-//  TemplateEditingView.swift
-//  MainApp
-//
-//  Created by ensan on 2020/12/20.
-//  Copyright © 2020 ensan. All rights reserved.
-//
-
 import Foundation
 import KanaKanjiConverterModule
 import SwiftUI
 import SwiftUIUtils
 import SwiftUtils
 
-struct TemplateEditingView: CancelableEditor {
-    enum Appearance {
-        case form
-        case embed(saveProcess: (TemplateData) -> Void)
-    }
-
-    struct Options {
-        var nameEdit: Bool = true
-        var appearance: Appearance = .form
-    }
-
-    @Environment(\.dismiss) private var dismiss
-    internal let base: TemplateData
-    private let options: Options
-    @Binding private var template: TemplateData
+struct TemplateEditorView: View {
+    private let saveProcess: (TemplateData) -> Void
     @State private var editingTemplate: TemplateData
-    // 名前の一覧
-    private let validationInfo: [String]
 
-    init(_ template: Binding<TemplateData>, validationInfo: [String], options: Options = Options()) {
+    init(_ template: Binding<TemplateData>, saveProcess: @escaping (TemplateData) -> Void) {
         debug("TemplateEditingView.init", template.wrappedValue)
-        self._template = template
-        self.base = template.wrappedValue
         self._editingTemplate = State(initialValue: template.wrappedValue)
-        self.validationInfo = validationInfo
-        self.options = options
+        self.saveProcess = saveProcess
     }
 
     @MainActor
     @ViewBuilder
     private var editorCore: some View {
-        if options.nameEdit {
-            VStack {
-                HStack {
-                    Text("名前")
-                    TextField("テンプレート名", text: $editingTemplate.name)
-                        .textFieldStyle(.roundedBorder)
-                        .submitLabel(.done)
-                }
-                if case let .nameError(message) = validation() {
-                    Label(message, systemImage: "exclamationmark.triangle")
-                        .foregroundStyle(.primary)
-                }
-            }
-        }
         Picker(selection: $editingTemplate.type, label: Text("")) {
             Text("時刻").tag(TemplateLiteralType.date)
             Text("ランダム").tag(TemplateLiteralType.random)
@@ -65,63 +25,17 @@ struct TemplateEditingView: CancelableEditor {
         .pickerStyle(.segmented)
         switch editingTemplate.type {
         case .date:
-            DateTemplateLiteralSettingView($editingTemplate)
+            DateTemplateLiteralSettingView($editingTemplate, onUpdate: saveProcess)
         case .random:
-            RandomTemplateLiteralSettingView($editingTemplate)
+            RandomTemplateLiteralSettingView($editingTemplate, onUpdate: saveProcess)
         }
     }
 
     var body: some View {
-        switch options.appearance {
-        case .form:
-            Form {
-                editorCore
+        editorCore
+            .onDisappear {
+                saveProcess(editingTemplate)
             }
-            .navigationBarTitle(Text("テンプレートを編集"), displayMode: .inline)
-            .navigationBarBackButtonHidden(true)
-            .navigationBarItems(
-                leading: Button("キャンセル", action: cancel),
-                trailing: Button("完了", action: save)
-            )
-        case .embed(let save):
-            editorCore
-                .onDisappear {
-                    save(editingTemplate)
-                }
-        }
-    }
-
-    private enum ValidationResult {
-        case success
-        case nameError(LocalizedStringKey)
-    }
-
-    private func validation() -> ValidationResult {
-        if editingTemplate.name.isEmpty {
-            return .nameError("名前を入力してください")
-        }
-        if editingTemplate.name != base.name {
-            let sames = validationInfo.filter {$0 == editingTemplate.name}
-            if sames.count == 1 {
-                return .nameError("名前が重複しています")
-            }
-        }
-        return .success
-    }
-
-    private func save() {
-        guard case .success = validation() else {
-            return
-        }
-        // データの更新
-        template = editingTemplate
-        // 画面を閉じる
-        self.dismiss()
-    }
-
-    func cancel() {
-        template = base
-        self.dismiss()
     }
 }
 
@@ -133,6 +47,7 @@ struct RandomTemplateLiteralSettingView: View {
     }
     // リテラル
     @Binding private var template: TemplateData
+    private let onUpdate: ((TemplateData) -> Void)?
 
     @State private var literal = RandomTemplateLiteral(value: .int(from: 1, to: 6))
     @State private var type: RandomTemplateLiteral.ValueType = .int
@@ -141,8 +56,9 @@ struct RandomTemplateLiteralSettingView: View {
     @State private var doubleStringRange = (left: "0", right: "1")
     @State private var stringsString: String = "グー,チョキ,パー"
 
-    fileprivate init(_ template: Binding<TemplateData>) {
+    fileprivate init(_ template: Binding<TemplateData>, onUpdate: ((TemplateData) -> Void)? = nil) {
         self._template = template
+        self.onUpdate = onUpdate
         if let template = template.wrappedValue.literal as? RandomTemplateLiteral {
             self._literal = State(initialValue: template)
             self._type = State(initialValue: template.value.type)
@@ -179,6 +95,7 @@ struct RandomTemplateLiteralSettingView: View {
             self.literal.value = .string(strings)
         }
         self.template.literal = self.literal
+        self.onUpdate?(self.template)
     }
 
     @ViewBuilder private func warning(_ type: Error) -> some View {
@@ -201,13 +118,10 @@ struct RandomTemplateLiteralSettingView: View {
                     Text("小数").tag(RandomTemplateLiteral.ValueType.double)
                     Text("文字列").tag(RandomTemplateLiteral.ValueType.string)
                 }
-            }
-            Section(header: Text("プレビュー")) {
-                TimelineView(.periodic(from: Date(), by: 0.8)) { _ in
-                    Text(self.literal.previewString())
+                .onChange(of: type) { _, _ in
+                    update()
                 }
             }
-
             switch type {
             case .int:
                 VStack {
@@ -218,6 +132,9 @@ struct RandomTemplateLiteralSettingView: View {
                             .submitLabel(.done)
                             .onSubmit(update)
                         Text("から")
+                    }
+                    .onChange(of: intStringRange.left) { _, _ in
+                        update()
                     }
                     if Int(intStringRange.left) == nil {
                         warning(.nan)
@@ -231,6 +148,9 @@ struct RandomTemplateLiteralSettingView: View {
                             .submitLabel(.done)
                             .onSubmit(update)
                         Text("まで")
+                    }
+                    .onChange(of: intStringRange.right) { _, _ in
+                        update()
                     }
                     if Int(intStringRange.right) == nil {
                         warning(.nan)
@@ -246,6 +166,9 @@ struct RandomTemplateLiteralSettingView: View {
                             .onSubmit(update)
                         Text("から")
                     }
+                    .onChange(of: doubleStringRange.left) { _, _ in
+                        update()
+                    }
                     if Double(doubleStringRange.left) == nil {
                         warning(.nan)
                     }
@@ -259,6 +182,9 @@ struct RandomTemplateLiteralSettingView: View {
                             .onSubmit(update)
                         Text("まで")
                     }
+                    .onChange(of: doubleStringRange.right) { _, _ in
+                        update()
+                    }
                     if Double(doubleStringRange.right) == nil {
                         warning(.nan)
                     }
@@ -270,6 +196,9 @@ struct RandomTemplateLiteralSettingView: View {
                             .textFieldStyle(.roundedBorder)
                             .submitLabel(.done)
                             .onSubmit(update)
+                    }
+                    .onChange(of: stringsString) { _, _ in
+                        update()
                     }
                     if stringsString.isEmpty {
                         warning(.stringIsNil)
@@ -284,6 +213,7 @@ struct DateTemplateLiteralSettingView: View {
     private static let templateLiteralType = TemplateLiteralType.date
     // リテラル
     @Binding private var template: TemplateData
+    private let onUpdate: ((TemplateData) -> Void)?
 
     @State private var literal = DateTemplateLiteral.example
     // 選択されているテンプレート
@@ -294,8 +224,9 @@ struct DateTemplateLiteralSettingView: View {
     @State private var formatter: DateFormatter = DateFormatter()
 
     @MainActor
-    fileprivate init(_ template: Binding<TemplateData>) {
+    fileprivate init(_ template: Binding<TemplateData>, onUpdate: ((TemplateData) -> Void)? = nil) {
         self._template = template
+        self.onUpdate = onUpdate
         if let template = template.wrappedValue.literal as? DateTemplateLiteral {
             if template.language == DateTemplateLiteral.example.language,
                template.type == DateTemplateLiteral.example.type,
@@ -358,6 +289,7 @@ struct DateTemplateLiteralSettingView: View {
                 self.date = Date()
                 self.template.literal = DateTemplateLiteral(format: formatSelection, type: .western, language: .japanese, delta: "0", deltaUnit: 1)
             }
+            self.onUpdate?(self.template)
         }
     }
 
@@ -383,17 +315,6 @@ struct DateTemplateLiteralSettingView: View {
                         update()
                     }
                 }
-            }
-
-            Section(header: Text("プレビュー")) {
-                TimelineView(.periodic(from: Date(), by: 0.5)) { _ in
-                    if formatSelection == "カスタム" {
-                        Text(formatter.string(from: Date().advanced(by: (Double(literal.delta) ?? 0) * Double(literal.deltaUnit))))
-                    } else {
-                        Text(formatter.string(from: Date()))
-                    }
-                }
-                .monospacedDigit()
             }
             if formatSelection == "カスタム" {
                 Section(header: Text("カスタム書式")) {

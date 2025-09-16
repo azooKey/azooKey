@@ -118,13 +118,15 @@ let package = Package(
             name: "KeyboardExtensionUtilsTests",
             dependencies: [
                 "KeyboardExtensionUtils",
-            ]
+            ],
+            swiftSettings: swiftSettings
         ),
         .testTarget(
             name: "AzooKeyUtilsTests",
             dependencies: [
                 "AzooKeyUtils",
-            ]
+            ],
+            swiftSettings: swiftSettings
         ),
     ] + (isXcodeVersion26 ? xcode26AdditionalTargets : [])
 )

@@ -8,9 +8,12 @@
 
 import AzooKeyUtils
 import Foundation
+import KeyboardViews
 import SwiftUI
+import struct KanaKanjiConverterModule.Candidate
 import struct KanaKanjiConverterModule.TemplateData
 import struct KanaKanjiConverterModule.DateTemplateLiteral
+
 import SwiftUIUtils
 import SwiftUtils
 
@@ -47,19 +50,10 @@ struct AzooKeyUserDictionaryView: View {
     @EnvironmentObject private var appStates: MainAppStates
 
     var body: some View {
-        Group {
-            switch variables.mode {
-            case .list:
-                UserDictionaryDataListView(variables: variables)
-            case .details:
-                if let item = self.variables.selectedItem {
-                    UserDictionaryDataEditor(item, variables: variables)
-                }
+        UserDictionaryDataListView(variables: variables)
+            .onDisappear {
+                appStates.requestReviewManager.shouldTryRequestReview = true
             }
-        }
-        .onDisappear {
-            appStates.requestReviewManager.shouldTryRequestReview = true
-        }
     }
 }
 
@@ -79,15 +73,6 @@ private struct UserDictionaryDataListView: View {
             Section {
                 Text("変換候補に単語を追加することができます。iOSの標準のユーザ辞書とは異なります。")
             }
-
-            Section {
-                Button("\(systemImage: "plus")追加する") {
-                    let id = variables.items.map {$0.id}.max()
-                    self.variables.selectedItem = UserDictionaryData.emptyData(id: (id ?? -1) + 1).makeEditableData()
-                    self.variables.mode = .details
-                }
-            }
-
             let currentGroupedItems: [String: [UserDictionaryData]] = Dictionary(grouping: variables.items, by: {$0.ruby.first.map {String($0)} ?? exceptionKey}).mapValues {$0.sorted {$0.id < $1.id}}
             let keys = currentGroupedItems.keys
             let currentKeys: [String] = keys.contains(exceptionKey) ? [exceptionKey] + keys.filter {$0 != exceptionKey}.sorted() : keys.sorted()
@@ -95,14 +80,18 @@ private struct UserDictionaryDataListView: View {
                 ForEach(currentKeys, id: \.self) {key in
                     Section(header: Text(key)) {
                         ForEach(currentGroupedItems[key]!) {data in
-                            Button {
-                                self.variables.selectedItem = data.makeEditableData()
-                                self.variables.mode = .details
+                            NavigationLink {
+                                UserDictionaryDataEditor(data.makeEditableData(), variables: variables)
                             } label: {
                                 LabeledContent {
                                     Text(data.ruby)
                                 } label: {
-                                    Text(data.word)
+                                    if data.isTemplateMode, let lit = data.formatLiteral, !lit.isEmpty {
+                                        Text(Candidate.parseTemplate(lit))
+                                            .monospacedDigit()
+                                    } else {
+                                        Text(data.word)
+                                    }
                                 }
                             }
                             .contextMenu {
@@ -117,11 +106,32 @@ private struct UserDictionaryDataListView: View {
                     }.environment(\.editMode, $editMode)
                 }
             }
+            #if DEBUG
+            Section("デバッグ") {
+                Button("マイグレーション状態をリセット") {
+                    UserDictionaryMigrationRunner.resetFlagForDebug()
+                }
+                .foregroundStyle(.red)
+            }
+            #endif
         }
         .onAppear {
             variables.templates = TemplateData.load()
         }
         .navigationBarTitle(Text("ユーザ辞書"), displayMode: .inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                NavigationLink {
+                    let id = variables.items.map { $0.id }.max()
+                    UserDictionaryDataEditor(
+                        UserDictionaryData.emptyData(id: (id ?? -1) + 1).makeEditableData(),
+                        variables: variables
+                    )
+                } label: {
+                    Text("追加する")
+                }
+            }
+        }
     }
 
     private func delete(section: String) -> (IndexSet) -> Void {
@@ -145,7 +155,9 @@ private struct UserDictionaryDataListView: View {
 private struct UserDictionaryDataEditor: CancelableEditor {
     @ObservedObject private var item: EditableUserDictionaryData
     @ObservedObject private var variables: UserDictManagerVariables
-    @State private var selectedTemplate: (name: String, index: Int)?
+    @Environment(\.dismiss) private var dismiss
+    // 日付・時刻変換用のテンプレート編集一時領域
+    @State private var templateLiteralData: TemplateData = TemplateData(template: DateTemplateLiteral.example.export(), name: "")
 
     // CancelableEditor Conformance
     typealias EditTarget = (EditableUserDictionaryData, [TemplateData])
@@ -155,103 +167,30 @@ private struct UserDictionaryDataEditor: CancelableEditor {
         self.item = item
         self.variables = variables
         self.base = (item.copy(), variables.templates)
-    }
-
-    private func hasTemplate(word: String) -> Bool {
-        word.contains(templateRegex)
-    }
-
-    private func templateIndex(name: String) -> Int? {
-        variables.templates.firstIndex(where: {$0.name == name})
-    }
-
-    // こちらは「今まで同名のテンプレートがなかった」場合にのみテンプレートを追加する
-    private func addNewTemplate(name: String) {
-        if !variables.templates.contains(where: {$0.name == name}) {
-            variables.templates.append(TemplateData(template: DateTemplateLiteral.example.export(), name: name))
+        if let literal = item.data.formatLiteral {
+            self._templateLiteralData = State(initialValue: TemplateData(template: literal, name: ""))
+        } else {
+            self._templateLiteralData = State(initialValue: TemplateData(template: DateTemplateLiteral.example.export(), name: ""))
         }
     }
 
-    @State private var wordEditMode: Bool = false
-    @State private var pickerTemplateName: String?
     @State private var shareThisWord = false
     @State private var showConfirmationDialogue = false
     @State private var sending = false
     @FocusState private var focusOnWordField: Bool?
 
-    private var templateRegex: some RegexComponent {
-        /{{.+?}}/
-    }
-
-    private func parsedWord(word: String) -> [String] {
-        var result: [String] = []
-        var startIndex = word.startIndex
-        while let range = word[startIndex...].firstMatch(of: templateRegex)?.range {
-            result.append(String(word[startIndex ..< range.lowerBound]))
-            result.append(String(word[range]))
-            startIndex = range.upperBound
-        }
-        result.append(String(word[startIndex ..< word.endIndex]))
-
-        return result
-    }
-
-    private func replaceTemplate(selectedTemplate: (name: String, index: Int), newName: String) {
-        var parsedWords = parsedWord(word: item.data.word)
-        if parsedWords.indices.contains(selectedTemplate.index) && parsedWords[selectedTemplate.index] == "{{\(selectedTemplate.name)}}" {
-            parsedWords[selectedTemplate.index] = "{{\(newName)}}"
-            item.data.word = parsedWords.joined()
-        }
-    }
-
-    @ViewBuilder
-    private func templateWordView(word: String) -> some View {
-        let parsedWords = parsedWord(word: word)
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(alignment: .center, spacing: 0) {
-                ForEach(parsedWords.indices, id: \.self) { i in
-                    let isTemplate = parsedWords[i].wholeMatch(of: templateRegex) != nil
-                    if isTemplate {
-                        Button {
-                            debug("Template:", parsedWords[i])
-                            selectedTemplate = (String(parsedWords[i].dropFirst(2).dropLast(2)), i)
-                        } label: {
-                            Text(parsedWords[i])
-                                .foregroundStyle(.primary)
-                                .padding(0)
-                                .background(Color.orange.opacity(0.7).cornerRadius(5))
-                        }
-                    } else {
-                        Text(parsedWords[i])
-                            .padding(0)
-                    }
-                }
-            }
-        }
-    }
-
     @ViewBuilder
     private var wordField: some View {
-        TextField("単語", text: $item.data.word)
-            .padding(.vertical, 2)
-            .focused($focusOnWordField, equals: true)
-            .submitLabel(.done)
-            .onSubmit {
-                selectedTemplate = nil
-                wordEditMode = false
+        if item.data.isTemplateMode {
+            TimelineView(.periodic(from: Date(), by: 0.5)) { _ in
+                Text(self.previewString())
+                    .monospacedDigit()
             }
-    }
-
-    @ViewBuilder
-    private func templateEditor(index: Int, selectedTemplate: (name: String, index: Int)) -> some View {
-        if variables.templates[index].name == selectedTemplate.name {
-            TemplateEditingView($variables.templates[index], validationInfo: variables.templates.map {$0.name}, options: .init(nameEdit: false, appearance: .embed { template in
-                if template.name == selectedTemplate.name && index < variables.templates.endIndex {
-                    variables.templates[index] = template
-                } else {
-                    debug("templateEditor: Unknown situation:", template, selectedTemplate, variables.templates[index])
-                }
-            }))
+        } else {
+            TextField("単語", text: $item.data.word)
+                .padding(.vertical, 2)
+                .focused($focusOnWordField, equals: true)
+                .submitLabel(.done)
         }
     }
 
@@ -265,23 +204,8 @@ private struct UserDictionaryDataEditor: CancelableEditor {
             }
             Section(header: Text("読みと単語"), footer: Text("\(systemImage: "doc.on.clipboard")を長押しでペースト")) {
                 HStack {
-                    if wordEditMode {
-                        wordField
-                    } else {
-                        if hasTemplate(word: item.data.word) {
-                            templateWordView(word: item.data.word)
-                            Spacer()
-                            Divider()
-                            Button {
-                                wordEditMode = true
-                                focusOnWordField = true
-                                selectedTemplate = nil
-                            } label: {
-                                Image(systemName: "rectangle.and.pencil.and.ellipsis")
-                            }
-                        } else {
-                            wordField
-                        }
+                    wordField
+                    if !item.data.isTemplateMode {
                         Divider()
                         PasteLongPressButton($item.data.word)
                             .padding(.horizontal, 5)
@@ -302,15 +226,39 @@ private struct UserDictionaryDataEditor: CancelableEditor {
                             .font(.caption)
                     }
                 }
+                if !item.data.isTemplateMode && (UserDictionaryMigrator.isUnsupportedLegacy(word: item.data.word) || UserDictionaryMigrator.isUnsupportedRandomWithAffixes(word: item.data.word, templates: variables.templates)) {
+                    HStack {
+                        Image(systemName: "exclamationmark.triangle")
+                        Text("このテンプレートのサポートは廃止されました。エントリを削除してください。")
+                            .font(.caption)
+                    }
+                }
             }
             Section(header: Text("詳細な設定")) {
                 if item.neadVerbCheck() {
                     Toggle("「\(item.mizenkeiWord)(\(item.mizenkeiRuby))」と言える", isOn: $item.data.isVerb)
+                        .disabled(item.data.isTemplateMode)
                 }
-                Toggle("人・動物・会社などの名前である", isOn: $item.data.isPersonName)
-                Toggle("場所・建物などの名前である", isOn: $item.data.isPlaceName)
+                if !item.data.isTemplateMode {
+                    Toggle("人・動物・会社などの名前である", isOn: $item.data.isPersonName)
+                    Toggle("場所・建物などの名前である", isOn: $item.data.isPlaceName)
+                }
+                Toggle("時刻・ランダム変換", isOn: $item.data.isTemplateMode)
+                    .onChange(of: item.data.isTemplateMode) { (_, value) in
+                        if value, item.data.formatLiteral == nil {
+                            item.data.formatLiteral = DateTemplateLiteral.example.export()
+                            templateLiteralData = TemplateData(template: item.data.formatLiteral!, name: "")
+                        }
+                    }
             }
-            if self.base.0.data.shared != true || (self.base.0.data != self.item.data) {
+            if item.data.isTemplateMode {
+                TemplateEditorView($templateLiteralData) { template in
+                    item.data.formatLiteral = template.literal.export()
+                    templateLiteralData = template
+                }
+            }
+            if !item.data.isTemplateMode,
+               self.base.0.data.shared != true || (self.base.0.data != self.item.data) {
                 Toggle(isOn: $shareThisWord) {
                     HStack {
                         Text("この単語をシェアする")
@@ -318,38 +266,6 @@ private struct UserDictionaryDataEditor: CancelableEditor {
                     }
                 }
                 .toggleStyle(.switch)
-            }
-            if let selectedTemplate {
-                if let index = templateIndex(name: selectedTemplate.name) {
-                    Section(header: Text("テンプレートを編集する")) {
-                        Text("{{\(selectedTemplate.name)}}を編集できます")
-                    }
-                    templateEditor(index: index, selectedTemplate: selectedTemplate)
-                } else {
-                    Section(header: Text("テンプレートを編集する")) {
-                        Text("{{\(selectedTemplate.name)}}というテンプレートが見つかりません。")
-                        Button {
-                            self.addNewTemplate(name: selectedTemplate.name)
-                        } label: {
-                            Text("{{\(selectedTemplate.name)}}を新規作成")
-                        }
-                        if !variables.templates.isEmpty {
-                            Picker("テンプレートを選ぶ", selection: $pickerTemplateName) {
-                                Text("なし").tag(String?.none)
-                                ForEach(variables.templates, id: \.name) {
-                                    Text($0.name).tag(String?.some($0.name))
-                                }
-                            }
-                            .onChange(of: pickerTemplateName) { (_, newValue) in
-                                if let newValue {
-                                    self.replaceTemplate(selectedTemplate: selectedTemplate, newName: newValue)
-                                    self.selectedTemplate?.name = newValue
-                                    self.pickerTemplateName = nil
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
         .sheet(isPresented: $showConfirmationDialogue) {
@@ -396,16 +312,23 @@ private struct UserDictionaryDataEditor: CancelableEditor {
         }
     }
 
+    private func previewString() -> String {
+        if let literal = item.data.formatLiteral, !literal.isEmpty {
+            return Candidate.parseTemplate(literal)
+        }
+        return item.data.word
+    }
+
     private func saveAndDismiss() {
         self.save()
-        variables.mode = .list
+        dismiss()
         MainAppFeedback.success()
     }
 
     fileprivate func cancel() {
         item.reset(from: base.0)
         variables.templates = base.1
-        variables.mode = .list
+        dismiss()
     }
 
     @MainActor
