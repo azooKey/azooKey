@@ -225,7 +225,6 @@ struct QwertyLayoutProvider<Extension: ApplicationSpecificKeyboardViewExtension>
                 role: .normal
             )
         }
-
         var dict: [UnifiedPositionSpecifier: any UnifiedKeyModelProtocol<Extension>] = [:]
         // Row 0
         for (i, c) in ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"].enumerated() {

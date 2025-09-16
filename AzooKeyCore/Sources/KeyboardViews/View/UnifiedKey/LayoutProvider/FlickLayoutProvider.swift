@@ -18,33 +18,37 @@ struct FlickLayoutProvider<Extension: ApplicationSpecificKeyboardViewExtension> 
         )
     }
 
-    @MainActor private static func customKey(center: String, left: String? = nil, top: String? = nil, right: String? = nil, bottom: String? = nil, color: FlickCustomKeyModel<Extension>.ColorRole = .normal) -> any UnifiedKeyModelProtocol<Extension> {
+    @MainActor private static func customKey(center: String, left: String? = nil, top: String? = nil, right: String? = nil, bottom: String? = nil, color: UnifiedGeneralKeyModel<Extension>.ColorRole = .normal) -> any UnifiedKeyModelProtocol<Extension> {
         var map: [FlickDirection: UnifiedVariation] = [:]
         if let left { map[.left] = UnifiedVariation(label: .text(left), pressActions: [.input(left)]) }
         if let top { map[.top] = UnifiedVariation(label: .text(top), pressActions: [.input(top)]) }
         if let right { map[.right] = UnifiedVariation(label: .text(right), pressActions: [.input(right)]) }
         if let bottom { map[.bottom] = UnifiedVariation(label: .text(bottom), pressActions: [.input(bottom)]) }
-        return FlickCustomKeyModel<Extension>(
+        return UnifiedGeneralKeyModel<Extension>(
             labelType: .text(center),
             pressActions: [.input(center)],
             longPressActions: .none,
             flick: map,
+            linearVariations: [],
+            linearDirection: .center,
             showsTapBubble: false,
             colorRole: color
         )
     }
 
-    @MainActor private static func customKey(label: KeyLabelType, center: String, left: String? = nil, top: String? = nil, right: String? = nil, bottom: String? = nil, color: FlickCustomKeyModel<Extension>.ColorRole = .normal) -> any UnifiedKeyModelProtocol<Extension> {
+    @MainActor private static func customKey(label: KeyLabelType, center: String, left: String? = nil, top: String? = nil, right: String? = nil, bottom: String? = nil, color: UnifiedGeneralKeyModel<Extension>.ColorRole = .normal) -> any UnifiedKeyModelProtocol<Extension> {
         var map: [FlickDirection: UnifiedVariation] = [:]
         if let left { map[.left] = UnifiedVariation(label: .text(left), pressActions: [.input(left)]) }
         if let top { map[.top] = UnifiedVariation(label: .text(top), pressActions: [.input(top)]) }
         if let right { map[.right] = UnifiedVariation(label: .text(right), pressActions: [.input(right)]) }
         if let bottom { map[.bottom] = UnifiedVariation(label: .text(bottom), pressActions: [.input(bottom)]) }
-        return FlickCustomKeyModel<Extension>(
+        return UnifiedGeneralKeyModel<Extension>(
             labelType: label,
             pressActions: [.input(center)],
             longPressActions: .none,
             flick: map,
+            linearVariations: [],
+            linearDirection: .center,
             showsTapBubble: false,
             colorRole: color
         )
@@ -61,13 +65,15 @@ struct FlickLayoutProvider<Extension: ApplicationSpecificKeyboardViewExtension> 
 
     @MainActor private static func functionalKeys() -> [any UnifiedKeyModelProtocol<Extension>] {
         // delete with left-flick smoothDelete
-        let delete = FlickCustomKeyModel<Extension>(
+        let delete: any UnifiedKeyModelProtocol<Extension> = UnifiedGeneralKeyModel<Extension>(
             labelType: .image("delete.left"),
             pressActions: [.delete(1)],
             longPressActions: .init(repeat: [.delete(1)]),
             flick: [
                 .left: UnifiedVariation(label: .image("xmark"), pressActions: [.smoothDelete])
             ],
+            linearVariations: [],
+            linearDirection: .center,
             showsTapBubble: false,
             colorRole: .special
         )

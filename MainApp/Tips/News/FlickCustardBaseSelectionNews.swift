@@ -13,7 +13,7 @@ struct FlickCustardBaseSelectionNews: View {
                 .listRowSeparator(.hidden, edges: .bottom)
             Text("好きな文字や文章を並べたオリジナルのタブを作成することができます。")
             NavigationLink("フリック式のカスタムタブを作る") {
-                EditingTenkeyCustardView(manager: $appStates.custardManager, path: nil)
+                EditingGridFitCustardView(manager: $appStates.custardManager, path: nil)
             }
             .foregroundStyle(.accentColor)
         }
