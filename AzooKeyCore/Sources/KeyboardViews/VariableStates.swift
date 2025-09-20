@@ -314,14 +314,16 @@ public final class VariableStates: ObservableObject {
             value.setIfFirst(orientation: orientation, size: .init(width: screenWidth, height: height), position: .zero)
         }
         let idealHeight = keyboardInternalSettingManager.oneHandedModeSetting.heightItem(orientation: orientation).height
+        let ignoreStoredHeight = UIDevice.current.userInterfaceIdiom == .pad && screenWidth < 400
+        let effectiveHeight = (ignoreStoredHeight ? height : (idealHeight ?? height)) * heightScaleFromKeyboardHeightSetting
         switch self.resizingState {
         case .fullwidth:
-            self.interfaceSize = CGSize(width: screenWidth, height: (idealHeight ?? height) * heightScaleFromKeyboardHeightSetting)
+            self.interfaceSize = CGSize(width: screenWidth, height: effectiveHeight)
         case .onehanded, .resizing:
             let item = keyboardInternalSettingManager.oneHandedModeSetting.item(orientation: orientation)
             // 安全のため、指示されたwidth, heightを超える値を許可しない。
-            self.interfaceSize = CGSize(width: min(screenWidth, item.width), height: (idealHeight ?? height) * heightScaleFromKeyboardHeightSetting)
-            self.interfacePosition = item.position
+            self.interfaceSize = CGSize(width: min(screenWidth, item.width), height: effectiveHeight)
+            self.interfacePosition = ignoreStoredHeight ? .zero : item.position
         }
     }
 
