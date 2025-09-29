@@ -31,13 +31,9 @@ struct CustomKeySettingFlickKeyView<Label: View>: View {
         selectedPosition == position
     }
 
-    private var strokeColor: Color {
-        focused ? .accentColor : .primary
-    }
-
     var body: some View {
         RoundedRectangle(cornerRadius: 10)
-            .stroke(strokeColor)
+            .stroke(focused ? .accentColor : .primary)
             .background {
                 RoundedRectangle(cornerRadius: 10).fill(Color.background)
             }

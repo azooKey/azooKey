@@ -97,6 +97,12 @@ private struct PressLifecycle: Sendable {
     // Pointers
     var flickStartLocation: CGPoint?
     var doublePress = DoublePressTracker()
+    enum Outcome: Sendable, Equatable {
+        case linearVariation
+        case action
+        case allFlickSuggest
+    }
+    var lockedOutcome: Outcome?
 
     mutating func reset(cancelTasks: Bool = true, preserveDoublePress: Bool = false) {
         if cancelTasks {
@@ -112,6 +118,7 @@ private struct PressLifecycle: Sendable {
         state = .idle
         mode = .none
         flickStartLocation = nil
+        lockedOutcome = nil
 
         if !preserveDoublePress {
             doublePress.reset()
@@ -121,12 +128,6 @@ private struct PressLifecycle: Sendable {
 
 @MainActor
 public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewExtension>: View {
-    // GestureSet expresses which gesture system this key supports,
-    // independent of layout naming.
-    public enum GestureSet {
-        case directionalFlick
-        case linearVariation
-    }
     private let model: any UnifiedKeyModelProtocol<Extension>
     private let tabDesign: TabDependentDesign
     private let size: CGSize
@@ -139,17 +140,14 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
     @Environment(Extension.Theme.self) private var theme
     @Environment(\.userActionManager) private var action
 
-    private let gestureSet: GestureSet
-
-    public init(model: any UnifiedKeyModelProtocol<Extension>, tabDesign: TabDependentDesign, size: CGSize, gestureSet: GestureSet, isSuggesting: Binding<Bool>) {
+    public init(model: any UnifiedKeyModelProtocol<Extension>, tabDesign: TabDependentDesign, size: CGSize, isSuggesting: Binding<Bool>) {
         self.model = model
         self.tabDesign = tabDesign
         self.size = size
-        self.gestureSet = gestureSet
         self._isSuggesting = isSuggesting
     }
 
-    // Step 1: introduce unified lifecycle state (not yet wired)
+    // Unified lifecycle state
     @State private var lifecycle = PressLifecycle()
 
     private var longpressDuration: TimeInterval {
@@ -166,18 +164,59 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
         }
     }
 
-    private func variation(for direction: FlickDirection) -> UnifiedVariation? {
-        if case let .fourWay(map) = model.variationSpace(variableStates: variableStates) {
-            return map[direction]
+    private func flickMap() -> [FlickDirection: UnifiedVariation] { model.getFlickVariationMap(variableStates: variableStates) }
+
+    private func variation(for direction: FlickDirection) -> UnifiedVariation? { flickMap()[direction] }
+
+    private func linearVariations() -> (arr: [QwertyVariationsModel.VariationElement], direction: VariationsViewDirection) { model.getLinearVariations(variableStates: variableStates) }
+
+    private func commitFlickLongPress() {
+        guard case .started = lifecycle.state else { return }
+        lifecycle.longPressTask = nil
+        lifecycle.state = .longPressed
+        guard lifecycle.lockedOutcome == nil else { return }
+        lifecycle.flickAllSuggestTask?.cancel()
+        if let outcome = decideLongPressOutcome() {
+            lifecycle.lockedOutcome = outcome
+            switch outcome {
+            case .linearVariation:
+                let (arr, _) = linearVariations()
+                if !arr.isEmpty {
+                    qwertySuggestType = .variation(selection: nil)
+                    isSuggesting = true
+                    lifecycle.state = .linearVariations(selection: nil)
+                }
+            case .action:
+                break
+            case .allFlickSuggest:
+                if !flickMap().isEmpty {
+                    qwertySuggestType = nil
+                    flickSuggestType = .all
+                    isSuggesting = true
+                }
+            }
         }
-        return nil
+    }
+
+    // Fixed policy: decide long-press outcome with priority
+    private func decideLongPressOutcome() -> PressLifecycle.Outcome? {
+        if model.hasLinearVariations(variableStates: variableStates) {
+            return .linearVariation
+        } else if model.hasLongPressAction(variableStates: variableStates) {
+            return .action
+        } else if model.hasFlickVariations(variableStates: variableStates) {
+            return .allFlickSuggest
+        } else {
+            return nil
+        }
     }
 
     // MARK: FourWay (Flick) gesture
     private var flickGesture: some Gesture {
         DragGesture(minimumDistance: .zero, coordinateSpace: .global)
             .onChanged { value in
-                guard gestureSet == .directionalFlick else { return }
+                // Enable only when flick variations exist
+                guard !self.flickMap().isEmpty else { return }
                 if lifecycle.mode == .none {
                     lifecycle.mode = .flick
                 }
@@ -186,6 +225,7 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                 switch lifecycle.state {
                 case .idle:
                     // 開始時にタスク/状態を整理
+                    self.lifecycle.lockedOutcome = nil
                     self.lifecycle.flickSuggestDismissTask?.cancel()
                     self.lifecycle.flickAllSuggestTask?.cancel()
                     self.flickSuggestType = nil
@@ -202,17 +242,17 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                     self.lifecycle.flickStartLocation = value.startLocation
                     // フィードバック/長押し予約
                     self.model.feedback(variableStates: variableStates)
-                    let longpressActions = self.model.longPressActions(variableStates: variableStates)
-                    self.action.reserveLongPressAction(longpressActions, taskStartDuration: self.longpressDuration, variableStates: variableStates)
-                    // 全サジェスト（一定時間後、バリエーションがある場合のみ）
+                    if self.decideLongPressOutcome() == .action {
+                        let longpressActions = self.model.longPressActions(variableStates: variableStates)
+                        self.action.reserveLongPressAction(longpressActions, taskStartDuration: self.longpressDuration, variableStates: variableStates)
+                    }
+                    // 全サジェスト（一定時間後、ポリシーが allFlickSuggest の場合のみ）
                     self.lifecycle.flickAllSuggestTask?.cancel()
                     let task = Task { @MainActor in
                         try? await Task.sleep(nanoseconds: 500_000_000)
                         if !Task.isCancelled,
                            case .started = lifecycle.state,
-                           case let .fourWay(map) = self.model.variationSpace(variableStates: variableStates),
-                           !map.isEmpty,
-                           self.model.longPressActions(variableStates: variableStates).isEmpty {
+                           self.decideLongPressOutcome() == .allFlickSuggest {
                             withAnimation(.easeIn(duration: 0.1)) {
                                 // Flickサジェスト表示へ移行するため小バブルを閉じる
                                 self.qwertySuggestType = nil
@@ -222,8 +262,20 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                         }
                     }
                     self.lifecycle.flickAllSuggestTask = task
+                    self.lifecycle.longPressTask?.cancel()
+                    self.lifecycle.longPressTask = Task { @MainActor in
+                        let delay = UInt64(self.longpressDuration * 1_000_000_000)
+                        do {
+                            try await Task.sleep(nanoseconds: delay)
+                        } catch {
+                            return
+                        }
+                        self.commitFlickLongPress()
+                    }
                 case let .started(date):
                     if self.model.isFlickAble(to: d, variableStates: variableStates), startLocation.distance(to: value.location) > self.model.flickSensitivity(to: d) {
+                        self.lifecycle.longPressTask?.cancel()
+                        self.lifecycle.longPressTask = nil
                         // 一方向サジェスト表示に切り替えるため小バブルを閉じる
                         self.qwertySuggestType = nil
                         self.flickSuggestType = .flick(d)
@@ -237,7 +289,7 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                         }
                     }
                     if Date().timeIntervalSince(date) >= self.longpressDuration {
-                        self.lifecycle.state = .longPressed
+                        self.commitFlickLongPress()
                     }
                 case let .flickOneSuggested(prevDirection, _):
                     if self.model.isFlickAble(to: d, variableStates: variableStates) {
@@ -288,10 +340,10 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                 case .longPressed:
                     // When long-press (all suggestions) is showing, and the finger moves sufficiently
                     // to a flickable direction, transition to one-direction suggest like original FlickKeyView.
-                    if self.model.isFlickAble(to: d, variableStates: variableStates),
+                    if self.lifecycle.lockedOutcome == .allFlickSuggest,
+                       self.model.isFlickAble(to: d, variableStates: variableStates),
                        startLocation.distance(to: value.location) > self.model.flickSensitivity(to: d),
-                       case let .fourWay(map) = self.model.variationSpace(variableStates: variableStates),
-                       !map.isEmpty {
+                       !self.flickMap().isEmpty {
                         if case .flick = self.flickSuggestType {} else {
                             // 一方向サジェストに切り替えるので小バブルを閉じる
                             self.qwertySuggestType = nil
@@ -314,7 +366,7 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                 }
             }
             .onEnded { _ in
-                guard gestureSet == .directionalFlick else { return }
+                guard !self.flickMap().isEmpty else { return }
                 let dismiss: Task<Void, Never> = Task { @MainActor in
                     try? await Task.sleep(nanoseconds: 70_000_000)
                     self.qwertySuggestType = nil
@@ -332,6 +384,8 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                         self.lifecycle.state = .longFlicked(direction)
                     }
                 }
+                self.lifecycle.longPressTask?.cancel()
+                self.lifecycle.longPressTask = nil
                 self.action.registerLongPressActionEnd(self.model.longPressActions(variableStates: variableStates))
                 self.lifecycle.flickAllSuggestTask?.cancel()
                 // End any reserved variation longpress for current direction
@@ -349,13 +403,14 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                 case .started:
                     self.action.registerActions(self.model.pressActions(variableStates: variableStates), variableStates: variableStates)
                 case let .flickOneSuggested(direction, _):
-                    if case let .fourWay(map) = model.variationSpace(variableStates: variableStates), let v = map[direction] {
+                    if let v = variation(for: direction) {
                         self.action.registerActions(v.pressActions, variableStates: variableStates)
                     }
                 case .longPressed:
                     break
                 case .longFlicked:
-                    if case let .fourWay(map) = model.variationSpace(variableStates: variableStates) {
+                    do {
+                        let map = flickMap()
                         // 長フリックで長押しが設定されていない場合はpressActions
                         // ここでは長押しは予約解除済みなので発火せず、pressのみ
                         // 長押しの有無までは表層から取れないため、pressのみ実施
@@ -366,8 +421,18 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                             self.action.registerActions(v.pressActions, variableStates: variableStates)
                         }
                     }
-                case .linearVariations:
-                    break
+                case let .linearVariations(selection):
+                    let (arr, _) = linearVariations()
+                    if !arr.isEmpty {
+                        if let selection {
+                            let sel = min(max(selection, 0), arr.count - 1)
+                            self.action.registerActions(arr[sel].actions, variableStates: variableStates)
+                        } else {
+                            self.action.registerActions(self.model.pressActions(variableStates: variableStates), variableStates: variableStates)
+                        }
+                    } else {
+                        self.action.registerActions(self.model.pressActions(variableStates: variableStates), variableStates: variableStates)
+                    }
                 }
                 // keep dismiss task alive; don't cancel it here
                 self.lifecycle.reset(cancelTasks: false)
@@ -378,13 +443,19 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
     private var qwertyGesture: some Gesture {
         DragGesture(minimumDistance: .zero)
             .onChanged { value in
-                // Linear専用ハンドラ
-                guard gestureSet == .linearVariation else { return }
+                // For keys with flick variations, allow linear handling only when linear mode is locked/active
+                if !self.flickMap().isEmpty && lifecycle.lockedOutcome != .linearVariation {
+                    if case .linearVariations = lifecycle.state {} else {
+                        return
+                    }
+                }
+                // Linear handler for non-flick keys; UI follows fixed policy
                 if lifecycle.mode == .none {
                     lifecycle.mode = .linear
                 }
                 switch self.lifecycle.state {
                 case .idle:
+                    self.lifecycle.lockedOutcome = nil
                     self.model.feedback(variableStates: variableStates)
                     // 単押しバブル（ジェスチャ非依存）
                     if self.model.showsTapBubble(variableStates: variableStates) {
@@ -395,7 +466,9 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                     // lifecycle handles started and double-press tracking
                     self.lifecycle.state = .started(now)
                     self.lifecycle.doublePress.update(touchDownDate: now)
-                    self.action.reserveLongPressAction(self.model.longPressActions(variableStates: variableStates), taskStartDuration: longpressDuration, variableStates: variableStates)
+                    if self.decideLongPressOutcome() == .action {
+                        self.action.reserveLongPressAction(self.model.longPressActions(variableStates: variableStates), taskStartDuration: longpressDuration, variableStates: variableStates)
+                    }
                     let task = Task { [longpressDuration] in
                         do {
                             try await Task.sleep(nanoseconds: UInt64(longpressDuration * 1_000_000_000))
@@ -403,12 +476,34 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                             return
                         }
                         if !Task.isCancelled && self.lifecycle.state.isActive {
-                            if self.model.showsTapBubble(variableStates: variableStates), case let .linear(arr, _) = model.variationSpace(variableStates: variableStates), !arr.isEmpty {
-                                self.qwertySuggestType = .variation(selection: nil)
-                                self.isSuggesting = true
-                                self.lifecycle.state = .linearVariations(selection: nil)
-                            } else {
-                                self.lifecycle.state = .longPressed
+                            if self.lifecycle.lockedOutcome == nil {
+                                if let outcome = decideLongPressOutcome() {
+                                    self.lifecycle.lockedOutcome = outcome
+                                    switch outcome {
+                                    case .linearVariation:
+                                        let (arr, _) = linearVariations()
+                                        if !arr.isEmpty {
+                                            self.qwertySuggestType = .variation(selection: nil)
+                                            self.isSuggesting = true
+                                            self.lifecycle.state = .linearVariations(selection: nil)
+                                        } else {
+                                            self.lifecycle.state = .longPressed
+                                        }
+                                    case .action:
+                                        self.lifecycle.state = .longPressed
+                                    case .allFlickSuggest:
+                                        if !self.flickMap().isEmpty {
+                                            self.qwertySuggestType = nil
+                                            self.flickSuggestType = .all
+                                            self.isSuggesting = true
+                                            self.lifecycle.state = .longPressed
+                                        } else {
+                                            self.lifecycle.state = .longPressed
+                                        }
+                                    }
+                                } else {
+                                    self.lifecycle.state = .longPressed
+                                }
                             }
                         }
                     }
@@ -419,11 +514,8 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                     break
                 case .linearVariations:
                     let dx = value.location.x - value.startLocation.x
-                    let selection: Int = if case let .linear(arr, direction) = model.variationSpace(variableStates: variableStates) {
-                        QwertyVariationsModel(arr, direction: direction).getSelection(dx: dx, tabDesign: tabDesign)
-                    } else {
-                        0
-                    }
+                    let (arr, direction) = linearVariations()
+                    let selection: Int = QwertyVariationsModel(arr, direction: direction).getSelection(dx: dx, tabDesign: tabDesign)
 
                     self.qwertySuggestType = .variation(selection: selection)
                     self.isSuggesting = true
@@ -435,8 +527,13 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                 }
             }
             .onEnded { _ in
+                // Commit only if linear mode is active or key has no flicks
+                if !self.flickMap().isEmpty && lifecycle.lockedOutcome != .linearVariation {
+                    if case .linearVariations = lifecycle.state {} else {
+                        return
+                    }
+                }
                 // Linear専用ハンドラ
-                guard gestureSet == .linearVariation else { return }
                 let endDate = Date()
                 self.lifecycle.doublePress.update(touchUpDate: endDate)
                 self.action.registerLongPressActionEnd(self.model.longPressActions(variableStates: variableStates))
@@ -458,9 +555,16 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                 case .longPressed:
                     break
                 case let .linearVariations(selection):
-                    if case let .linear(arr, _) = model.variationSpace(variableStates: variableStates), !arr.isEmpty {
-                        let sel = min(max(selection ?? 0, 0), arr.count - 1)
-                        self.action.registerActions(arr[sel].actions, variableStates: variableStates)
+                    let (arr, _) = linearVariations()
+                    if !arr.isEmpty {
+                        if let selection {
+                            let sel = min(max(selection, 0), arr.count - 1)
+                            self.action.registerActions(arr[sel].actions, variableStates: variableStates)
+                        } else {
+                            self.action.registerActions(self.model.pressActions(variableStates: variableStates), variableStates: variableStates)
+                        }
+                    } else {
+                        self.action.registerActions(self.model.pressActions(variableStates: variableStates), variableStates: variableStates)
                     }
                 case .flickOneSuggested:
                     break
@@ -499,17 +603,14 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
         .gesture(flickGesture.simultaneously(with: qwertyGesture))
         .overlay { self.model.label(width: size.width, theme: theme, states: variableStates, color: nil) }
         .overlay(alignment: .center) {
-            if let flickSuggestType, gestureSet == .directionalFlick {
+            if let flickSuggestType, !self.flickMap().isEmpty {
                 UnifiedFlickSuggestView<Extension>(model: model, tabDesign: tabDesign, size: size, suggestType: flickSuggestType)
             }
         }
         .overlay(alignment: .bottom) {
             if let qwertySuggestType {
-                let variationsModel: QwertyVariationsModel = if case let .linear(arr, direction) = model.variationSpace(variableStates: variableStates) {
-                    QwertyVariationsModel(arr, direction: direction)
-                } else {
-                    QwertyVariationsModel([])
-                }
+                let (arr, direction) = linearVariations()
+                let variationsModel = QwertyVariationsModel(arr, direction: direction)
                 let baseLabel = self.model.label(width: size.width, theme: theme, states: variableStates, color: nil)
                 UnifiedQwertySuggestView<Extension>(baseLabel: baseLabel, variationsModel: variationsModel, tabDesign: tabDesign, size: size, suggestType: qwertySuggestType)
             }

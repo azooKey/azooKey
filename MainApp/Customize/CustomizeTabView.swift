@@ -33,12 +33,12 @@ struct CustomizeTabView: View {
                             ManageCustardView(manager: $appStates.custardManager, path: $path)
                         }
                         .foregroundStyle(.accentColor)
-                        NavigationLink("スクロール式のカスタムタブを作る") {
+                        NavigationLink("定型文タブを作る") {
                             EditingScrollCustardView(manager: $appStates.custardManager, path: $path)
                         }
                         .foregroundStyle(.accentColor)
-                        NavigationLink("フリック式のカスタムタブを作る") {
-                            EditingTenkeyCustardView(manager: $appStates.custardManager, path: $path)
+                        NavigationLink("カスタムタブを作る") {
+                            EditingGridFitCustardView(manager: $appStates.custardManager, path: $path)
                         }
                         .foregroundStyle(.accentColor)
                     }

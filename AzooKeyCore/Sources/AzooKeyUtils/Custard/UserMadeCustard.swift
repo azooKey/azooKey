@@ -12,7 +12,7 @@ import KeyboardViews
 
 public enum UserMadeCustard: Codable, Sendable {
     case gridScroll(UserMadeGridScrollCustard)
-    case tenkey(UserMadeTenKeyCustard)
+    case tenkey(UserMadeGridFitCustard)
 }
 
 public extension UserMadeCustard {
@@ -63,7 +63,7 @@ public extension UserMadeCustard {
             self = .gridScroll(value)
         case .tenkey:
             let value = try container.decode(
-                UserMadeTenKeyCustard.self,
+                UserMadeGridFitCustard.self,
                 forKey: .tenkey
             )
             self = .tenkey(value)
@@ -160,7 +160,7 @@ public struct UserMadeGridScrollCustard: Codable, Sendable {
     }
 }
 
-public struct UserMadeTenKeyCustard: Codable, Sendable, Equatable {
+public struct UserMadeGridFitCustard: Codable, Sendable, Equatable {
     public init(tabName: String, rowCount: String, columnCount: String, inputStyle: CustardInputStyle, language: CustardLanguage, keys: [KeyPosition: UserMadeKeyData], emptyKeys: Set<KeyPosition> = [], addTabBarAutomatically: Bool) {
         self.tabName = tabName
         self.rowCount = rowCount

@@ -20,10 +20,8 @@ struct UnifiedFlickSuggestView<Extension: ApplicationSpecificKeyboardViewExtensi
     }
 
     private func variation(for direction: FlickDirection) -> UnifiedVariation? {
-        if case let .fourWay(map) = model.variationSpace(variableStates: variableStates) {
-            return map[direction]
-        }
-        return nil
+        let map = model.getFlickVariationMap(variableStates: variableStates)
+        return map[direction]
     }
 
     @ViewBuilder
@@ -36,10 +34,8 @@ struct UnifiedFlickSuggestView<Extension: ApplicationSpecificKeyboardViewExtensi
     }
 
     private func isEnabled(_ direction: FlickDirection) -> Bool {
-        if case let .fourWay(map) = model.variationSpace(variableStates: variableStates) {
-            return !map.isEmpty && model.isFlickAble(to: direction, variableStates: variableStates)
-        }
-        return false
+        let map = model.getFlickVariationMap(variableStates: variableStates)
+        return !map.isEmpty && model.isFlickAble(to: direction, variableStates: variableStates)
     }
 
     private func getSuggestView(direction: FlickDirection, isHidden: Bool, isPointed: Bool) -> some View {

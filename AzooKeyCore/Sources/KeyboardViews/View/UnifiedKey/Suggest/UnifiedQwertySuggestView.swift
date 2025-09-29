@@ -55,9 +55,17 @@ struct UnifiedQwertySuggestView<Extension: ApplicationSpecificKeyboardViewExtens
         return Path { path in
             var points = [CGPoint]()
             points.append(contentsOf: [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: BC)])
-            if ldw > 0 { points.append(CGPoint(x: ldw + _CD.width, y: BC)) } else { points.append(CGPoint(x: ldw + _CD.width, y: BC + _CD.height)) }
+            if ldw > 0 {
+                points.append(CGPoint(x: ldw + _CD.width, y: BC))
+            } else {
+                points.append(CGPoint(x: ldw + _CD.width, y: BC + _CD.height))
+            }
             points.append(contentsOf: [CGPoint(x: ldw + _CD.width, y: height), CGPoint(x: ldw + _CD.width + EF, y: height)])
-            if rdw > 0 { points.append(CGPoint(x: ldw + _CD.width + EF, y: BC)) } else { points.append(CGPoint(x: ldw + _CD.width + EF, y: BC + _CD.height)) }
+            if rdw > 0 {
+                points.append(CGPoint(x: ldw + _CD.width + EF, y: BC))
+            } else {
+                points.append(CGPoint(x: ldw + _CD.width + EF, y: BC + _CD.height))
+            }
             points.append(contentsOf: [CGPoint(x: width, y: BC), CGPoint(x: width, y: 0)])
             path.addPoints(points, cornerRadius: 4)
         }.offsetBy(dx: -(ldw + _CD.width), dy: 0)

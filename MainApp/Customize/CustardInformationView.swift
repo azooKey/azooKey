@@ -15,7 +15,7 @@ import SwiftUIUtils
 import SwiftUtils
 
 extension Custard {
-    var userMadeTenKeyCustard: UserMadeTenKeyCustard? {
+    var userMadeTenKeyCustard: UserMadeGridFitCustard? {
         guard self.interface.keyStyle == .tenkeyStyle else {
             return nil
         }
@@ -45,7 +45,7 @@ extension Custard {
                 }
             }
         }
-        return UserMadeTenKeyCustard(
+        return UserMadeGridFitCustard(
             tabName: self.identifier,
             rowCount: layout.rowCount.description,
             columnCount: layout.columnCount.description,
@@ -205,13 +205,13 @@ struct CustardInformationView: View {
                         .foregroundStyle(.accentColor)
                     case let .tenkey(value):
                         NavigationLink("編集する") {
-                            EditingTenkeyCustardView(manager: $appStates.custardManager, editingItem: value, path: $path)
+                            EditingGridFitCustardView(manager: $appStates.custardManager, editingItem: value, path: $path)
                         }
                         .foregroundStyle(.accentColor)
                     }
                 } else if let editingItem = custard.userMadeTenKeyCustard {
                     NavigationLink("編集する") {
-                        EditingTenkeyCustardView(manager: $appStates.custardManager, editingItem: editingItem, path: $path)
+                        EditingGridFitCustardView(manager: $appStates.custardManager, editingItem: editingItem, path: $path)
                     }
                     .foregroundStyle(.accentColor)
                 }

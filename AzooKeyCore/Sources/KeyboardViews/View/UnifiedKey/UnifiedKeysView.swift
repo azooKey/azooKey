@@ -3,7 +3,7 @@ import SwiftUI
 
 public struct UnifiedKeysView<Extension: ApplicationSpecificKeyboardViewExtension, Content: View>: View {
     private let contentGenerator: (UnifiedGenericKeyView<Extension>, UnifiedPositionSpecifier) -> (Content)
-    private let models: [(position: UnifiedPositionSpecifier, model: any UnifiedKeyModelProtocol<Extension>, gesture: UnifiedGenericKeyView<Extension>.GestureSet)]
+    private let models: [(position: UnifiedPositionSpecifier, model: any UnifiedKeyModelProtocol<Extension>)]
     private let tabDesign: TabDependentDesign
     @State private var activeSuggestKeys: Set<String> = []
 
@@ -11,7 +11,7 @@ public struct UnifiedKeysView<Extension: ApplicationSpecificKeyboardViewExtensio
         position.x >= 0 && position.y >= 0 && position.x + position.width <= tabDesign.horizontalKeyCount && position.y + position.height <= tabDesign.verticalKeyCount
     }
 
-    public init(models: [(position: UnifiedPositionSpecifier, model: any UnifiedKeyModelProtocol<Extension>, gesture: UnifiedGenericKeyView<Extension>.GestureSet)], tabDesign: TabDependentDesign, @ViewBuilder generator: @escaping (UnifiedGenericKeyView<Extension>, UnifiedPositionSpecifier) -> (Content)) {
+    public init(models: [(position: UnifiedPositionSpecifier, model: any UnifiedKeyModelProtocol<Extension>)], tabDesign: TabDependentDesign, @ViewBuilder generator: @escaping (UnifiedGenericKeyView<Extension>, UnifiedPositionSpecifier) -> (Content)) {
         self.models = models.filter { Self.isWithinBounds($0.position, tabDesign: tabDesign) }
         self.tabDesign = tabDesign
         self.contentGenerator = generator
@@ -32,7 +32,7 @@ public struct UnifiedKeysView<Extension: ApplicationSpecificKeyboardViewExtensio
             ForEach(models, id: \.position) { item in
                 let info = keyData(position: item.position)
                 let keyID = "\(item.position.x)-\(item.position.y)"
-                let keyView = UnifiedGenericKeyView<Extension>(model: item.model, tabDesign: tabDesign, size: info.size, gestureSet: item.gesture, isSuggesting: Binding(
+                let keyView = UnifiedGenericKeyView<Extension>(model: item.model, tabDesign: tabDesign, size: info.size, isSuggesting: Binding(
                     get: { activeSuggestKeys.contains(keyID) },
                     set: { newValue in if newValue { activeSuggestKeys.insert(keyID) } else { activeSuggestKeys.remove(keyID) } }
                 ))

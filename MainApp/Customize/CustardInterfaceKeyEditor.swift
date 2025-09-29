@@ -12,19 +12,115 @@ import Foundation
 import KeyboardViews
 import SwiftUI
 import SwiftUIUtils
+import UniformTypeIdentifiers
 
+// Stable ID wrapper for longpress chip items
+private struct IndexedLongpressItem: Identifiable, Hashable {
+    let id: UUID
+    let index: Int
+}
 private enum LabelType: Equatable {
     case text, systemImage, mainAndSub
 }
-
-private struct EquatablePair<First: Equatable, Second: Equatable>: Equatable {
-    var first: First
-    var second: Second
+// 共通のラベル選択肢（自動を含む）
+private enum LabelSelection: Equatable {
+    case auto, text, systemImage, mainAndSub
 }
 
-private extension Equatable {
-    func and<T: Equatable>(_ value: T) -> EquatablePair<Self, T> {
-        .init(first: self, second: value)
+// MARK: 共通セクションビュー
+private struct LabelEditorSection: View {
+    @Binding var selection: LabelSelection
+    @Binding var labelText: String
+    @Binding var labelImageName: String
+    @Binding var labelMain: String
+    @Binding var labelSub: String
+    @Binding var pressActions: [CodableActionData]
+    var supportsAuto: Bool
+    var showHelp: Bool
+
+    var body: some View {
+        Section(header: Text("ラベル")) {
+            Picker("ラベルの種類", selection: $selection) {
+                if supportsAuto {
+                    Text("自動").tag(LabelSelection.auto)
+                }
+                Text("テキスト").tag(LabelSelection.text)
+                Text("システムアイコン").tag(LabelSelection.systemImage)
+                Text("メインとサブ").tag(LabelSelection.mainAndSub)
+            }
+            .onChange(of: pressActions) { (_, _) in
+                if supportsAuto, selection == .auto {
+                    let text = pressActions.inputText ?? ""
+                    labelText = text
+                }
+            }
+            switch selection {
+            case .auto:
+                EmptyView()
+            case .text:
+                HStack {
+                    Text("ラベル")
+                    if showHelp {
+                        HelpAlertButton(title: "ラベル", explanation: "キーに表示される文字を設定します。")
+                    }
+                    TextField("ラベル", text: $labelText)
+                        .textFieldStyle(.roundedBorder)
+                        .submitLabel(.done)
+                }
+            case .systemImage:
+                SystemIconPicker(icon: $labelImageName)
+            case .mainAndSub:
+                HStack {
+                    Text("メイン")
+                    if showHelp {
+                        HelpAlertButton(title: "メイン", explanation: "大きく表示される文字を設定します。")
+                    }
+                    TextField("メインのラベル", text: $labelMain)
+                        .textFieldStyle(.roundedBorder)
+                        .submitLabel(.done)
+                }
+                HStack {
+                    Text("サブ")
+                    if showHelp {
+                        HelpAlertButton(title: "サブ", explanation: "小さく表示される文字を設定します。")
+                    }
+                    TextField("サブのラベル", text: $labelSub)
+                        .textFieldStyle(.roundedBorder)
+                        .submitLabel(.done)
+                }
+            }
+        }
+    }
+}
+
+private struct PressActionSection: View {
+    @Binding var actions: [CodableActionData]
+    var body: some View {
+        Section(header: Text("アクション"), footer: Text("キーを押したときの動作をより詳しく設定します。")) {
+            NavigationLink("アクションを編集する") {
+                CodableActionDataEditor($actions, availableCustards: CustardManager.load().availableCustards)
+            }
+            .foregroundStyle(.accentColor)
+        }
+    }
+}
+
+private struct LongpressActionSection: View {
+    @Binding var action: CodableLongpressActionData
+    var warning: LocalizedStringKey?
+
+    var body: some View {
+        Section(header: Text("長押しアクション"), footer: Text("キーを長押ししたときの動作をより詳しく設定します。")) {
+            NavigationLink("長押しアクションを編集する") {
+                CodableLongpressActionDataEditor($action, availableCustards: CustardManager.load().availableCustards)
+            }
+            .foregroundStyle(.accentColor)
+            if let warning {
+                Text(warning)
+                    .font(.footnote)
+                    .foregroundStyle(.orange)
+            }
+        }
     }
 }
 
@@ -37,16 +133,6 @@ fileprivate extension [CodableActionData] {
                 nil
             }
         }.first
-    }
-}
-
-fileprivate extension CustardKeyLabelStyle {
-    var textValue: String? {
-        if case let .text(string) = self {
-            string
-        } else {
-            nil
-        }
     }
 }
 
@@ -293,6 +379,64 @@ fileprivate extension CustardInterfaceCustomKey {
     }
 }
 
+// MARK: - Longpress variations utilities (for linear variations editing)
+fileprivate extension CustardInterfaceCustomKey {
+    func longpressKeys() -> [CustardInterfaceVariationKey] {
+        self.variations.compactMap { v in
+            if case .longpressVariation = v.type {
+                v.key
+            } else {
+                nil
+            }
+        }
+    }
+    mutating func setLongpressKeys(_ keys: [CustardInterfaceVariationKey]) {
+        let flicks = self.variations.filter { v in
+            if case .flickVariation = v.type {
+                return true
+            } else {
+                return false
+            }
+        }
+        self.variations = flicks + keys.map {
+            .init(type: .longpressVariation, key: $0)
+        }
+    }
+    subscript(longpressListIndex index: Int) -> CustardInterfaceVariationKey {
+        get { self.longpressKeys()[index] }
+        set {
+            var arr = self.longpressKeys()
+            arr[index] = newValue
+            self.setLongpressKeys(arr)
+        }
+    }
+    mutating func appendLongpressVariation() {
+        var arr = self.longpressKeys()
+        // 初期は入力とラベルを一致させて自動判定にできるよう、空文字の入力アクションを設定
+        arr.append(
+            .init(
+                design: .init(label: .text("")),
+                press_actions: [.input("")],
+                longpress_actions: .none
+            )
+        )
+        self.setLongpressKeys(arr)
+    }
+    mutating func removeLongpress(at index: Int) {
+        var arr = self.longpressKeys()
+        guard arr.indices.contains(index) else {
+            return
+        }
+        arr.remove(at: index)
+        self.setLongpressKeys(arr)
+    }
+    mutating func moveLongpress(fromOffsets: IndexSet, toOffset: Int) {
+        var arr = self.longpressKeys()
+        arr.move(fromOffsets: fromOffsets, toOffset: toOffset)
+        self.setLongpressKeys(arr)
+    }
+}
+
 fileprivate extension CustardInterfaceVariationKey {
     enum LabelTextKey { case labelText }
     enum PressActionKey { case pressAction }
@@ -416,6 +560,11 @@ struct CustardInterfaceKeyEditor: View {
     private let target: Target
 
     @State private var selectedPosition: FlickKeyPosition = .center
+    @State private var longpressSelectedIndex: Int = -1
+    @State private var dragFromLongpressIndex: Int?
+    @State private var longpressIDs: [UUID] = []
+    @State private var longpressSelection: [UUID: LabelSelection] = [:]
+    // 長押しの自動ラベル選択は「入力とラベル文字列が一致しているか」で判定する（フリックと同様）
 
     private struct KeyLabelTypeWrapper {
         var center: LabelType?
@@ -446,6 +595,12 @@ struct CustardInterfaceKeyEditor: View {
         }
     }
     @State private var keyLabelTypeWrapper: KeyLabelTypeWrapper = KeyLabelTypeWrapper()
+    // 編集モード切替（フリック / 長押しバリエーション）
+    private enum EditSegment: Sendable, Hashable {
+        case flick
+        case longpress
+    }
+    @State private var editSegment: EditSegment = .flick
 
     enum Target {
         /// フリック用のカスタムキーの編集画面
@@ -506,14 +661,34 @@ struct CustardInterfaceKeyEditor: View {
             case let .custom(value):
                 switch target {
                 case .flick:
-                    Text("編集したい方向を選択してください。")
-                        .padding(.vertical)
-                        .foregroundStyle(.secondary)
-                    flickKeysView(key: value)
+                    // セグメント切替（フリック / 長押しバリエーション）
+                    Picker("編集モード", selection: $editSegment) {
+                        Text("フリック").tag(EditSegment.flick)
+                        Text("長押しバリエーション").tag(EditSegment.longpress)
+                    }
+                    .pickerStyle(.segmented)
+                    .padding(.horizontal)
+
+                    switch editSegment {
+                    case .flick:
+                        Text("編集したい方向を選択してください。")
+                            .padding(.vertical)
+                            .foregroundStyle(.secondary)
+                        flickKeysView(key: value)
+                        customKeyEditor(position: selectedPosition)
+                    case .longpress:
+                        longpressListEditor
+                        let count = keyData.model[.custom].longpressKeys().count
+                        if (0..<count).contains(longpressSelectedIndex) {
+                            customKeyEditor(longpressIndex: longpressSelectedIndex)
+                        } else {
+                            Spacer()
+                        }
+                    }
                 case .simple:
                     keyView(key: value, position: .center)
+                    customKeyEditor(position: .center)
                 }
-                customKeyEditor(position: selectedPosition)
             case .system:
                 systemKeyEditor()
             }
@@ -521,6 +696,126 @@ struct CustardInterfaceKeyEditor: View {
         .background(Color.secondarySystemBackground)
         .navigationTitle(Text("キーの編集"))
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    // MARK: Longpress variations list editor (Qwerty-like UI)
+    @ViewBuilder
+    private var longpressListEditor: some View {
+        let customBinding = Binding<CustardInterfaceCustomKey>(
+            get: { keyData.model[.custom] },
+            set: { keyData.model[.custom] = $0 }
+        )
+        let longpressBinding = Binding<[CustardInterfaceVariationKey]>(
+            get: { customBinding.wrappedValue.longpressKeys() },
+            set: { arr in
+                var v = customBinding.wrappedValue
+                v.setLongpressKeys(arr)
+                customBinding.wrappedValue = v
+            }
+        )
+
+        let screenWidth = UIScreen.main.bounds.width
+        let chipWidth: CGFloat = min(120, screenWidth / 4.5)
+        let chipHeight: CGFloat = 44
+        let padding: CGFloat = 6
+
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("長押しバリエーション").font(.headline)
+                Spacer()
+                Button("追加", systemImage: "plus") {
+                    var v = customBinding.wrappedValue
+                    v.appendLongpressVariation()
+                    customBinding.wrappedValue = v
+                    longpressSelectedIndex = customBinding.wrappedValue.longpressKeys().indices.last ?? -1
+                    let newId = UUID()
+                    longpressIDs.append(newId)
+                    // 追加直後は自動モードにして、入力とラベルの同期を有効にする
+                    longpressSelection[newId] = .auto
+                }
+            }
+            if longpressBinding.wrappedValue.isEmpty {
+                Text("バリエーションはキーを長押しすると選択できます").foregroundStyle(.secondary)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 0) {
+                        let safeCount = min(longpressIDs.count, longpressBinding.wrappedValue.count)
+                        let indexed: [IndexedLongpressItem] = (0..<safeCount).map { .init(id: longpressIDs[$0], index: $0) }
+                        ForEach(indexed, id: \.id) { elem in
+                            let i = elem.index
+                            let item = longpressBinding.wrappedValue[i]
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color.background)
+                                .stroke(longpressSelectedIndex == i ? .accentColor : .primary)
+                                .focus(.accentColor, focused: longpressSelectedIndex == i)
+                                .overlay {
+                                    switch item[.labelType] {
+                                    case .text:
+                                        Text(item[.labelText])
+                                            .lineLimit(1)
+                                            .padding(.horizontal, 6)
+                                    case .systemImage:
+                                        let name = item[.labelImageName]
+                                        Image(systemName: name)
+                                            .padding(.horizontal, 6)
+                                    case .mainAndSub:
+                                        VStack(spacing: 2) {
+                                            Text(item[.labelMain])
+                                            Text(item[.labelSub]).font(.caption)
+                                        }
+                                        .padding(.horizontal, 6)
+                                    }
+                                }
+                                .compositingGroup()
+                                .frame(width: chipWidth, height: chipHeight)
+                                .padding(padding)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    longpressSelectedIndex = i
+                                }
+                                .onDrag {
+                                    self.dragFromLongpressIndex = i
+                                    return NSItemProvider(contentsOf: URL(string: "longpress-\(i)")!)!
+                                }
+                                .onDrop(of: [.url], delegate: LocalDropDelegate {
+                                    guard let from = self.dragFromLongpressIndex else {
+                                        return
+                                    }
+                                    withAnimation(.default) {
+                                        var arr = longpressBinding.wrappedValue
+                                        let toOffset = i > from ? i + 1 : i
+                                        arr.move(fromOffsets: IndexSet(integer: from), toOffset: toOffset)
+                                        // move stable IDs in tandem for animation
+                                        let movedId = longpressIDs.remove(at: from)
+                                        longpressIDs.insert(movedId, at: i > from ? i : i)
+                                        var v = customBinding.wrappedValue
+                                        v.setLongpressKeys(arr)
+                                        customBinding.wrappedValue = v
+                                        self.dragFromLongpressIndex = i
+                                        self.longpressSelectedIndex = i
+                                    }
+                                })
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
+            }
+        }
+        .padding(.horizontal)
+        .onAppear {
+            let count = longpressBinding.wrappedValue.count
+            if longpressIDs.count != count {
+                longpressIDs = (0..<count).map { _ in UUID() }
+            }
+        }
+        .onChange(of: longpressBinding.wrappedValue.count) { (_, newCount) in
+            let current = longpressIDs.count
+            if newCount > current {
+                longpressIDs.append(contentsOf: Array(repeating: UUID(), count: newCount - current))
+            } else if newCount < current {
+                longpressIDs.removeLast(current - newCount)
+            }
+        }
     }
 
     private var keyPicker: some View {
@@ -581,6 +876,16 @@ struct CustardInterfaceKeyEditor: View {
         return false
     }
 
+    private func isInputActionEditable(actions: [CodableActionData]) -> Bool {
+        if actions.count == 1, case .input = actions.first {
+            return true
+        }
+        if actions.isEmpty {
+            return true
+        }
+        return false
+    }
+
     private func customKeyEditor(position: FlickKeyPosition) -> some View {
         Form {
             Section(header: Text("入力")) {
@@ -611,106 +916,70 @@ struct CustardInterfaceKeyEditor: View {
                     .foregroundStyle(.accentColor)
                 }
             }
-            Section(header: Text("ラベル")) {
-                Picker("ラベルの種類", selection: $keyLabelTypeWrapper[position]) {
-                    Text("自動").tag(LabelType?.none)
-                    Text("テキスト").tag(LabelType.text)
-                    Text("システムアイコン").tag(LabelType.systemImage)
-                    Text("メインとサブ").tag(LabelType.mainAndSub)
-                }
-                .onChange(of: keyLabelTypeWrapper[position].and(keyData.model[.custom][.pressAction, position].and(position))) { (_, newValue) in
-                    guard newValue.first == nil else { return }
-                    let actions = newValue.second.first
-                    let position = newValue.second.second
-                    let firstLabel = actions.inputText
-                    if let firstLabel {
-                        self.keyData.model[.custom][.label, position] = .text(firstLabel)
-                    } else {
-                        self.keyLabelTypeWrapper[position] = .text
-                    }
-                }
-                switch keyLabelTypeWrapper[position] {
-                case .none:
-                    EmptyView()
-                case .text:
-                    HStack {
-                        Text("ラベル")
-                        HelpAlertButton(title: "ラベル", explanation: "キーに表示される文字を設定します。")
-                        TextField(
-                            "ラベル",
-                            text: Binding(
-                                get: {
-                                    keyData.model[.custom][.labelText, position]
-                                },
-                                set: {
-                                    keyData.model[.custom][.labelText, position] = $0
-                                }
-                            )
-                        )
-                        .textFieldStyle(.roundedBorder)
-                        .submitLabel(.done)
-                    }
-                case .systemImage:
-                    SystemIconPicker(
-                        icon: Binding(
-                            get: {
-                                keyData.model[.custom][.labelImageName, position]
-                            },
-                            set: {
-                                keyData.model[.custom][.labelImageName, position] = $0
+            LabelEditorSection(
+                selection: Binding(
+                    get: {
+                        if let t = keyLabelTypeWrapper[position] {
+                            switch t {
+                            case .text: .text
+                            case .systemImage: .systemImage
+                            case .mainAndSub: .mainAndSub
                             }
-                        )
-                    )
-                case .mainAndSub:
-                    HStack {
-                        Text("メイン")
-                        HelpAlertButton(title: "メイン", explanation: "大きく表示される文字を設定します。")
-                        TextField(
-                            "メインのラベル",
-                            text: Binding(
-                                get: {
-                                    keyData.model[.custom][.labelMain, position]
-                                },
-                                set: {
-                                    keyData.model[.custom][.labelMain, position] = $0
-                                }
-                            )
-                        )
-                        .textFieldStyle(.roundedBorder)
-                        .submitLabel(.done)
+                        } else {
+                            .auto
+                        }
+                    },
+                    set: { sel in
+                        switch sel {
+                        case .auto:
+                            keyLabelTypeWrapper[position] = nil
+                            let text = keyData.model[.custom][.pressAction, position].inputText ?? ""
+                            keyData.model[.custom][.label, position] = .text(text)
+                        case .text:
+                            keyLabelTypeWrapper[position] = .text
+                            keyData.model[.custom][.label, position] = .text(keyData.model[.custom][.labelText, position])
+                        case .systemImage:
+                            keyLabelTypeWrapper[position] = .systemImage
+                            keyData.model[.custom][.label, position] = .systemImage(keyData.model[.custom][.labelImageName, position])
+                        case .mainAndSub:
+                            keyLabelTypeWrapper[position] = .mainAndSub
+                            keyData.model[.custom][.label, position] = .mainAndSub(keyData.model[.custom][.labelMain, position], keyData.model[.custom][.labelSub, position])
+                        }
                     }
-                    HStack {
-                        Text("サブ")
-                        HelpAlertButton(title: "サブ", explanation: "小さく表示される文字を設定します。")
-                        TextField(
-                            "サブのラベル",
-                            text: Binding(
-                                get: {
-                                    keyData.model[.custom][.labelSub, position]
-                                },
-                                set: {
-                                    keyData.model[.custom][.labelSub, position] = $0
-                                }
-                            )
-                        )
-                        .textFieldStyle(.roundedBorder)
-                        .submitLabel(.done)
+                ),
+                labelText: Binding(
+                    get: { keyData.model[.custom][.labelText, position] },
+                    set: { keyData.model[.custom][.labelText, position] = $0 }
+                ),
+                labelImageName: Binding(
+                    get: { keyData.model[.custom][.labelImageName, position] },
+                    set: { keyData.model[.custom][.labelImageName, position] = $0 }
+                ),
+                labelMain: Binding(
+                    get: { keyData.model[.custom][.labelMain, position] },
+                    set: { keyData.model[.custom][.labelMain, position] = $0 }
+                ),
+                labelSub: Binding(
+                    get: { keyData.model[.custom][.labelSub, position] },
+                    set: { keyData.model[.custom][.labelSub, position] = $0 }
+                ),
+                pressActions: $keyData.model[.custom][.pressAction, position],
+                supportsAuto: true,
+                showHelp: true
+            )
+            PressActionSection(actions: $keyData.model[.custom][.pressAction, position])
+            LongpressActionSection(
+                action: $keyData.model[.custom][.longpressAction, position],
+                warning: {
+                    if position == .center {
+                        let hasLongpressVars = !keyData.model[.custom].longpressKeys().isEmpty
+                        if hasLongpressVars {
+                            return "長押しバリエーションが設定されている場合長押しアクションは動作しません"
+                        }
                     }
-
-                }
-            }
-            Section(header: Text("アクション"), footer: Text("キーを押したときの動作をより詳しく設定します。")) {
-                NavigationLink("アクションを編集する") {
-                    CodableActionDataEditor($keyData.model[.custom][.pressAction, position], availableCustards: CustardManager.load().availableCustards)
-                }
-                .foregroundStyle(.accentColor)
-            }
-            Section(header: Text("長押しアクション"), footer: Text("キーを長押ししたときの動作をより詳しく設定します。")) {
-                NavigationLink("長押しアクションを編集する") {
-                    CodableLongpressActionDataEditor($keyData.model[.custom][.longpressAction, position], availableCustards: CustardManager.load().availableCustards)
-                }
-                .foregroundStyle(.accentColor)
-            }
+                    return nil
+                }()
+            )
             if position == .center {
                 Section(header: Text("キーの色")) {
                     Picker("キーの色", selection: $keyData.model[.custom].design.color) {
@@ -783,5 +1052,157 @@ struct CustardInterfaceKeyEditor: View {
             }
             .frame(width: keySize.width, height: keySize.height)
         }
+    }
+
+    // Unified longpress editor (same style sections as flick editor)
+    @ViewBuilder private func customKeyEditor(longpressIndex index: Int) -> some View {
+        let variation = Binding<CustardInterfaceVariationKey>(
+            get: {
+                let arr = keyData.model[.custom].longpressKeys()
+                if arr.indices.contains(index) {
+                    return arr[index]
+                } else {
+                    return .init(design: .init(label: .text("")), press_actions: [.input("")], longpress_actions: .none)
+                }
+            },
+            set: { newValue in
+                var model = keyData.model[.custom]
+                var arr = model.longpressKeys()
+                if arr.indices.contains(index) {
+                    arr[index] = newValue
+                    model.setLongpressKeys(arr)
+                    keyData.model[.custom] = model
+                }
+            }
+        )
+        let currentId: UUID? = longpressIDs.indices.contains(index) ? longpressIDs[index] : nil
+        let lpLabelType = Binding<LabelSelection>(
+            get: {
+                if let id = currentId, let sel = longpressSelection[id] {
+                    return sel
+                }
+                let input = variation.wrappedValue[.pressAction].inputText
+                switch variation.wrappedValue.design.label {
+                case .text(let s):
+                    if let input, input == s {
+                        return .auto
+                    } else {
+                        return .text
+                    }
+                case .systemImage:
+                    return .systemImage
+                case .mainAndSub:
+                    return .mainAndSub
+                }
+            },
+            set: { newValue in
+                if let id = currentId {
+                    longpressSelection[id] = newValue
+                }
+                switch newValue {
+                case .auto:
+                    let text = variation.wrappedValue[.pressAction].inputText ?? ""
+                    variation.wrappedValue.design.label = .text(text)
+                case .text:
+                    variation.wrappedValue[.labelType] = .text
+                case .systemImage:
+                    variation.wrappedValue[.labelType] = .systemImage
+                case .mainAndSub:
+                    variation.wrappedValue[.labelType] = .mainAndSub
+                }
+            }
+        )
+
+        Form {
+            Section(header: Text("入力")) {
+                let actions = variation.wrappedValue[.pressAction]
+                if isInputActionEditable(actions: actions) {
+                    HStack {
+                        Text("入力")
+                        TextField(
+                            "入力",
+                            text: Binding(
+                                get: { variation.wrappedValue[.inputAction] },
+                                set: { variation.wrappedValue[.inputAction] = $0 }
+                            )
+                        )
+                        .textFieldStyle(.roundedBorder)
+                        .submitLabel(.done)
+                    }
+                } else {
+                    Text("このキーには入力以外のアクションが設定されています。現在のアクションを消去して入力する文字を設定するには「入力を設定する」を押してください")
+                    Button("入力を設定する") {
+                        variation.wrappedValue[.inputAction] = ""
+                    }
+                    .foregroundStyle(.accentColor)
+                }
+            }
+            LabelEditorSection(
+                selection: lpLabelType,
+                labelText: variation[.labelText],
+                labelImageName: variation[.labelImageName],
+                labelMain: variation[.labelMain],
+                labelSub: variation[.labelSub],
+                pressActions: variation[.pressAction],
+                supportsAuto: true,
+                showHelp: false
+            )
+            .onAppear {
+                if let id = currentId, longpressSelection[id] == nil {
+                    let input = variation.wrappedValue[.pressAction].inputText
+                    let initial: LabelSelection
+                    switch variation.wrappedValue.design.label {
+                    case .text(let s):
+                        if let input, input == s {
+                            initial = .auto
+                        } else {
+                            initial = .text
+                        }
+                    case .systemImage:
+                        initial = .systemImage
+                    case .mainAndSub:
+                        initial = .mainAndSub
+                    }
+                    longpressSelection[id] = initial
+                }
+            }
+            PressActionSection(actions: variation[.pressAction])
+            LongpressActionSection(action: variation[.longpressAction])
+            Section {
+                Button("このバリエーションを削除") {
+                    var model = keyData.model[.custom]
+                    model.removeLongpress(at: index)
+                    keyData.model[.custom] = model
+                    if longpressIDs.indices.contains(index) {
+                        let removed = longpressIDs.remove(at: index)
+                        longpressSelection.removeValue(forKey: removed)
+                    }
+                    let count = keyData.model[.custom].longpressKeys().count
+                    if count == 0 {
+                        longpressSelectedIndex = -1
+                    } else {
+                        longpressSelectedIndex = min(index, count - 1)
+                    }
+                }
+                .foregroundStyle(.red)
+            }
+        }
+    }
+}
+
+// Local drop delegate for reordering chips via onDrag/onDrop
+private struct LocalDropDelegate: DropDelegate {
+    let onMove: () -> Void
+
+    func performDrop(info: DropInfo) -> Bool {
+        true
+    }
+    func dropEntered(info: DropInfo) {
+        withAnimation(.default) {
+            self.onMove()
+        }
+    }
+    func dropUpdated(info: DropInfo) -> DropProposal? {
+        DropProposal(operation: .move)
     }
 }

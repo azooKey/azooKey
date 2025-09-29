@@ -166,41 +166,30 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
     func renderUnified(
         modelsDict: [UnifiedPositionSpecifier: any UnifiedKeyModelProtocol<Extension>],
         width: Int,
-        height: Int,
-        gestureFor: (any UnifiedKeyModelProtocol<Extension>) -> UnifiedGenericKeyView<Extension>.GestureSet
+        height: Int
     ) -> some View {
         let design = TabDependentDesign(width: width, height: height, interfaceSize: variableStates.interfaceSize, orientation: variableStates.keyboardOrientation)
-        let unifiedModels: [(UnifiedPositionSpecifier, any UnifiedKeyModelProtocol<Extension>, UnifiedGenericKeyView<Extension>.GestureSet)] = modelsDict.map { (pos, model) in
-            (pos, model, gestureFor(model))
-        }
+        let unifiedModels: [(UnifiedPositionSpecifier, any UnifiedKeyModelProtocol<Extension>)] = modelsDict.map { (pos, model) in (pos, model) }
         UnifiedKeysView(models: unifiedModels, tabDesign: design) { keyView, _ in keyView }
     }
 
     @MainActor @ViewBuilder
     func keyboardView(tab: KeyboardTab.ExistentialTab) -> some View {
-        let qwertyGesture: (any UnifiedKeyModelProtocol<Extension>) -> UnifiedGenericKeyView<Extension>.GestureSet = { model in
-            if case let .fourWay(map) = model.variationSpace(variableStates: variableStates), !map.isEmpty {
-                return .directionalFlick
-            } else {
-                return .linearVariation
-            }
-        }
-
         switch tab {
         case .flick_hira:
-            renderUnified(modelsDict: FlickLayoutProvider<Extension>.hiraKeyboard, width: 5, height: 4, gestureFor: qwertyGesture)
+            renderUnified(modelsDict: FlickLayoutProvider<Extension>.hiraKeyboard, width: 5, height: 4)
         case .flick_abc:
-            renderUnified(modelsDict: FlickLayoutProvider<Extension>.abcKeyboard, width: 5, height: 4, gestureFor: qwertyGesture)
+            renderUnified(modelsDict: FlickLayoutProvider<Extension>.abcKeyboard, width: 5, height: 4)
         case .flick_numbersymbols:
-            renderUnified(modelsDict: FlickLayoutProvider<Extension>.numberKeyboard, width: 5, height: 4, gestureFor: qwertyGesture)
+            renderUnified(modelsDict: FlickLayoutProvider<Extension>.numberKeyboard, width: 5, height: 4)
         case .qwerty_hira:
-            renderUnified(modelsDict: QwertyLayoutProvider<Extension>.hiraKeyboard(), width: 10, height: 4, gestureFor: qwertyGesture)
+            renderUnified(modelsDict: QwertyLayoutProvider<Extension>.hiraKeyboard(), width: 10, height: 4)
         case .qwerty_abc:
-            renderUnified(modelsDict: QwertyLayoutProvider<Extension>.abcKeyboard(), width: 10, height: 4, gestureFor: qwertyGesture)
+            renderUnified(modelsDict: QwertyLayoutProvider<Extension>.abcKeyboard(), width: 10, height: 4)
         case .qwerty_numbers:
-            renderUnified(modelsDict: QwertyLayoutProvider<Extension>.numberKeyboard, width: 10, height: 4, gestureFor: qwertyGesture)
+            renderUnified(modelsDict: QwertyLayoutProvider<Extension>.numberKeyboard, width: 10, height: 4)
         case .qwerty_symbols:
-            renderUnified(modelsDict: QwertyLayoutProvider<Extension>.symbolsKeyboard(), width: 10, height: 4, gestureFor: qwertyGesture)
+            renderUnified(modelsDict: QwertyLayoutProvider<Extension>.symbolsKeyboard(), width: 10, height: 4)
         case let .custard(custard):
             CustomKeyboardView<Extension>(custard: custard)
         case let .special(tab):

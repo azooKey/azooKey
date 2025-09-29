@@ -182,13 +182,13 @@ struct ManageCustardView: View {
                                             }
                                         case let .tenkey(value):
                                             NavigationLink("編集") {
-                                                EditingTenkeyCustardView(manager: $manager, editingItem: value, path: $path)
+                                                EditingGridFitCustardView(manager: $manager, editingItem: value, path: $path)
                                             }
                                         }
                                         Divider()
                                     } else if let editingItem = custard.userMadeTenKeyCustard {
                                         NavigationLink("編集") {
-                                            EditingTenkeyCustardView(manager: $manager, editingItem: editingItem, path: $path)
+                                            EditingGridFitCustardView(manager: $manager, editingItem: editingItem, path: $path)
                                         }
                                         Divider()
                                     }
@@ -224,14 +224,14 @@ struct ManageCustardView: View {
             .onAppear(perform: {self.loadWebCustard()})
 
             Section(header: Text("作る")) {
-                Text("登録したい文字や単語を順番に書いていくだけでスクロール式のカスタムタブを作成することができます。")
-                NavigationLink("スクロール式のカスタムタブを作る") {
+                Text("登録したい文字や単語を順番に書いていくだけで定型文入力に便利なタブを作成できます。")
+                NavigationLink("定型文タブを作る") {
                     EditingScrollCustardView(manager: $manager, path: $path)
                 }
                 .foregroundStyle(.accentColor)
-                Text("フリック式のカスタムタブを作成することができます。")
-                NavigationLink("フリック式のカスタムタブを作る") {
-                    EditingTenkeyCustardView(manager: $manager, path: $path)
+                Text("日本語/英語入力用のタブをフルカスタマイズできます。")
+                NavigationLink("カスタムタブを作る") {
+                    EditingGridFitCustardView(manager: $manager, path: $path)
                 }
                 .foregroundStyle(.accentColor)
             }
