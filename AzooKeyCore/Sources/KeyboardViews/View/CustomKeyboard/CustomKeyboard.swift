@@ -84,12 +84,7 @@ public extension CustardInterface {
                         QwertyNextCandidateKeyModel<Extension>()
                     }
                 case .changeKeyboard:
-                    switch self.keyStyle {
-                    case .tenkeyStyle:
-                        FlickChangeKeyboardKeyModel<Extension>()
-                    case .pcStyle:
-                        QwertyChangeKeyboardKeyModel<Extension>()
-                    }
+                    UnifiedChangeKeyboardKeyModel<Extension>()
                 case .flickKogaki:
                     FlickKogakiKeyModel<Extension>()
                 case .flickKutoten:

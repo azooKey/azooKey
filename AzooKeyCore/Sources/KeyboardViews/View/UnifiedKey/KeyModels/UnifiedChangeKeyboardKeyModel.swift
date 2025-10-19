@@ -3,7 +3,7 @@ import Foundation
 import KeyboardThemes
 import SwiftUI
 
-struct FlickChangeKeyboardKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: UnifiedKeyModelProtocol {
+struct UnifiedChangeKeyboardKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: UnifiedKeyModelProtocol {
     @MainActor private var _enablePasteButton: Bool {
         Extension.SettingProvider.enablePasteButton
     }
