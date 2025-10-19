@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftUI
+import CustardKit
 
 @MainActor
 public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>: View {
@@ -177,11 +178,11 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
     func keyboardView(tab: KeyboardTab.ExistentialTab) -> some View {
         switch tab {
         case .flick_hira:
-            CustomKeyboardView<Extension>(custard: .flickJapanese)
+            CustomKeyboardView<Extension>(custard: settingAppliedFlickCustard(.flickJapanese))
         case .flick_abc:
-            CustomKeyboardView<Extension>(custard: .flickEnglish)
+            CustomKeyboardView<Extension>(custard: settingAppliedFlickCustard(.flickEnglish))
         case .flick_numbersymbols:
-            CustomKeyboardView<Extension>(custard: .flickNumberSymbols)
+            CustomKeyboardView<Extension>(custard: settingAppliedFlickCustard(.flickNumberSymbols))
         case .qwerty_hira:
             renderUnified(modelsDict: QwertyLayoutProvider<Extension>.hiraKeyboard(), width: 10, height: 4)
         case .qwerty_abc:
@@ -200,5 +201,15 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
                 EmojiTab<Extension>()
             }
         }
+    }
+
+    private func settingAppliedFlickCustard(_ custard: Custard) -> Custard {
+        var custard = custard
+        if Extension.SettingProvider.useNextCandidateKey {
+            var interface = custard.interface
+            interface.keys[.gridFit(.init(x: 4, y: 1))] = .system(.nextCandidate)
+            custard.interface = interface
+        }
+        return custard
     }
 }
