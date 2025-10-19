@@ -177,11 +177,11 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
     func keyboardView(tab: KeyboardTab.ExistentialTab) -> some View {
         switch tab {
         case .flick_hira:
-            renderUnified(modelsDict: FlickLayoutProvider<Extension>.hiraKeyboard, width: 5, height: 4)
+            CustomKeyboardView<Extension>(custard: .flickJapanese)
         case .flick_abc:
-            renderUnified(modelsDict: FlickLayoutProvider<Extension>.abcKeyboard, width: 5, height: 4)
+            CustomKeyboardView<Extension>(custard: .flickEnglish)
         case .flick_numbersymbols:
-            renderUnified(modelsDict: FlickLayoutProvider<Extension>.numberKeyboard, width: 5, height: 4)
+            CustomKeyboardView<Extension>(custard: .flickNumberSymbols)
         case .qwerty_hira:
             renderUnified(modelsDict: QwertyLayoutProvider<Extension>.hiraKeyboard(), width: 10, height: 4)
         case .qwerty_abc:
