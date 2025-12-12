@@ -22,7 +22,7 @@ jobs:
           submodules: true
 
       - name: Cache DerivedData
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/Library/Developer/Xcode/DerivedData
           key: ${{ runner.os }}-derived-data-${{ hashFiles('**/project.pbxproj') }}
