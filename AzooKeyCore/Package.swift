@@ -1,4 +1,4 @@
-// swift-tools-version: 6.1
+// swift-tools-version: 6.2
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -6,29 +6,6 @@ import PackageDescription
 let swiftSettings: [SwiftSetting] = [
     .enableUpcomingFeature("ExistentialAny"),
     .interoperabilityMode(.Cxx),
-]
-
-#if canImport(FoundationModels)
-let isXcodeVersion26 = true
-#else
-let isXcodeVersion26 = false
-#endif
-
-let xcode26AdditionalTargets: [Target] = [
-    .binaryTarget(
-        // Note: Xcode 26以降、AzooKeyKanaKanjiConverter側のXCFrameworkのbinaryTargetをXcodeが解決してくれなくなった。
-        // そこで、binaryTargetを再度AzooKeyCore側でも要求することで、結果的に認識されるようになる。
-        // さらに`AzooKeyUtils`でも`llama`を要求しないとビルドは通らない。
-        // ただし、Xcode 26より前の場合は逆にこの対応を入れると動作しないので、Xcodeバージョンを確認する必要がある
-        name: "llama",
-        url: "https://github.com/azooKey/llama.cpp/releases/download/b4846/signed-llama.xcframework.zip",
-        // this can be computed `swift package compute-checksum llama-b4844-xcframework.zip`
-        checksum: "db3b13169df8870375f212e6ac21194225f1c85f7911d595ab64c8c790068e0a"
-    ),
-]
-
-let xcode26AdditionalTargetDependency: [Target.Dependency] = [
-    "llama"
 ]
 
 let package = Package(
@@ -101,7 +78,7 @@ let package = Package(
             dependencies: [
                 "KeyboardThemes",
                 "KeyboardViews",
-            ] + (isXcodeVersion26 ? xcode26AdditionalTargetDependency : []),
+            ],
             resources: [],
             swiftSettings: swiftSettings
         ),
@@ -128,5 +105,5 @@ let package = Package(
             ],
             swiftSettings: swiftSettings
         ),
-    ] + (isXcodeVersion26 ? xcode26AdditionalTargets : [])
+    ]
 )
