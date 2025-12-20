@@ -27,3 +27,17 @@ public extension Binding where Value: Sendable {
         )
     }
 }
+
+public extension Binding where Value == Optional<String> {
+    @MainActor
+    func wrapped(default: String = "") -> Binding<String> {
+        .init(
+            get: {
+                self.wrappedValue ?? `default`
+            },
+            set: {newValue in
+                self.wrappedValue = newValue
+            }
+        )
+    }
+}

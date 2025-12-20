@@ -10,7 +10,7 @@ import CustardKit
 import Foundation
 import SwiftUI
 
-fileprivate extension CustardKeyLabelStyle {
+public extension CustardKeyLabelStyle {
     var keyLabelType: KeyLabelType {
         switch self {
         case let .text(value):
@@ -19,6 +19,8 @@ fileprivate extension CustardKeyLabelStyle {
             return .image(value)
         case let .mainAndSub(main, sub):
             return .symbols([main, sub])
+        case let .mainAndDirections(main, directions):
+            return .mainAndDirections(main, directions)
         }
     }
 }

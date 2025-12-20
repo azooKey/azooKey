@@ -20,11 +20,11 @@ private struct IndexedLongpressItem: Identifiable, Hashable {
     let index: Int
 }
 private enum LabelType: Equatable {
-    case text, systemImage, mainAndSub
+    case text, systemImage, mainAndSub, mainAndDirections
 }
 // 共通のラベル選択肢（自動を含む）
 private enum LabelSelection: Equatable {
-    case auto, text, systemImage, mainAndSub
+    case auto, text, systemImage, mainAndSub, mainAndDirections
 }
 
 // MARK: 共通セクションビュー
@@ -34,6 +34,8 @@ private struct LabelEditorSection: View {
     @Binding var labelImageName: String
     @Binding var labelMain: String
     @Binding var labelSub: String
+    @Binding var labelDirections: CustardKeyDirectionalLabel
+
     @Binding var pressActions: [CodableActionData]
     var supportsAuto: Bool
     var showHelp: Bool
@@ -47,6 +49,7 @@ private struct LabelEditorSection: View {
                 Text("テキスト").tag(LabelSelection.text)
                 Text("システムアイコン").tag(LabelSelection.systemImage)
                 Text("メインとサブ").tag(LabelSelection.mainAndSub)
+                Text("メインと4方向").tag(LabelSelection.mainAndDirections)
             }
             .onChange(of: pressActions) { (_, _) in
                 if supportsAuto, selection == .auto {
@@ -85,6 +88,52 @@ private struct LabelEditorSection: View {
                         HelpAlertButton(title: "サブ", explanation: "小さく表示される文字を設定します。")
                     }
                     TextField("サブのラベル", text: $labelSub)
+                        .textFieldStyle(.roundedBorder)
+                        .submitLabel(.done)
+                }
+            case .mainAndDirections:
+                HStack {
+                    Text("メイン")
+                    if showHelp {
+                        HelpAlertButton(title: "メイン", explanation: "中心に表示される文字を設定します。")
+                    }
+                    TextField("メインのラベル", text: $labelMain)
+                        .textFieldStyle(.roundedBorder)
+                        .submitLabel(.done)
+                }
+                HStack {
+                    Text("左")
+                    if showHelp {
+                        HelpAlertButton(title: "左", explanation: "左に表示される文字を設定します。")
+                    }
+                    TextField("左のラベル", text: $labelDirections.left.wrapped())
+                        .textFieldStyle(.roundedBorder)
+                        .submitLabel(.done)
+                }
+                HStack {
+                    Text("上")
+                    if showHelp {
+                        HelpAlertButton(title: "上", explanation: "上に表示される文字を設定します。")
+                    }
+                    TextField("上のラベル", text: $labelDirections.top.wrapped())
+                        .textFieldStyle(.roundedBorder)
+                        .submitLabel(.done)
+                }
+                HStack {
+                    Text("右")
+                    if showHelp {
+                        HelpAlertButton(title: "右", explanation: "右に表示される文字を設定します。")
+                    }
+                    TextField("右のラベル", text: $labelDirections.right.wrapped())
+                        .textFieldStyle(.roundedBorder)
+                        .submitLabel(.done)
+                }
+                HStack {
+                    Text("下")
+                    if showHelp {
+                        HelpAlertButton(title: "下", explanation: "下に表示される文字を設定します。")
+                    }
+                    TextField("下のラベル", text: $labelDirections.bottom.wrapped())
                         .textFieldStyle(.roundedBorder)
                         .submitLabel(.done)
                 }
@@ -204,6 +253,7 @@ fileprivate extension CustardInterfaceCustomKey {
     enum LabelTypeKey { case labelType }
     enum LabelMainKey { case labelMain }
     enum LabelSubKey { case labelSub }
+    enum LabelDirectionsKey { case labelDirections }
     enum PressActionKey { case pressAction }
     enum InputActionKey { case inputAction }
     enum LongpressActionKey { case longpressAction }
@@ -270,6 +320,12 @@ fileprivate extension CustardInterfaceCustomKey {
             if case let .mainAndSub(value, _) = self.design.label {
                 return value
             }
+            if case let .mainAndDirections(value, _) = self.design.label {
+                return value
+            }
+            if case let .text(value) = self.design.label {
+                return value
+            }
             return ""
         }
         set {
@@ -277,8 +333,10 @@ fileprivate extension CustardInterfaceCustomKey {
                 self[direction][.labelMain] = newValue
             } else if case let .mainAndSub(_, variations) = self.design.label {
                 self.design.label = .mainAndSub(newValue, variations)
+            } else if case let .mainAndDirections(_, variations) = self.design.label {
+                self.design.label = .mainAndDirections(newValue, variations)
             } else {
-                self.design.label = .mainAndSub(newValue, "")
+                self.design.label = .text(newValue)
             }
         }
     }
@@ -304,6 +362,26 @@ fileprivate extension CustardInterfaceCustomKey {
         }
     }
 
+    subscript(label: LabelDirectionsKey, position: FlickKeyPosition) -> CustardKeyDirectionalLabel {
+        get {
+            if let direction = position.flickDirection {
+                return self[direction][.labelDirections]
+            }
+            if case let .mainAndDirections(_, value) = self.design.label {
+                return value
+            }
+            return CustardKeyDirectionalLabel()
+        }
+        set {
+            if let direction = position.flickDirection {
+                self[direction][.labelDirections] = newValue
+            } else {
+                let main = self[.labelMain, position]
+                self.design.label = .mainAndDirections(main, newValue)
+            }
+        }
+    }
+
     subscript(label: LabelTypeKey, position: FlickKeyPosition) -> LabelType {
         get {
             if let direction = position.flickDirection {
@@ -313,6 +391,7 @@ fileprivate extension CustardInterfaceCustomKey {
             case .systemImage: return .systemImage
             case .text: return .text
             case .mainAndSub: return .mainAndSub
+            case .mainAndDirections: return .mainAndDirections
             }
         }
         set {
@@ -326,6 +405,8 @@ fileprivate extension CustardInterfaceCustomKey {
                     self.design.label = .systemImage("circle.fill")
                 case .mainAndSub:
                     self.design.label = .mainAndSub("A", "BC")
+                case .mainAndDirections:
+                    self.design.label = .mainAndDirections("", .init())
                 }
             }
         }
@@ -450,6 +531,7 @@ fileprivate extension CustardInterfaceVariationKey {
     enum LabelTypeKey { case labelType }
     enum LabelMainKey { case labelMain }
     enum LabelSubKey { case labelSub }
+    enum LabelDirectionsKey { case labelDirections }
 
     subscript(label: LabelTextKey) -> String {
         get {
@@ -480,13 +562,21 @@ fileprivate extension CustardInterfaceVariationKey {
             if case let .mainAndSub(value, _) = self.design.label {
                 return value
             }
+            if case let .mainAndDirections(value, _) = self.design.label {
+                return value
+            }
+            if case let .text(value) = self.design.label {
+                return value
+            }
             return ""
         }
         set {
             if case let .mainAndSub(_, variations) = self.design.label {
                 self.design.label = .mainAndSub(newValue, variations)
+            } else if case let .mainAndDirections(_, variations) = self.design.label {
+                self.design.label = .mainAndDirections(newValue, variations)
             } else {
-                self.design.label = .mainAndSub(newValue, "")
+                self.design.label = .text(newValue)
             }
         }
     }
@@ -507,12 +597,26 @@ fileprivate extension CustardInterfaceVariationKey {
         }
     }
 
+    subscript(label: LabelDirectionsKey) -> CustardKeyDirectionalLabel {
+        get {
+            if case let .mainAndDirections(_, directions) = self.design.label {
+                return directions
+            }
+            return CustardKeyDirectionalLabel()
+        }
+        set {
+            let main = self[.labelMain]
+            self.design.label = .mainAndDirections(main, newValue)
+        }
+    }
+
     subscript(label: LabelTypeKey) -> LabelType {
         get {
             switch self.design.label {
             case .systemImage: return .systemImage
             case .text: return .text
             case .mainAndSub: return .mainAndSub
+            case .mainAndDirections: return .mainAndDirections
             }
         }
         set {
@@ -523,6 +627,8 @@ fileprivate extension CustardInterfaceVariationKey {
                 self.design.label = .systemImage("circle.fill")
             case .mainAndSub:
                 self.design.label = .mainAndSub("A", "BC")
+            case .mainAndDirections:
+                self.design.label = .mainAndDirections("", .init())
             }
         }
     }
@@ -634,6 +740,8 @@ struct CustardInterfaceKeyEditor: View {
                 .systemImage
             case .mainAndSub:
                 .mainAndSub
+            case .mainAndDirections:
+                .mainAndDirections
             }
         }
         if case .custom = self.keyData.model {
@@ -765,6 +873,8 @@ struct CustardInterfaceKeyEditor: View {
                                             Text(item[.labelSub]).font(.caption)
                                         }
                                         .padding(.horizontal, 6)
+                                    case .mainAndDirections:
+                                        DirectionalKeyLabel(main: item[.labelMain], directions: item[.labelDirections], subFont: .caption)
                                     }
                                 }
                                 .compositingGroup()
@@ -926,6 +1036,7 @@ struct CustardInterfaceKeyEditor: View {
                             case .text: .text
                             case .systemImage: .systemImage
                             case .mainAndSub: .mainAndSub
+                            case .mainAndDirections: .mainAndDirections
                             }
                         } else {
                             .auto
@@ -946,6 +1057,9 @@ struct CustardInterfaceKeyEditor: View {
                         case .mainAndSub:
                             keyLabelTypeWrapper[position] = .mainAndSub
                             keyData.model[.custom][.label, position] = .mainAndSub(keyData.model[.custom][.labelMain, position], keyData.model[.custom][.labelSub, position])
+                        case .mainAndDirections:
+                            keyLabelTypeWrapper[position] = .mainAndDirections
+                            keyData.model[.custom][.label, position] = .mainAndDirections(keyData.model[.custom][.labelMain, position], keyData.model[.custom][.labelDirections, position])
                         }
                     }
                 ),
@@ -964,6 +1078,10 @@ struct CustardInterfaceKeyEditor: View {
                 labelSub: Binding(
                     get: { keyData.model[.custom][.labelSub, position] },
                     set: { keyData.model[.custom][.labelSub, position] = $0 }
+                ),
+                labelDirections: Binding(
+                    get: { keyData.model[.custom][.labelDirections, position] },
+                    set: { keyData.model[.custom][.labelDirections, position] = $0 }
                 ),
                 pressActions: $keyData.model[.custom][.pressAction, position],
                 supportsAuto: true,
@@ -1051,6 +1169,11 @@ struct CustardInterfaceKeyEditor: View {
                 }
             }
             .frame(width: keySize.width, height: keySize.height)
+        case .mainAndDirections:
+            CustomKeySettingFlickKeyView(position, selectedPosition: $selectedPosition) {
+                DirectionalKeyLabel(main: key[.labelMain, position], directions: key[.labelDirections, position])
+            }
+            .frame(width: keySize.width, height: keySize.height)
         }
     }
 
@@ -1093,6 +1216,8 @@ struct CustardInterfaceKeyEditor: View {
                     return .systemImage
                 case .mainAndSub:
                     return .mainAndSub
+                case .mainAndDirections:
+                    return .mainAndDirections
                 }
             },
             set: { newValue in
@@ -1109,6 +1234,8 @@ struct CustardInterfaceKeyEditor: View {
                     variation.wrappedValue[.labelType] = .systemImage
                 case .mainAndSub:
                     variation.wrappedValue[.labelType] = .mainAndSub
+                case .mainAndDirections:
+                    variation.wrappedValue[.labelType] = .mainAndDirections
                 }
             }
         )
@@ -1144,6 +1271,7 @@ struct CustardInterfaceKeyEditor: View {
                 labelImageName: variation[.labelImageName],
                 labelMain: variation[.labelMain],
                 labelSub: variation[.labelSub],
+                labelDirections: variation[.labelDirections],
                 pressActions: variation[.pressAction],
                 supportsAuto: true,
                 showHelp: false
@@ -1163,6 +1291,8 @@ struct CustardInterfaceKeyEditor: View {
                         initial = .systemImage
                     case .mainAndSub:
                         initial = .mainAndSub
+                    case .mainAndDirections:
+                        initial = .mainAndDirections
                     }
                     longpressSelection[id] = initial
                 }
