@@ -17,7 +17,7 @@ jobs:
     steps: 
     - uses: swift-actions/setup-swift@7ca6abe6b3b0e8b5421b88be48feee39cbf52c6a
       with:
-        swift-version: "5.9"
+        swift-version: "6.2"
 
     - uses: actions/checkout@v6
       with:

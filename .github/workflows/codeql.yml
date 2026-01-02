@@ -66,7 +66,7 @@ jobs:
       if: matrix.build-mode == 'manual'
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: "16.2"
+        xcode-version: "latest-stable"
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
