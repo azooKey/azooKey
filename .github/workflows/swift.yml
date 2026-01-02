@@ -12,12 +12,13 @@ on:
 jobs:
   build:
 
-    runs-on: macos-latest
+    runs-on: macos-15
 
     steps: 
-    - uses: swift-actions/setup-swift@7ca6abe6b3b0e8b5421b88be48feee39cbf52c6a
+    - name: Set up Xcode
+      uses: maxim-lobanov/setup-xcode@v1
       with:
-        swift-version: "5.9"
+        xcode-version: "latest-stable"
 
     - uses: actions/checkout@v6
       with:
