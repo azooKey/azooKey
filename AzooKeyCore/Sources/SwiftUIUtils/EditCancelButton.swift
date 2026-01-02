@@ -23,7 +23,7 @@ public struct EditConfirmButton: View {
     private var action: () -> ()
 
     public var body: some View {
-        if #available(iOS 26, *) {
+        if #available(iOS 26, macOS 26, *) {
             Button(self.confirmationType.label, systemImage: "checkmark", role: .confirm) {
                 self.action()
             }
@@ -57,7 +57,7 @@ public struct EditCancelButton: View {
     }
 
     public var body: some View {
-        if #available(iOS 26, *) {
+        if #available(iOS 26, macOS 26, *) {
             Button("キャンセル", systemImage: "xmark", role: .cancel) {
                 if confirmationRequired {
                     self.showCancellationAlert = true
