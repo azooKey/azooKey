@@ -278,13 +278,13 @@ public enum Design {
                 case .xsmall:
                     return 0.6
                 case .xxsmall:
-                    return 0.2
+                    return 0.5
                 }
             }
         }
 
         private func getMaximumFontSize(for text: String, width: CGFloat, maxFontSize: Int) -> CGFloat {
-            var lowerBound = 5
+            var lowerBound = 9
             var upperBound = maxFontSize
             var mid = 0
             while lowerBound < upperBound {
