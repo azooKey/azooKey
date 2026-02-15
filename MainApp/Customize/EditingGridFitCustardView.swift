@@ -348,7 +348,9 @@ struct EditingGridFitCustardView: CancelableEditor {
                 self.baseSelectionSheetState.showBaseSelectionSheet = true
             }
         }
-        .sheet(isPresented: self.$baseSelectionSheetState.showBaseSelectionSheet) {
+        .sheet(isPresented: self.$baseSelectionSheetState.showBaseSelectionSheet, onDismiss: {
+            self.baseSelectionSheetState.hasShown = true
+        }) {
             NavigationStack {
                 List {
                     ForEach(baseCustards, id: \.identifier) {custard in
