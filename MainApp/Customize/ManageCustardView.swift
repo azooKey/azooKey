@@ -152,6 +152,8 @@ struct ManageCustardView: View {
     @Binding private var path: [CustomizeTabView.Path]
     @State private var webCustards: WebCustardList = .init(last_update: "", custards: [])
     @State private var showDocumentPicker = false
+    @State private var showURLImportAlert = false
+    @State private var showRecommendedImportDialog = false
     @State private var selectedDocument: Data = Data()
     @State private var addTabBar = true
     init(manager: Binding<CustardManager>, path: Binding<[CustomizeTabView.Path]>) {
@@ -159,82 +161,123 @@ struct ManageCustardView: View {
         self._path = path
     }
 
-    var body: some View {
-        Form {
-            Section(header: Text("一覧")) {
-                if manager.availableCustards.isEmpty {
-                    Text("カスタムタブがまだありません")
-                } else {
-                    List {
-                        ForEach(manager.availableCustards, id: \.self) {identifier in
-                            if let custard = self.getCustard(identifier: identifier) {
-                                NavigationLink(identifier) {
-                                    CustardInformationView(custard: custard, path: $path)
-                                }
-                                .contextMenu {
-                                    if let metadata = manager.metadata[custard.identifier],
-                                       metadata.origin == .userMade,
-                                       let userdata = try? manager.userMadeCustardData(identifier: custard.identifier) {
-                                        switch userdata {
-                                        case let .gridScroll(value):
-                                            NavigationLink("編集") {
-                                                EditingScrollCustardView(manager: $manager, editingItem: value, path: $path)
-                                            }
-                                        case let .tenkey(value):
-                                            NavigationLink("編集") {
-                                                EditingGridFitCustardView(manager: $manager, editingItem: value, path: $path)
-                                            }
-                                        }
-                                        Divider()
-                                    } else if let editingItem = custard.userMadeTenKeyCustard {
+    private var tabList: some View {
+        Section(header: Text("一覧")) {
+            if manager.availableCustards.isEmpty {
+                Text("カスタムタブがまだありません")
+            } else {
+                List {
+                    ForEach(manager.availableCustards, id: \.self) {identifier in
+                        if let custard = self.getCustard(identifier: identifier) {
+                            NavigationLink(identifier) {
+                                CustardInformationView(custard: custard, path: $path)
+                            }
+                            .contextMenu {
+                                if let metadata = manager.metadata[custard.identifier],
+                                   metadata.origin == .userMade,
+                                   let userdata = try? manager.userMadeCustardData(identifier: custard.identifier) {
+                                    switch userdata {
+                                    case let .gridScroll(value):
                                         NavigationLink("編集") {
-                                            EditingGridFitCustardView(manager: $manager, editingItem: editingItem, path: $path)
+                                            EditingScrollCustardView(manager: $manager, editingItem: value, path: $path)
                                         }
-                                        Divider()
-                                    }
-                                    Button("複製", systemImage: "square.on.square") {
-                                        do {
-                                            try manager.duplicateCustard(identifier: custard.identifier)
-                                        } catch {
-                                            debug(error.localizedDescription)
+                                    case let .tenkey(value):
+                                        NavigationLink("編集") {
+                                            EditingGridFitCustardView(manager: $manager, editingItem: value, path: $path)
                                         }
-                                    }
-                                    Button("名前を変更", systemImage: "pencil") {
-                                        renamingIdentifier = custard.identifier
-                                        renamingName = custard.metadata.display_name
-                                        showRenameAlert = true
                                     }
                                     Divider()
-                                    Button("削除", systemImage: "trash", role: .destructive) {
-                                        self.deletingCustardIdentifier = identifier
-                                        self.showDeleteAlert = true
-                                        manager.removeCustard(identifier: identifier)
+                                } else if let editingItem = custard.userMadeTenKeyCustard {
+                                    NavigationLink("編集") {
+                                        EditingGridFitCustardView(manager: $manager, editingItem: editingItem, path: $path)
+                                    }
+                                    Divider()
+                                }
+                                Button("複製", systemImage: "square.on.square") {
+                                    do {
+                                        try manager.duplicateCustard(identifier: custard.identifier)
+                                    } catch {
+                                        debug(error.localizedDescription)
                                     }
                                 }
-                            } else if let custardFileURL = self.getCustardFile(identifier: identifier) {
-                                ShareLink(item: custardFileURL) {
-                                    Label("読み込みに失敗したカスタムタブ「\(identifier)」を書き出す", systemImage: "square.and.arrow.up")
+                                Button("名前を変更", systemImage: "pencil") {
+                                    renamingIdentifier = custard.identifier
+                                    renamingName = custard.metadata.display_name
+                                    showRenameAlert = true
+                                }
+                                Divider()
+                                Button("削除", systemImage: "trash", role: .destructive) {
+                                    self.deletingCustardIdentifier = identifier
+                                    self.showDeleteAlert = true
+                                    manager.removeCustard(identifier: identifier)
                                 }
                             }
+                        } else if let custardFileURL = self.getCustardFile(identifier: identifier) {
+                            ShareLink(item: custardFileURL) {
+                                Label("読み込みに失敗したカスタムタブ「\(identifier)」を書き出す", systemImage: "square.and.arrow.up")
+                            }
                         }
-                        .onDelete(perform: {self.delete(at: $0)})
                     }
+                    .onDelete(perform: {self.delete(at: $0)})
                 }
             }
-            .onAppear(perform: {self.loadWebCustard()})
+        }
+    }
 
-            Section(header: Text("作る")) {
-                Text("登録したい文字や単語を順番に書いていくだけで定型文入力に便利なタブを作成できます。")
-                NavigationLink("定型文タブを作る") {
+
+    private var newTabToolBarItem: ToolbarItem<(), some View> {
+        ToolbarItem(placement: .topBarTrailing) {
+            Menu {
+                NavigationLink {
                     EditingScrollCustardView(manager: $manager, path: $path)
+                } label: {
+                    Label("定型文タブの作成", systemImage: "text.badge.plus")
                 }
-                .foregroundStyle(.accentColor)
-                Text("日本語/英語入力用のタブをフルカスタマイズできます。")
-                NavigationLink("カスタムタブを作る") {
+                NavigationLink {
                     EditingGridFitCustardView(manager: $manager, path: $path)
+                } label: {
+                    Label("カスタムタブの作成", systemImage: "keyboard")
                 }
-                .foregroundStyle(.accentColor)
+                Button("おすすめから読み込む", systemImage: "star") {
+                    showRecommendedImportDialog = true
+                }
+                Button("iCloudから読み込む", systemImage: "icloud.and.arrow.down") {
+                    showDocumentPicker = true
+                }
+                Button("URLから読み込む", systemImage: "link.badge.plus") {
+                    showURLImportAlert = true
+                }
+            } label: {
+                Image(systemName: "plus")
             }
+        }
+    }
+
+    @ViewBuilder
+    private func recommendedTabList(dismissSheetOnSelect: Bool = false) -> some View {
+        ForEach(webCustards.custards, id: \.file) {item in
+            HStack {
+                Button {
+                    if dismissSheetOnSelect {
+                        showRecommendedImportDialog = false
+                    }
+                    Task {
+                        await self.downloadAsync(from: "https://azookey.netlify.app/static/custard/\(item.file)")
+                    }
+                } label: {
+                    Image(systemName: "square.and.arrow.down")
+                        .foregroundStyle(.accentColor)
+                        .padding(.horizontal, 5)
+                }
+                Text(verbatim: item.name)
+            }
+        }
+    }
+
+    var body: some View {
+        Form {
+            self.tabList
+                .onAppear(perform: {self.loadWebCustard()})
             if let custards = self.downloaderState.custards {
                 ForEach(custards, id: \.identifier) {custard in
                     Section(header: Text("読み込んだタブ")) {
@@ -261,47 +304,6 @@ struct ManageCustardView: View {
                 .foregroundStyle(.red)
 
             } else {
-                Section(header: Text("おすすめ")) {
-                    ForEach(webCustards.custards, id: \.file) {item in
-                        HStack {
-                            Button {
-                                Task {
-                                    await self.downloadAsync(from: "https://azookey.netlify.app/static/custard/\(item.file)")
-                                }
-                            } label: {
-                                Image(systemName: "square.and.arrow.down")
-                                    .foregroundStyle(.accentColor)
-                                    .padding(.horizontal, 5)
-                            }
-                            Text(verbatim: item.name)
-                        }
-                    }
-                }
-
-                Section(header: Text("読み込む")) {
-                    Button("iCloudから読み込む") {
-                        showDocumentPicker = true
-                    }
-                }
-                Section(header: Text("URLから読み込む"), footer: Text("\(systemImage: "doc.on.clipboard")を長押しでペースト")) {
-                    HStack {
-                        TextField("URLを入力", text: $urlString)
-                            .submitLabel(.go)
-                            .onSubmit {
-                                Task {
-                                    await self.downloadAsync(from: urlString)
-                                }
-                            }
-                        Divider()
-                        PasteLongPressButton($urlString)
-                            .padding(.horizontal, 5)
-                    }
-                    Button("読み込む") {
-                        Task {
-                            await self.downloadAsync(from: urlString)
-                        }
-                    }
-                }
                 if let text = self.downloaderState.processState.description {
                     ProgressView(text)
                 }
@@ -318,6 +320,9 @@ struct ManageCustardView: View {
             }
         }
         .navigationBarTitle(Text("カスタムタブの管理"), displayMode: .inline)
+        .toolbar {
+            self.newTabToolBarItem
+        }
         .alert("注意", isPresented: $showAlert, presenting: alertType) { alertType in
             switch alertType {
             case let .overlapCustard(custard: custard):
@@ -378,6 +383,33 @@ struct ManageCustardView: View {
         }
         .alert("名前が重複しています", isPresented: $showDuplicateNameAlert) {
             Button("OK", role: .cancel) {}
+        }
+        .alert("URLから読み込む", isPresented: $showURLImportAlert) {
+            TextField("URLを入力", text: $urlString)
+            Button("読み込む") {
+                Task {
+                    await self.downloadAsync(from: urlString)
+                }
+            }
+            Button("キャンセル", role: .cancel) {}
+        } message: {
+            Text("カスタムタブファイルのURLを入力してください。")
+        }
+        .sheet(isPresented: $showRecommendedImportDialog) {
+            NavigationStack {
+                List {
+                    self.recommendedTabList(dismissSheetOnSelect: true)
+                }
+                .navigationTitle("おすすめから読み込む")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("閉じる") {
+                            showRecommendedImportDialog = false
+                        }
+                    }
+                }
+            }
         }
         .fileImporter(isPresented: $showDocumentPicker, allowedContentTypes: ["txt", "custard", "json"].compactMap {UTType(filenameExtension: $0, conformingTo: .text)}) {result in
             switch result {
