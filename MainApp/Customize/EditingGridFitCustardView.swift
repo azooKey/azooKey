@@ -85,6 +85,18 @@ struct EditingGridFitCustardView: CancelableEditor {
         )
     }
 
+    private var editingInterface: CustardInterface {
+        .init(
+            keyStyle: isTenkeyStyle ? .tenkeyStyle : .pcStyle,
+            keyLayout: .gridFit(layout),
+            keys: editingItem.keys.reduce(into: [:]) {dict, item in
+                if case let .gridFit(x: x, y: y) = item.key {
+                    dict[.gridFit(.init(x: x, y: y, width: item.value.width, height: item.value.height))] = item.value.model
+                }
+            }
+        )
+    }
+
     init(manager: Binding<CustardManager>, editingItem: UserMadeGridFitCustard? = nil, path: Binding<[CustomizeTabView.Path]>?) {
         self._manager = manager
         self.shouldJustDimiss = path == nil
@@ -176,7 +188,7 @@ struct EditingGridFitCustardView: CancelableEditor {
             .padding(.horizontal, 8)
             if !showPreview {
                 let design = TabDependentDesign(width: layout.rowCount, height: layout.columnCount, interfaceSize: interfaceSize, orientation: MainAppDesign.keyboardOrientation)
-                let unifiedModels = custard.interface.unifiedKeyModels(extension: AzooKeyKeyboardViewExtension.self)
+                let unifiedModels = editingInterface.unifiedKeyModels(extension: AzooKeyKeyboardViewExtension.self)
                 UnifiedKeysView(models: unifiedModels, tabDesign: design) { (view: UnifiedGenericKeyView<AzooKeyKeyboardViewExtension>, pos: UnifiedPositionSpecifier) in
                     let x = Int(pos.x)
                     let y = Int(pos.y)
