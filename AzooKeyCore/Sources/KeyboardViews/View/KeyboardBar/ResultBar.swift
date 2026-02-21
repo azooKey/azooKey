@@ -23,11 +23,19 @@ private extension Equatable {
 
 @MainActor
 struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
+    private enum TabBarButtonPlacement {
+        case center
+        case leading
+    }
+
     @Environment(Extension.Theme.self) private var theme
     @Environment(\.userActionManager) private var action
     @EnvironmentObject private var variableStates: VariableStates
     @Binding private var isResultViewExpanded: Bool
     @State private var undoButtonAction: VariableStates.UndoAction?
+    @State private var tabBarButtonPlacement: TabBarButtonPlacement = .center
+    @State private var isTabBarButtonVisible = false
+    @State private var tabBarButtonAnimationTask: Task<(), Never>?
     private var displayTabBarButton: Bool {
         Extension.SettingProvider.displayTabBarButton
     }
@@ -37,6 +45,10 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
     }
     private var buttonHeight: CGFloat {
         Design.keyboardBarHeight(interfaceHeight: variableStates.interfaceSize.height, orientation: variableStates.keyboardOrientation) * 0.6
+    }
+    private var tabBarButtonReservedWidth: CGFloat {
+        // KeyboardBarButton has circle size (0.8 * bar height) plus horizontal padding (5pt each side).
+        Design.keyboardBarHeight(interfaceHeight: variableStates.interfaceSize.height, orientation: variableStates.keyboardOrientation) * 0.8 + 10
     }
 
     init(isResultViewExpanded: Binding<Bool>) {
@@ -48,24 +60,70 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
             .zIndex(10)
     }
 
+    private var tabBarButtonHiddenScale: CGFloat { 0.55 }
+
+    private var tabBarButtonAlignment: Alignment {
+        switch tabBarButtonPlacement {
+        case .center:
+            .center
+        case .leading:
+            .leading
+        }
+    }
+
+    private func setTabBarButtonState(for displayState: ResultModel.DisplayState) {
+        switch displayState {
+        case .nothing:
+            self.tabBarButtonPlacement = .center
+            self.isTabBarButtonVisible = true
+        case .predictions:
+            self.tabBarButtonPlacement = .leading
+            self.isTabBarButtonVisible = true
+        case .results:
+            self.tabBarButtonPlacement = .center
+            self.isTabBarButtonVisible = false
+        }
+    }
+
+    private func updateTabBarButtonLayout(from oldState: ResultModel.DisplayState, to newState: ResultModel.DisplayState) {
+        let stagedHideDuration = 0.10
+        let stagedShowDuration = 0.22
+
+        tabBarButtonAnimationTask?.cancel()
+        tabBarButtonAnimationTask = nil
+
+        if oldState == .predictions && newState == .nothing {
+            withAnimation(.easeIn(duration: stagedHideDuration)) {
+                self.isTabBarButtonVisible = false
+            }
+
+            tabBarButtonAnimationTask = Task { @MainActor in
+                try? await Task.sleep(nanoseconds: UInt64(stagedHideDuration * 1_000_000_000))
+                guard !Task.isCancelled else { return }
+                self.tabBarButtonPlacement = .center
+                withAnimation(.easeOut(duration: stagedShowDuration)) {
+                    self.isTabBarButtonVisible = true
+                }
+            }
+            return
+        }
+
+        self.setTabBarButtonState(for: newState)
+    }
+
     var body: some View {
         Group {
             if variableStates.resultModel.displayState == .nothing {
-                HStack {
-                    if displayTabBarButton {
-                        tabBarButton
-                        if undoButtonAction != nil {
-                            Spacer()
-                        }
-                    }
-                }
-                .overlay {
+                HStack {}
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .overlay(alignment: .trailing) {
                     if let undoButtonAction {
                         Button("取り消す", systemImage: "arrow.uturn.backward") {
                             KeyboardFeedback<Extension>.click()
                             self.action.registerAction(undoButtonAction.action, variableStates: variableStates)
                         }
                         .buttonStyle(ResultButtonStyle<Extension>(height: buttonHeight))
+                        .padding(.trailing, 10)
                     }
                 }
                 .onAppear {
@@ -84,7 +142,6 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                         }
                     }
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color(.sRGB, white: 1, opacity: 0.001))
                 .onLongPressGesture {
                     self.action.registerAction(.setTabBar(.toggle), variableStates: variableStates)
@@ -92,8 +149,8 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
             } else {
                 HStack {
                     if variableStates.resultModel.displayState == .predictions && displayTabBarButton {
-                        tabBarButton
-                        Spacer()
+                        Color.clear
+                            .frame(width: tabBarButtonReservedWidth)
                     }
                     ScrollView(.horizontal, showsIndicators: false) {
                         ScrollViewReader {scrollViewProxy in
@@ -168,9 +225,27 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                         .padding(.trailing, 10)
                     }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .animation(.easeIn(duration: 0.2), value: variableStates.resultModel.displayState == .nothing)
+        .overlay(alignment: tabBarButtonAlignment) {
+            if displayTabBarButton {
+                tabBarButton
+                    .scaleEffect(isTabBarButtonVisible ? 1 : tabBarButtonHiddenScale, anchor: .center)
+                    .opacity(isTabBarButtonVisible ? 1 : 0)
+                    .allowsHitTesting(isTabBarButtonVisible)
+            }
+        }
+        .onAppear {
+            self.setTabBarButtonState(for: variableStates.resultModel.displayState)
+        }
+        .onChange(of: variableStates.resultModel.displayState) { oldValue, newValue in
+            self.updateTabBarButtonLayout(from: oldValue, to: newValue)
+        }
+        .onDisappear {
+            tabBarButtonAnimationTask?.cancel()
+            tabBarButtonAnimationTask = nil
+        }
     }
 
     private func pressed(_ data: ResultData) {
