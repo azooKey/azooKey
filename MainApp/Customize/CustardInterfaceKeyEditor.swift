@@ -176,12 +176,21 @@ private struct LongpressActionSection: View {
 fileprivate extension [CodableActionData] {
     var inputText: String? {
         self.compactMap { action in
-            if case let .input(text) = action {
+            switch action {
+            case let .input(text), let .directInput(text):
                 text
-            } else {
+            default:
                 nil
             }
         }.first
+    }
+
+    var usesDirectInput: Bool {
+        if case .directInput = self.first {
+            true
+        } else {
+            false
+        }
     }
 }
 
@@ -433,16 +442,18 @@ fileprivate extension CustardInterfaceCustomKey {
             if let direction = position.flickDirection {
                 return self[direction][.inputAction]
             }
-            if case let .input(value) = self.press_actions.first {
+            switch self.press_actions.first {
+            case let .input(value), let .directInput(value):
                 return value
+            default:
+                return ""
             }
-            return ""
         }
         set {
             if let direction = position.flickDirection {
                 self[direction][.inputAction] = newValue
             } else {
-                self.press_actions = [.input(newValue)]
+                self.press_actions = self.press_actions.usesDirectInput ? [.directInput(newValue)] : [.input(newValue)]
             }
         }
     }
@@ -644,13 +655,15 @@ fileprivate extension CustardInterfaceVariationKey {
 
     subscript(inputAction: InputActionKey) -> String {
         get {
-            if case let .input(value) = self.press_actions.first {
+            switch self.press_actions.first {
+            case let .input(value), let .directInput(value):
                 return value
+            default:
+                return ""
             }
-            return ""
         }
         set {
-            self.press_actions = [.input(newValue)]
+            self.press_actions = self.press_actions.usesDirectInput ? [.directInput(newValue)] : [.input(newValue)]
         }
     }
 
@@ -978,21 +991,31 @@ struct CustardInterfaceKeyEditor: View {
 
     private func isInputActionEditable(position: FlickKeyPosition) -> Bool {
         let actions = self.keyData.model[.custom][.pressAction, position]
-        if actions.count == 1, case .input = actions.first {
-            return true
-        }
         if actions.isEmpty {
             return true
+        }
+        if actions.count == 1 {
+            switch actions.first {
+            case .input, .directInput:
+                return true
+            default:
+                break
+            }
         }
         return false
     }
 
     private func isInputActionEditable(actions: [CodableActionData]) -> Bool {
-        if actions.count == 1, case .input = actions.first {
-            return true
-        }
         if actions.isEmpty {
             return true
+        }
+        if actions.count == 1 {
+            switch actions.first {
+            case .input, .directInput:
+                return true
+            default:
+                break
+            }
         }
         return false
     }

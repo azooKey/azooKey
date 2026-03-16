@@ -29,7 +29,7 @@ extension CodableActionData {
     var hasAssociatedValue: Bool {
         switch self {
         case .input("\n"): false
-        case .delete, .smartDelete, .input, .replaceLastCharacters, .replaceDefault, .moveCursor, .smartMoveCursor, .moveTab, .launchApplication, .selectCandidate, .completeCharacterForm: true
+        case .delete, .smartDelete, .input, .directInput, .replaceLastCharacters, .replaceDefault, .moveCursor, .smartMoveCursor, .moveTab, .launchApplication, .selectCandidate, .completeCharacterForm: true
         case  .enableResizingMode, .complete, .smartDeleteDefault, .toggleCapsLockState, .toggleCursorBar, .toggleTabBar, .dismissKeyboard, .paste: false
         }
     }
@@ -45,6 +45,8 @@ extension CodableActionData {
         } else {
             "改行を入力"
         }
+        case let .directInput(value):
+            "「\(value)」を直接入力"
         case let .moveCursor(value): return "\(String(value))文字分カーソルを移動"
         case let .smartMoveCursor(value): return "\(stringArrayDescription(value.targets))の隣までカーソルを移動"
         case let .delete(value): return "\(String(value))文字削除"
@@ -201,6 +203,8 @@ private struct CodableActionEditor: View {
             } else {
                 ActionEditTextField("入力する文字", action: $action) {value} convert: {.input($0)}
             }
+        case let .directInput(value):
+            ActionEditTextField("直接入力する文字", action: $action) {value} convert: {.directInput($0)}
         case let .delete(count):
             ActionEditIntegerTextField("削除する文字数", action: $action) {"\(count)"} convert: {value in
                 if let count = Int(value) {
@@ -858,6 +862,7 @@ struct CodableLongpressActionDataEditor: View {
                 if repeatActions.isEmpty {
                     QuickActionPicker(recommendation: [
                         .init(action: .input(""), systemImage: "character.cursor.ibeam", title: "入力"),
+                        .init(action: .directInput(""), systemImage: "text.badge.plus", title: "直接入力"),
                         .init(action: .delete(1), systemImage: "delete.left", title: "削除"),
                         .init(action: .moveCursor(1), systemImage: "arrowtriangle.left.and.line.vertical.and.arrowtriangle.right", title: "カーソル移動"),
                     ]) {
@@ -943,6 +948,7 @@ private struct QuickActionPicker: View {
     static var defaultRecommendation: [Item] {
         [
             .init(action: .input(""), systemImage: "character.cursor.ibeam", title: "入力"),
+            .init(action: .directInput(""), systemImage: "text.badge.plus", title: "直接入力"),
             .init(action: .delete(1), systemImage: "delete.left", title: "削除"),
             .init(action: .moveTab(.system(.user_japanese)), systemImage: "arrow.right.square", title: "タブの移動"),
         ]
@@ -1026,6 +1032,9 @@ private struct ActionPicker: View {
             case .basic:
                 Button("文字の入力") {
                     process(.input(""))
+                }
+                Button("文字の直接入力") {
+                    process(.directInput(""))
                 }
                 Button("タブの移動") {
                     process(.moveTab(.system(.user_japanese)))

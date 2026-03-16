@@ -84,17 +84,19 @@ private extension CustardInterfaceCustomKey {
     /// ベースカスタードを記述するためのヘルパー関数
     consuming func mainAndSubLabel() -> CustardInterfaceCustomKey {
         let center: String? = self.press_actions.first.flatMap {
-            if case let .input(value) = $0 {
+            switch $0 {
+            case let .input(value), let .directInput(value):
                 value
-            } else {
+            default:
                 nil
             }
         }
         let subs: [String] = self.variations.compactMap { (variation: CustardInterfaceVariation) in
             variation.key.press_actions.first.flatMap {
-                if case let .input(value) = $0 {
+                switch $0 {
+                case let .input(value), let .directInput(value):
                     value
-                } else {
+                default:
                     nil
                 }
             }
