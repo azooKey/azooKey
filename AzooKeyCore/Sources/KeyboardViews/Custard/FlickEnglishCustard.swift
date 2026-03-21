@@ -82,6 +82,7 @@ private extension CustardInterfaceCustomKey {
         let transform: (CodableActionData) -> CodableActionData = {
             switch $0 {
             case .input(let value): .input(value.lowercased())
+            case .directInput(let value): .directInput(value.lowercased())
             default: $0
             }
         }

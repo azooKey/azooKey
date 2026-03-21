@@ -151,7 +151,7 @@ public struct UserMadeGridScrollCustard: Codable, Sendable {
             }
             let label = target.count > 1 ? target[1] : input
             keys.append(.init(
-                model: .custom(.init(design: .init(label: .text(label), color: .normal), press_actions: [.input(input)], longpress_actions: .none, variations: [])),
+                model: .custom(.init(design: .init(label: .text(label), color: .normal), press_actions: [.directInput(input)], longpress_actions: .none, variations: [])),
                 width: 1,
                 height: 1
             ))

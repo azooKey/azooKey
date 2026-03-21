@@ -38,10 +38,10 @@ struct EditingScrollCustardView: CancelableEditor {
             .init(model: .custom(.init(design: .init(label: .systemImage("list.bullet"), color: .special), press_actions: [.toggleTabBar], longpress_actions: .none, variations: [])), width: 1, height: 1),
             .init(model: .custom(.init(design: .init(label: .systemImage("delete.left"), color: .special), press_actions: [.delete(1)], longpress_actions: .init(repeat: [.delete(1)]), variations: [])), width: 1, height: 1),
             .init(model: .system(.enter), width: 1, height: 1),
-            .init(model: .custom(.init(design: .init(label: .text("おはよう"), color: .normal), press_actions: [.input("おはよう")], longpress_actions: .none, variations: [])), width: 1, height: 1),
-            .init(model: .custom(.init(design: .init(label: .text("こんにちは"), color: .normal), press_actions: [.input("こんにちは")], longpress_actions: .none, variations: [])), width: 1, height: 1),
-            .init(model: .custom(.init(design: .init(label: .text("おつかれさま"), color: .normal), press_actions: [.input("おつかれさま")], longpress_actions: .none, variations: [])), width: 1, height: 1),
-            .init(model: .custom(.init(design: .init(label: .text("おやすみ"), color: .normal), press_actions: [.input("おやすみ")], longpress_actions: .none, variations: [])), width: 1, height: 1),
+            .init(model: .custom(.init(design: .init(label: .text("おはよう"), color: .normal), press_actions: [.directInput("おはよう")], longpress_actions: .none, variations: [])), width: 1, height: 1),
+            .init(model: .custom(.init(design: .init(label: .text("こんにちは"), color: .normal), press_actions: [.directInput("こんにちは")], longpress_actions: .none, variations: [])), width: 1, height: 1),
+            .init(model: .custom(.init(design: .init(label: .text("おつかれさま"), color: .normal), press_actions: [.directInput("おつかれさま")], longpress_actions: .none, variations: [])), width: 1, height: 1),
+            .init(model: .custom(.init(design: .init(label: .text("おやすみ"), color: .normal), press_actions: [.directInput("おやすみ")], longpress_actions: .none, variations: [])), width: 1, height: 1),
         ],
         addTabBarAutomatically: true
     )
@@ -151,7 +151,7 @@ struct EditingScrollCustardView: CancelableEditor {
                                 model: .custom(
                                     .init(
                                         design: .init(label: .text(addingItem), color: .normal),
-                                        press_actions: [.input(addingItem)],
+                                        press_actions: [.directInput(addingItem)],
                                         longpress_actions: .none,
                                         variations: []
                                     )
