@@ -161,8 +161,8 @@ final class InputManager {
 
         return ConvertRequestOptions(
             N_best: 10,
-            requireJapanesePrediction: requireJapanesePrediction,
-            requireEnglishPrediction: requireEnglishPrediction,
+            requireJapanesePrediction: .autoMix,
+            requireEnglishPrediction: .autoMix,
             keyboardLanguage: keyboardLanguage,
             // KeyboardSettingsを注入
             englishCandidateInRoman2KanaInput: englishCandidateInRoman2KanaInput,

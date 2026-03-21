@@ -16,7 +16,7 @@ GitHub上で「feat: 〇〇する」というような形のIssueを立ててく
 
 ### 2.2. プロジェクトを準備する
 
-GitHub上で、azooKeyのプロジェクトをフォークしてください。あなたのユーザ名が「hoge」の場合は「https://github.com/hoge/azooKey」ができあがります。
+GitHub上で、azooKeyのプロジェクトをフォークしてください。あなたのユーザ名が「hoge」の場合は「[https://github.com/hoge/azooKey](https://github.com/hoge/azooKey)」ができあがります。
 
 「1」でクローンして動かしたazooKeyのディレクトリで、以下のコマンドを実行します。`<alias>`部分は好きな名前（例えば`hoge`）に置き換えてください。これにより、あなたのフォークに`hoge`と言うエイリアスが追加されます。
 
