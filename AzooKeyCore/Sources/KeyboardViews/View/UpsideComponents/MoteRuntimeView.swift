@@ -18,6 +18,14 @@ struct MoteRuntimeView<Extension: ApplicationSpecificKeyboardViewExtension>: Vie
         runtime.currentQuestion
     }
 
+    private var chatContext: MoteChatContextInput {
+        .init(
+            leftText: variableStates.surroundingText.leftSideText,
+            centerText: variableStates.surroundingText.centerText,
+            rightText: variableStates.surroundingText.rightSideText
+        )
+    }
+
     var body: some View {
         VStack(spacing: 8) {
             content
@@ -52,6 +60,8 @@ struct MoteRuntimeView<Extension: ApplicationSpecificKeyboardViewExtension>: Vie
             stagePanel
         case .fullText:
             fullTextPanel
+        case .fallback:
+            fallbackPanel
         }
     }
 
@@ -144,6 +154,25 @@ struct MoteRuntimeView<Extension: ApplicationSpecificKeyboardViewExtension>: Vie
         }
     }
 
+    private var fallbackPanel: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("AI提案の取得に失敗しました")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text(runtime.fallbackMessage ?? "通信状態を確認して再試行してください。")
+                .font(.footnote)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Button("再試行") {
+                runtime.retryFromFallback(chatContext: chatContext)
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .background(theme.resultBackgroundColor.color)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+        }
+    }
+
     private var bottomBar: some View {
         HStack(spacing: 8) {
             tabButton(title: "mote+AI", tab: .moteAI)
@@ -155,7 +184,7 @@ struct MoteRuntimeView<Extension: ApplicationSpecificKeyboardViewExtension>: Vie
     private func tabButton(title: String, tab: MoteBottomTab, disabled: Bool = false) -> some View {
         let isSelected = runtime.selectedBottomTab == tab
         return Button {
-            let result = runtime.handleBottomTabTap(tab)
+            let result = runtime.handleBottomTabTap(tab, chatContext: chatContext)
             if result == .closeUpside {
                 action.registerAction(.setUpsideComponent(nil), variableStates: variableStates)
             }

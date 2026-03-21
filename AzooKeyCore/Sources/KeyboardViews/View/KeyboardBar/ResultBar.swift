@@ -52,7 +52,12 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
         Button {
             KeyboardFeedback<Extension>.click()
             self.action.registerAction(.setUpsideComponent(.moteRuntime), variableStates: variableStates)
-            variableStates.moteRuntime.startAskUserFlow()
+            let chatContext = MoteChatContextInput(
+                leftText: variableStates.surroundingText.leftSideText,
+                centerText: variableStates.surroundingText.centerText,
+                rightText: variableStates.surroundingText.rightSideText
+            )
+            variableStates.moteRuntime.startAskUserFlow(chatContext: chatContext)
         } label: {
             Label("mote+AI", systemImage: "sparkles")
         }

@@ -29,6 +29,7 @@ public enum MoteRuntimeScreen: Equatable, Sendable {
     case loading
     case stage
     case fullText
+    case fallback
 }
 
 public enum MoteBottomTab: Equatable, Sendable {
@@ -51,10 +52,16 @@ public final class MoteRuntimeState: ObservableObject {
     @Published public private(set) var currentQuestionIndex = 0
     @Published public private(set) var generatedChips: [String] = []
     @Published public private(set) var tappedChipHistory: [String] = []
+    @Published public private(set) var fallbackMessage: String?
 
     public private(set) var flowTask: Task<Void, Never>?
 
-    public init() {}
+    private let apiClient: any MoteRuntimeAPIProviding
+    private var latestChatContext: MoteChatContextInput = .empty
+
+    public init(apiClient: any MoteRuntimeAPIProviding = MoteRuntimeAPIClient()) {
+        self.apiClient = apiClient
+    }
 
     deinit {
         flowTask?.cancel()
@@ -73,20 +80,20 @@ public final class MoteRuntimeState: ObservableObject {
 
     public var selectedBottomTab: MoteBottomTab? {
         switch screen {
-        case .askUser:
+        case .askUser, .loading, .fallback:
             return .moteAI
         case .keyboard, .stage:
             return .keyboard
         case .fullText:
             return .fullText
-        case .loading:
-            return nil
         }
     }
 
-    public func startAskUserFlow() {
+    public func startAskUserFlow(chatContext: MoteChatContextInput = .empty) {
         guard !isProcessing else { return }
         guard screen != .askUser else { return }
+
+        latestChatContext = chatContext
 
         flowTask?.cancel()
         flowTask = nil
@@ -96,18 +103,22 @@ public final class MoteRuntimeState: ObservableObject {
         askUserQuestions = []
         askUserAnswers = [:]
         currentQuestionIndex = 0
+        fallbackMessage = nil
 
         isProcessing = true
         screen = .loading
 
         flowTask = Task { @MainActor [weak self] in
+            guard let self else { return }
             do {
-                try await Task.sleep(nanoseconds: 200_000_000)
+                let questions = try await self.apiClient.fetchAskUserQuestions(chatContext: chatContext)
                 try Task.checkCancellation()
-            } catch {
+                self.showAskUserQuestions(questions)
+            } catch is CancellationError {
                 return
+            } catch {
+                self.showFallback(message: error.localizedDescription)
             }
-            self?.showAskUserQuestions()
         }
     }
 
@@ -123,10 +134,10 @@ public final class MoteRuntimeState: ObservableObject {
         }
     }
 
-    public func handleBottomTabTap(_ tab: MoteBottomTab) -> MoteBottomTabResult {
+    public func handleBottomTabTap(_ tab: MoteBottomTab, chatContext: MoteChatContextInput = .empty) -> MoteBottomTabResult {
         switch tab {
         case .moteAI:
-            startAskUserFlow()
+            startAskUserFlow(chatContext: chatContext)
             return .keepUpside
         case .keyboard:
             if screen == .askUser || screen == .loading {
@@ -143,6 +154,10 @@ public final class MoteRuntimeState: ObservableObject {
             screen = .fullText
             return .keepUpside
         }
+    }
+
+    public func retryFromFallback(chatContext: MoteChatContextInput = .empty) {
+        startAskUserFlow(chatContext: chatContext)
     }
 
     public func recordChipTap(_ text: String) {
@@ -164,16 +179,21 @@ public final class MoteRuntimeState: ObservableObject {
         askUserQuestions = []
         askUserAnswers = [:]
         currentQuestionIndex = 0
+        fallbackMessage = nil
     }
 
-    private func showAskUserQuestions() {
-        guard !Task.isCancelled else { return }
+    private func showAskUserQuestions(_ questions: [MoteAskUserQuestion]) {
+        guard questions.count == 3, questions.allSatisfy({ $0.options.count == 3 }) else {
+            showFallback(message: MoteRuntimeAPIError.invalidResponse.localizedDescription)
+            return
+        }
 
-        askUserQuestions = Self.defaultQuestions()
+        askUserQuestions = questions
         askUserAnswers = [:]
         currentQuestionIndex = 0
         isProcessing = false
         flowTask = nil
+        fallbackMessage = nil
         screen = .askUser
     }
 
@@ -182,89 +202,40 @@ public final class MoteRuntimeState: ObservableObject {
         flowTask = nil
         isProcessing = true
         screen = .loading
+        fallbackMessage = nil
 
         let answers = askUserAnswers
+        let chatContext = latestChatContext
         flowTask = Task { @MainActor [weak self] in
+            guard let self else { return }
             do {
-                try await Task.sleep(nanoseconds: 250_000_000)
+                let chips = try await self.apiClient.generateReplyChips(chatContext: chatContext, answers: answers)
                 try Task.checkCancellation()
-            } catch {
+                self.finishReplyGeneration(chips: chips)
+            } catch is CancellationError {
                 return
+            } catch {
+                self.showFallback(message: error.localizedDescription)
             }
-            self?.finishReplyGeneration(answers: answers)
         }
     }
 
-    private func finishReplyGeneration(answers: [Int: String]) {
-        guard !Task.isCancelled else { return }
+    private func finishReplyGeneration(chips: [String]) {
+        guard (2...5).contains(chips.count) else {
+            showFallback(message: MoteRuntimeAPIError.invalidResponse.localizedDescription)
+            return
+        }
 
-        let first = answers[0] ?? "state_concrete"
-        let second = answers[1] ?? "act_today"
-        let third = answers[2] ?? "thanks_first"
-
-        generatedChips = [
-            "ありがとう、まず状況を共有するね。",
-            "次の動きは \(humanReadablePlan(from: second)) で進めるよ。",
-            "最後に \(humanReadableCare(from: third)) を添えるね。"
-        ]
-        _ = first
-
+        generatedChips = chips
         isProcessing = false
         flowTask = nil
         screen = .stage
     }
 
-    private func humanReadablePlan(from value: String) -> String {
-        switch value {
-        case "act_tomorrow":
-            return "明日対応"
-        case "propose_alternative":
-            return "代替案の提案"
-        default:
-            return "今日対応"
-        }
-    }
-
-    private func humanReadableCare(from value: String) -> String {
-        switch value {
-        case "reduce_burden":
-            return "負担軽減の提案"
-        case "ask_confirmation":
-            return "確認質問"
-        default:
-            return "謝意"
-        }
-    }
-
-    private static func defaultQuestions() -> [MoteAskUserQuestion] {
-        [
-            MoteAskUserQuestion(
-                index: 0,
-                text: "まず伝えるべき事実はどれですか？",
-                options: [
-                    MoteAskUserOption(label: "今の状況を具体的に伝える", value: "state_concrete"),
-                    MoteAskUserOption(label: "時間の見通しを伝える", value: "time_estimate"),
-                    MoteAskUserOption(label: "未確定であることを伝える", value: "state_uncertain")
-                ]
-            ),
-            MoteAskUserQuestion(
-                index: 1,
-                text: "次の行動として近いものは？",
-                options: [
-                    MoteAskUserOption(label: "今日中に対応する", value: "act_today"),
-                    MoteAskUserOption(label: "明日対応する", value: "act_tomorrow"),
-                    MoteAskUserOption(label: "代替案を提案する", value: "propose_alternative")
-                ]
-            ),
-            MoteAskUserQuestion(
-                index: 2,
-                text: "相手への配慮として含める要素は？",
-                options: [
-                    MoteAskUserOption(label: "謝意を先に伝える", value: "thanks_first"),
-                    MoteAskUserOption(label: "負担軽減の提案をする", value: "reduce_burden"),
-                    MoteAskUserOption(label: "確認質問を添える", value: "ask_confirmation")
-                ]
-            )
-        ]
+    private func showFallback(message: String) {
+        isProcessing = false
+        flowTask = nil
+        fallbackMessage = message
+        screen = .fallback
     }
 }

@@ -20,6 +20,12 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>MoteAPIAskUserPath</key>
+	<string>/api/mote/ask-user</string>
+	<key>MoteAPIBaseURL</key>
+	<string>$(MOTE_API_BASE_URL)</string>
+	<key>MoteAPIReplyPath</key>
+	<string>/api/mote/reply</string>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionAttributes</key>
