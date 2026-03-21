@@ -14,6 +14,7 @@ public enum UpsideComponent: Equatable, Sendable {
     case search([ConverterBehaviorSemantics.ReplacementTarget])
     case supplementaryCandidates
     case reportSuggestion(ReportContent)
+    case moteRuntime
 }
 
 public enum KeyboardTab: Equatable {

@@ -108,6 +108,8 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
                             SupplementaryCandidateView<Extension>()
                         case let .reportSuggestion(content):
                             ReportSuggestionView<Extension>(content: content)
+                        case .moteRuntime:
+                            MoteRuntimeView<Extension>()
                         }
                     }
                     .frame(height: Design.upsideComponentHeight(upsideComponent, orientation: variableStates.keyboardOrientation))

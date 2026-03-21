@@ -33,6 +33,7 @@ public final class VariableStates: ObservableObject {
         } else {
             nil
         }
+        self.moteRuntime = MoteRuntimeState()
         if let interfaceWidth {
             self.setInterfaceSize(orientation: orientation ?? .vertical, screenWidth: interfaceWidth)
         } else if let orientation {
@@ -185,6 +186,7 @@ public final class VariableStates: ObservableObject {
 
     @Published public var reportSuggestionState: ReportSuggestionState?
     @Published public var reportDetailState: ReportDetailState?
+    @MainActor @Published public var moteRuntime: MoteRuntimeState
 
     public func setSurroundingText(leftSide: String, center: String, rightSide: String) {
         self.surroundingText.leftSideText = leftSide

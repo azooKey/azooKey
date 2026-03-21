@@ -180,6 +180,8 @@ public enum Design {
             return (vertical: 0.15, horizontal: 0.15)
         case .reportSuggestion:
             return (vertical: 0.2, horizontal: 0.2)
+        case .moteRuntime:
+            return (vertical: 0.55, horizontal: 0.55)
         }
     }
 

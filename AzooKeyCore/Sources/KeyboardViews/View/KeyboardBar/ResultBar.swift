@@ -48,15 +48,27 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
             .zIndex(10)
     }
 
+    private var moteAIButton: some View {
+        Button {
+            KeyboardFeedback<Extension>.click()
+            self.action.registerAction(.setUpsideComponent(.moteRuntime), variableStates: variableStates)
+            variableStates.moteRuntime.startAskUserFlow()
+        } label: {
+            Label("mote+AI", systemImage: "sparkles")
+        }
+        .buttonStyle(ResultButtonStyle<Extension>(height: buttonHeight))
+    }
+
     var body: some View {
         Group {
             if variableStates.resultModel.displayState == .nothing {
                 HStack {
                     if displayTabBarButton {
                         tabBarButton
-                        if undoButtonAction != nil {
-                            Spacer()
-                        }
+                    }
+                    moteAIButton
+                    if undoButtonAction != nil {
+                        Spacer()
                     }
                 }
                 .overlay {
