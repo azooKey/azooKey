@@ -29,6 +29,13 @@ Apple Developer Account（無料）が必要です。開発環境は最新のXco
 
    ```
    git clone https://github.com/azooKey/azooKey --recursive
+   cd azooKey
+   ```
+
+1. bootstrapスクリプトで初期セットアップを実行します。
+
+   ```
+   scripts/bootstrap.sh
    ```
 
 1. `azooKey.xcodeproj`を開き、Xcodeの指示に従って「Run (Command+R)」を実行してください。
@@ -37,6 +44,8 @@ Apple Developer Account（無料）が必要です。開発環境は最新のXco
 
 ### テスト方法
 [Document](docs/tests.md)をご覧ください。
+
+セットアップの詳細は [docs/setup_local.md](docs/setup_local.md) を参照してください。
 
 ### 辞書の変更
 
@@ -58,4 +67,3 @@ GitHub Sponsorsをご利用ください。
 Copyright (c) 2020-2025 Keita Miwa (ensan).
 
 azooKeyはMIT Licenseでライセンスされています。詳しくは[LICENSE](./LICENSE)をご覧ください。
-

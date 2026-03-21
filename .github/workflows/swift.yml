@@ -33,9 +33,12 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-swift-
 
-    - name: Build
-      # TODO: add KeyboardViews
-      run: swift build --package-path AzooKeyCore --target SwiftUIUtils;swift build --package-path AzooKeyCore --target KeyboardThemes
+    - name: Build AzooKeyCore Targets
+      run: |
+        swift build --package-path AzooKeyCore --target SwiftUIUtils
+        swift build --package-path AzooKeyCore --target KeyboardThemes
 
-    - name: Run tests
-      run: echo "There is no test suits yet"
+    - name: Validate Package and Project Metadata
+      run: |
+        swift package dump-package --package-path AzooKeyCore > /dev/null
+        xcodebuild -list -project azooKey.xcodeproj > /dev/null

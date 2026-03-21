@@ -35,3 +35,12 @@ xcuserdata/
 **/xcshareddata/WorkspaceSettings.xcsettings
 
 # End of https://www.toptal.com/developers/gitignore/api/xcode
+
+# Local secrets and generated auth artifacts
+.env
+.env.local
+.env.*
+!.env.example
+*.p8
+private_keys/
+ExportOptions.plist

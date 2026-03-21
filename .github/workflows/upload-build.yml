@@ -14,6 +14,8 @@ jobs:
   build_and_upload:
     name: Build and Upload to App Store Connect
     runs-on: macos-15
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout
@@ -34,6 +36,32 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-derived-data-
 
+      - name: Validate Required Secrets
+        run: |
+          required=(
+            EXPORT_OPTIONS
+            APPLE_API_KEY
+            APPLE_API_KEY_ID
+            APPLE_API_ISSUER_ID
+            APPLE_ID
+            APP_SPECIFIC_PASSWORD
+          )
+
+          for key in "${required[@]}"; do
+            if [ -z "${!key:-}" ]; then
+              echo "Missing required secret: $key"
+              echo "See .github/secrets-template.md for setup."
+              exit 1
+            fi
+          done
+        env:
+          EXPORT_OPTIONS: ${{ secrets.EXPORT_OPTIONS }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APP_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
+
       - name: Archive Project
         run: |                        
           xcodebuild archive -project azooKey.xcodeproj \
@@ -50,7 +78,7 @@ jobs:
       - name: Create Private Key
         run: |
           mkdir private_keys
-          echo -n '${{ secrets.APPLE_API_KEY }}' | base64 --decode > ./private_keys/AuthKey_${{ secrets.APPLE_API_ISSUER_ID }}.p8
+          echo -n '${{ secrets.APPLE_API_KEY }}' | base64 --decode > ./private_keys/AuthKey_${{ secrets.APPLE_API_KEY_ID }}.p8
 
       - name: Export IPA
         run: |   
@@ -59,7 +87,7 @@ jobs:
                      -exportOptionsPlist ExportOptions.plist \
                      -exportPath app.ipa \
                      -allowProvisioningUpdates \
-                     -authenticationKeyPath `pwd`/private_keys/AuthKey_${{ secrets.APPLE_API_ISSUER_ID }}.p8 \
+                     -authenticationKeyPath `pwd`/private_keys/AuthKey_${{ secrets.APPLE_API_KEY_ID }}.p8 \
                      -authenticationKeyID ${{ secrets.APPLE_API_KEY_ID }} \
                      -authenticationKeyIssuerID ${{ secrets.APPLE_API_ISSUER_ID }}
 
@@ -69,3 +97,9 @@ jobs:
                        -u ${{ secrets.APPLE_ID }} \
                        -p ${{ secrets.APP_SPECIFIC_PASSWORD }} \
                        --type ios
+
+      - name: Cleanup Local Secrets Artifacts
+        if: always()
+        run: |
+          rm -rf private_keys
+          rm -f ExportOptions.plist
