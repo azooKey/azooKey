@@ -68,6 +68,7 @@ struct EditingTabBarView: View {
                 }
                 Section(header: Text("アイテム")) {
                     DisclosuringList($items) { $item in
+                        let item = $item.wrappedValue
                         Toggle("このアイテムをピン留め", isOn: $item.pinned)
                         TabNavigationViewItemLabelTypePicker(item: $item)
                         HStack {
@@ -81,7 +82,8 @@ struct EditingTabBarView: View {
                             Text(makeLabelText(item: item))
                                 .foregroundStyle(.gray)
                         }
-                    } label: { item in
+                    } label: { $item in
+                        let item = $item.wrappedValue
                         HStack {
                             if item.pinned {
                                 Label("ピン留め済み", systemImage: "pin.circle.fill")
