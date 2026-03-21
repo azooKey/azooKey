@@ -45,8 +45,7 @@ extension CodableActionData {
         } else {
             "改行を入力"
         }
-        case let .directInput(value):
-            "「\(value)」を直接入力"
+        case let .directInput(value): return "「\(value)」を直接入力"
         case let .moveCursor(value): return "\(String(value))文字分カーソルを移動"
         case let .smartMoveCursor(value): return "\(stringArrayDescription(value.targets))の隣までカーソルを移動"
         case let .delete(value): return "\(String(value))文字削除"
