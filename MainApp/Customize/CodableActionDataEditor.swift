@@ -28,8 +28,8 @@ fileprivate extension CharacterForm {
 extension CodableActionData {
     var hasAssociatedValue: Bool {
         switch self {
-        case .input("\n"): false
-        case .delete, .smartDelete, .input, .directInput, .replaceLastCharacters, .replaceDefault, .moveCursor, .smartMoveCursor, .moveTab, .launchApplication, .selectCandidate, .completeCharacterForm: true
+        case .input, .directInput, .moveCursor, .delete: false
+        case .smartDelete, .replaceLastCharacters, .replaceDefault, .smartMoveCursor, .moveTab, .launchApplication, .selectCandidate, .completeCharacterForm: true
         case  .enableResizingMode, .complete, .smartDeleteDefault, .toggleCapsLockState, .toggleCursorBar, .toggleTabBar, .dismissKeyboard, .paste: false
         }
     }
@@ -118,13 +118,10 @@ struct CodableActionDataEditor: View {
                 } else {
                     DisclosuringList($actions) { $action in
                         CodableActionEditor(action: $action, availableCustards: availableCustards)
-                    } label: { action in
-                        Text(action.data.label)
-                            .contextMenu {
-                                Button("削除", systemImage: "trash", role: .destructive) {
-                                    actions.removeAll(where: {$0.id == action.id})
-                                }
-                            }
+                    } label: { $action in
+                        EditableActionListLabel(action: $action) {
+                            actions.removeAll(where: {$0.id == $action.wrappedValue.id})
+                        }
                     }
                     .onDelete(perform: delete)
                     .onMove(perform: onMove)
@@ -196,30 +193,6 @@ private struct CodableActionEditor: View {
 
     var body: some View {
         switch action.data {
-        case let .input(value):
-            if value == "\n" {
-                Text(action.data.label)
-            } else {
-                ActionEditTextField("入力する文字", action: $action) {value} convert: {.input($0)}
-            }
-        case let .directInput(value):
-            ActionEditTextField("直接入力する文字", action: $action) {value} convert: {.directInput($0)}
-        case let .delete(count):
-            ActionEditIntegerTextField("削除する文字数", action: $action) {"\(count)"} convert: {value in
-                if let count = Int(value) {
-                    return .delete(count)
-                }
-                return nil
-            }
-            Text("負の値を指定すると右側の文字を削除します")
-        case let .moveCursor(count):
-            ActionEditIntegerTextField("移動する文字数", action: $action) {"\(count)"} convert: {value in
-                if let count = Int(value) {
-                    return .moveCursor(count)
-                }
-                return nil
-            }
-            Text("負の値を指定すると左にカーソルが動きます")
         case .moveTab:
             ActionMoveTabEditView($action, availableCustards: availableCustards)
         case .smartDelete(let item):
@@ -255,8 +228,126 @@ private struct CodableActionEditor: View {
             ActionReplaceBehaviorEditView($action)
         case .completeCharacterForm:
             ActionCompleteCharacterFormEditView($action)
-        case .paste, .complete, .smartDeleteDefault, .enableResizingMode, .toggleTabBar, .toggleCursorBar, .toggleCapsLockState, .dismissKeyboard:
+        case .input, .directInput, .moveCursor, .delete, .paste, .complete, .smartDeleteDefault, .enableResizingMode, .toggleTabBar, .toggleCursorBar, .toggleCapsLockState, .dismissKeyboard:
             EmptyView()
+        }
+    }
+}
+
+private struct EditableActionListLabel: View {
+    @Environment(\.editMode) private var editMode
+    @Binding private var action: EditingCodableActionData
+    private let onDelete: () -> Void
+    @State private var deleteValue = ""
+    @State private var moveCursorValue = ""
+
+    init(action: Binding<EditingCodableActionData>, onDelete: @escaping () -> Void) {
+        self._action = action
+        self.onDelete = onDelete
+        if case let .delete(value) = action.wrappedValue.data {
+            self._deleteValue = State(initialValue: "\(value)")
+        }
+        if case let .moveCursor(value) = action.wrappedValue.data {
+            self._moveCursorValue = State(initialValue: "\(value)")
+        }
+    }
+
+    private var isEditingList: Bool {
+        editMode?.wrappedValue.isEditing == true
+    }
+
+    private var inputTextBinding: Binding<String> {
+        Binding(
+            get: {
+                switch action.data {
+                case let .input(value), let .directInput(value):
+                    return value
+                default:
+                    return ""
+                }
+            },
+            set: { newValue in
+                switch action.data {
+                case .input:
+                    action.data = .input(newValue)
+                case .directInput:
+                    action.data = .directInput(newValue)
+                default:
+                    break
+                }
+            }
+        )
+    }
+
+    var body: some View {
+        Group {
+            if isEditingList {
+                Text(action.data.label)
+            } else {
+                switch action.data {
+                case .input("\n"):
+                    Text(action.data.label)
+                case .input:
+                    HStack {
+                        TextField("文字", text: inputTextBinding)
+                            .textFieldStyle(.roundedBorder)
+                            .submitLabel(.done)
+                        Text("を入力")
+                            .foregroundStyle(.secondary)
+                    }
+                case .directInput:
+                    HStack {
+                        TextField("文字", text: inputTextBinding)
+                            .textFieldStyle(.roundedBorder)
+                            .submitLabel(.done)
+                        Text("を直接入力")
+                            .foregroundStyle(.secondary)
+                    }
+                case .delete:
+                    HStack {
+                        IntegerTextField("値", text: $deleteValue, range: .min ... .max)
+                            .keyboardType(.numberPad)
+                            .textFieldStyle(.roundedBorder)
+                            .submitLabel(.done)
+                        Text("文字削除")
+                            .foregroundStyle(.secondary)
+                    }
+                case .moveCursor:
+                    HStack {
+                        IntegerTextField("値", text: $moveCursorValue, range: .min ... .max)
+                            .keyboardType(.numberPad)
+                            .textFieldStyle(.roundedBorder)
+                            .submitLabel(.done)
+                        Text("文字移動")
+                            .foregroundStyle(.secondary)
+                    }
+                default:
+                    Text(action.data.label)
+                }
+            }
+        }
+        .onChange(of: deleteValue) { (_, newValue) in
+            if case .delete = action.data, let value = Int(newValue) {
+                action.data = .delete(value)
+            }
+        }
+        .onChange(of: moveCursorValue) { (_, newValue) in
+            if case .moveCursor = action.data, let value = Int(newValue) {
+                action.data = .moveCursor(value)
+            }
+        }
+        .onChange(of: action.data) { (_, newValue) in
+            if case let .delete(value) = newValue, deleteValue != "\(value)" {
+                deleteValue = "\(value)"
+            }
+            if case let .moveCursor(value) = newValue, moveCursorValue != "\(value)" {
+                moveCursorValue = "\(value)"
+            }
+        }
+        .contextMenu {
+            Button("削除", systemImage: "trash", role: .destructive) {
+                onDelete()
+            }
         }
     }
 }
@@ -483,36 +574,6 @@ private struct ActionEditTextField: View {
                     action.data = data
                 }
             }
-            .textFieldStyle(.roundedBorder)
-            .submitLabel(.done)
-    }
-}
-
-private struct ActionEditIntegerTextField: View {
-    private let title: LocalizedStringKey
-    private let range: ClosedRange<Int>
-    @Binding private var action: EditingCodableActionData
-    private let convert: (String) -> CodableActionData?
-    init(_ title: LocalizedStringKey, action: Binding<EditingCodableActionData>, range: ClosedRange<Int> = .min ... .max, initialValue: () -> String?, convert: @escaping (String) -> CodableActionData?) {
-        self.title = title
-        self.range = range
-        self.convert = convert
-        self._action = action
-        if let initialValue = initialValue() {
-            self._value = State(initialValue: initialValue)
-        }
-    }
-
-    @State private var value = ""
-
-    var body: some View {
-        IntegerTextField(title, text: $value, range: range)
-            .onChange(of: value) { (_, value) in
-                if let data = convert(value) {
-                    action.data = data
-                }
-            }
-            .keyboardType(.numberPad)
             .textFieldStyle(.roundedBorder)
             .submitLabel(.done)
     }
@@ -835,13 +896,10 @@ struct CodableLongpressActionDataEditor: View {
                 } else {
                     DisclosuringList($startActions) { $action in
                         CodableActionEditor(action: $action, availableCustards: availableCustards)
-                    } label: { action in
-                        Text(action.data.label)
-                            .contextMenu {
-                                Button("削除", systemImage: "trash", role: .destructive) {
-                                    startActions.removeAll(where: {$0.id == action.id})
-                                }
-                            }
+                    } label: { $action in
+                        EditableActionListLabel(action: $action) {
+                            startActions.removeAll(where: {$0.id == $action.wrappedValue.id})
+                        }
                     }
                     .onDelete(perform: {startActions.remove(atOffsets: $0)})
                     .onMove(perform: {startActions.move(fromOffsets: $0, toOffset: $1)})
@@ -871,13 +929,10 @@ struct CodableLongpressActionDataEditor: View {
                 } else {
                     DisclosuringList($repeatActions) { $action in
                         CodableActionEditor(action: $action, availableCustards: availableCustards)
-                    } label: { action in
-                        Text(action.data.label)
-                            .contextMenu {
-                                Button("削除", systemImage: "trash", role: .destructive) {
-                                    repeatActions.removeAll(where: {$0.id == action.id})
-                                }
-                            }
+                    } label: { $action in
+                        EditableActionListLabel(action: $action) {
+                            repeatActions.removeAll(where: {$0.id == $action.wrappedValue.id})
+                        }
                     }
                     .onDelete(perform: {repeatActions.remove(atOffsets: $0)})
                     .onMove(perform: {repeatActions.move(fromOffsets: $0, toOffset: $1)})

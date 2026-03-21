@@ -12,13 +12,13 @@ import SwiftUIUtils
 struct DisclosuringList<Item: Sendable & Identifiable, Label: View, Content: View>: View {
     @Environment(\.editMode) var editMode
     @Binding private var items: [Item]
-    private let label: (Item) -> Label
+    private let label: (Binding<Item>) -> Label
     private let content: (Binding<Item>) -> Content
     private var delete: ((IndexSet) -> Void)?
     private var move: ((IndexSet, Int) -> Void)?
     private var disclosingCondition: (Item) -> Bool = { _ in true }
 
-    init(_ items: Binding<[Item]>, @ViewBuilder content: @escaping (Binding<Item>) -> Content, @ViewBuilder label: @escaping (Item) -> Label) {
+    init(_ items: Binding<[Item]>, @ViewBuilder content: @escaping (Binding<Item>) -> Content, @ViewBuilder label: @escaping (Binding<Item>) -> Label) {
         self._items = items
         self.label = label
         self.content = content
@@ -32,11 +32,11 @@ struct DisclosuringList<Item: Sendable & Identifiable, Label: View, Content: Vie
                 content(value.$item)
                     .listRowSeparator(.hidden, edges: .top)
             } label: {
-                label(value.item)
+                label(value.$item)
                     .listRowSeparator(.hidden, edges: .bottom)
             }
         case false:
-            label(value.item)
+            label(value.$item)
         }
     }
 
@@ -46,7 +46,7 @@ struct DisclosuringList<Item: Sendable & Identifiable, Label: View, Content: Vie
         } else {
             List {
                 ForEach($items.identifiableItems) {value in
-                    label(value.item)
+                    label(value.$item)
                 }
                 .onDelete(perform: delete)
                 .onMove(perform: move)
