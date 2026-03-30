@@ -64,6 +64,8 @@ struct SettingTabView: View {
                     if !self.isCustard(appStates.japaneseLayout) || !self.isCustard(appStates.englishLayout) {
                         BoolSettingView(.useNextCandidateKey)
                             .searchKeys("次候補キー")
+                        BoolSettingView(.confirmCandidateOnCharacterInput)
+                            .searchKeys("次候補キー", "候補確定")
                     }
                     if self.canQwertyLayout(appStates.englishLayout) {
                         BoolSettingView(.useShiftKey)

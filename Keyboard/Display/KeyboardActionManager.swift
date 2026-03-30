@@ -153,6 +153,9 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
         switch action {
         case let .input(text, simpleInsert):
             self.textEditingActionDidBegin(variableStates: variableStates)
+            if ConfirmCandidateOnCharacterInput.value, let candidate = variableStates.resultModel.getSelectedCandidate() {
+                self.notifyComplete(candidate, variableStates: variableStates)
+            }
             if (variableStates.boolStates.isCapsLocked || variableStates.boolStates.isShifted) && [.en_US, .el_GR].contains(variableStates.keyboardLanguage) {
                 let input = text.uppercased()
                 self.inputManager.input(text: input, requireSetResult: requireSetResult, simpleInsert: simpleInsert, inputStyle: variableStates.inputStyle)

@@ -102,6 +102,10 @@ public enum AzooKeyKeyboardViewExtension: ApplicationSpecificKeyboardViewExtensi
         UseNextCandidateKey.value
     }
 
+    public static var confirmCandidateOnCharacterInput: Bool {
+        ConfirmCandidateOnCharacterInput.value
+    }
+
     public static var displayCursorBarAutomatically: Bool {
         DisplayCursorBarAutomatically.value
     }

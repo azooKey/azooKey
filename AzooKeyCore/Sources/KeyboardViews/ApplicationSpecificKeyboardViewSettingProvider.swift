@@ -30,6 +30,7 @@ import Foundation
     static var useShiftKey: Bool { get }
     static var keepDeprecatedShiftKeyBehavior: Bool { get }
     static var useNextCandidateKey: Bool { get }
+    static var confirmCandidateOnCharacterInput: Bool { get }
 
     /// タブバーボタンを表示する
     static var displayTabBarButton: Bool { get }
