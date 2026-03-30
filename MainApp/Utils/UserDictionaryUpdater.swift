@@ -40,7 +40,9 @@ struct UserDictionaryUpdater {
         let paths: [String] = self.additionalSystemDictionaries.flatMap {
             switch $0 {
             case .emoji:
-                if #available(iOS 18.4, *) {
+                if #available(iOS 26.4, *) {
+                    ["emoji_dict_E17.0.txt"]
+                } else if #available(iOS 18.4, *) {
                     ["emoji_dict_E16.0.txt"]
                 } else {
                     // in this case, always satisfies #available(iOS 17.4, *)
