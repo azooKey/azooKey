@@ -15,6 +15,11 @@ struct UpdateInformationView: View {
             Group {
                 // version 3.0系
                 Group {
+                    VersionView("3.0.3", releaseDate: "近日公開予定") {
+                        ParagraphView("機能を改善しました。") {
+                            "iOS 26.4以降で利用可能なUnicode17.0に対応した絵文字のデータを追加しました"
+                        }
+                    }
                     VersionView("3.0.2", releaseDate: "2025年10月15日") {
                         ParagraphView("フィードバックを簡単に送信する機能を追加しました。") {
                             "「azooKeyの開発に協力」を設定すると、誤変換レポートの提案がキーボードの利用中に提案されるようになります"

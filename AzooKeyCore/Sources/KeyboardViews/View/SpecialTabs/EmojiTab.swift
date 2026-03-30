@@ -208,7 +208,9 @@ struct EmojiTab<Extension: ApplicationSpecificKeyboardViewExtension>: View {
     private static func getEmojis(keyboardInternalSettingManager: KeyboardInternalSettingManager) -> [Genre: [EmojiData]] {
         let fileURL: URL
         // 読み込むファイルはバージョンごとに変更する必要がある
-        if #available(iOS 18.4, *) {
+        if #available(iOS 26.4, *) {
+            fileURL = Bundle.main.bundleURL.appendingPathComponent("emoji_genre_E17.0.txt", isDirectory: false)
+        } else if #available(iOS 18.4, *) {
             fileURL = Bundle.main.bundleURL.appendingPathComponent("emoji_genre_E16.0.txt", isDirectory: false)
         } else {
             // in this case, always satisfies #available(iOS 17.4, *)
