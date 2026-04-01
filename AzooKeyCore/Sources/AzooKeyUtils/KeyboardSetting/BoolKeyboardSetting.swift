@@ -190,17 +190,6 @@ public extension KeyboardSettingKey where Self == UseNextCandidateKey {
     static var useNextCandidateKey: Self { .init() }
 }
 
-public struct ConfirmCandidateOnCharacterInput: BoolKeyboardSettingKey {
-    public static let title: LocalizedStringKey = "文字入力で候補を確定する"
-    public static let explanation: LocalizedStringKey = "次候補キーで候補を選択中に文字を入力すると、選択中の候補を確定してから文字を入力します。「次候補キーを使う」が有効な場合のみ機能します。"
-    public static let defaultValue = false
-    public static let key: String = "confirm_candidate_on_character_input"
-}
-
-public extension KeyboardSettingKey where Self == ConfirmCandidateOnCharacterInput {
-    static var confirmCandidateOnCharacterInput: Self { .init() }
-}
-
 public struct HideResetButtonInOneHandedMode: BoolKeyboardSettingKey {
     public static let title: LocalizedStringKey = "片手モードで解除ボタンを表示しない"
     public static let explanation: LocalizedStringKey = "片手モードの際に表示される解除ボタンを非表示にします。片手モードの調整はタブバーのボタンから行えます。"
