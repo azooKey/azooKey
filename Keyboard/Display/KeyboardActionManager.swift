@@ -153,14 +153,30 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
         switch action {
         case let .input(text, simpleInsert):
             self.textEditingActionDidBegin(variableStates: variableStates)
-            if let candidate = variableStates.resultModel.getSelectedCandidate() {
-                self.notifyComplete(candidate, variableStates: variableStates)
-            }
+            let input: String
             if (variableStates.boolStates.isCapsLocked || variableStates.boolStates.isShifted) && [.en_US, .el_GR].contains(variableStates.keyboardLanguage) {
-                let input = text.uppercased()
-                self.inputManager.input(text: input, requireSetResult: requireSetResult, simpleInsert: simpleInsert, inputStyle: variableStates.inputStyle)
+                input = text.uppercased()
             } else {
-                self.inputManager.input(text: text, requireSetResult: requireSetResult, simpleInsert: simpleInsert, inputStyle: variableStates.inputStyle)
+                input = text
+            }
+
+            if let candidate = variableStates.resultModel.getSelectedCandidate() {
+                if let candidate = candidate as? Candidate,
+                   requireSetResult,
+                   self.inputManager.complete(candidate: candidate, followedBy: input, simpleInsert: simpleInsert, inputStyle: variableStates.inputStyle) {
+                    self.registerActions(candidate.actions.map(\.action), variableStates: variableStates)
+                    let (left, center, right) = self.inputManager.getSurroundingText()
+                    let target = variableStates.tabManager.existentialTab().replacementTarget
+                    if !target.isEmpty {
+                        self.inputManager.updateTextReplacementCandidates(left: left, center: center, right: right, target: target)
+                    }
+                    variableStates.setEnterKeyState(self.inputManager.getEnterKeyState())
+                } else {
+                    self.notifyComplete(candidate, variableStates: variableStates)
+                    self.inputManager.input(text: input, requireSetResult: requireSetResult, simpleInsert: simpleInsert, inputStyle: variableStates.inputStyle)
+                }
+            } else {
+                self.inputManager.input(text: input, requireSetResult: requireSetResult, simpleInsert: simpleInsert, inputStyle: variableStates.inputStyle)
             }
             self.shiftStateOff(variableStates: variableStates)
         case let .insertMainDisplay(text):
@@ -525,6 +541,7 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
 
     /// 何かが変化する前に状態の保存を行う関数。
     override func notifySomethingWillChange(left: String, center: String, right: String) {
+        debug("[expected-edit]", "notifySomethingWillChange", (left, center, right))
         // self.tempTextDataが`nil`でない場合、上書きせず終了する
         guard self.tempTextData == nil else {
             debug("notifySomethingWillChange: There is already `tempTextData`: \(tempTextData!)")
@@ -606,6 +623,24 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
             debug("notifySomethingDidChange: Could not found `tempTextData`")
             return
         }
+        let expectedEditConsumption = self.inputManager.consumeExpectedEdit(
+            beforeLeft: tempLeft,
+            beforeCenter: b_center,
+            beforeRight: b_right,
+            afterLeft: a_left,
+            afterCenter: a_center,
+            afterRight: a_right
+        )
+        debug("[expected-edit]", "notifySomethingDidChange.expectedEditConsumption", (tempLeft, b_center, b_right), (a_left, a_center, a_right), expectedEditConsumption)
+        switch expectedEditConsumption {
+        case .matched(let hasMoreEdits):
+            self.tempTextData = hasMoreEdits ? (left: a_left, center: a_center, right: a_right) : nil
+            debug("[expected-edit]", "self-originated edit", (tempLeft, b_center, b_right), (a_left, a_center, a_right))
+            return
+        case .noMatch:
+            break
+        }
+
         // 終了時に必ずtempTextDataを`nil`にする
         defer {
             self.tempTextData = nil
@@ -614,12 +649,6 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
         // iOS16以降左側の文字列の設計が変わったので、adjustする
         let a_left = self.inputManager.adjustLeftString(a_left)
         let b_left = self.inputManager.adjustLeftString(tempLeft)
-
-        // システムによる操作でこの関数が呼ばれた場合はスルーする
-        if let operation = self.inputManager.getPreviousSystemOperation() {
-            debug("non user operation \(operation)", a_left, a_center, a_right)
-            return
-        }
 
         let hasSomethingChanged = a_left != b_left || a_center != b_center || a_right != b_right
         if hasSomethingChanged {
