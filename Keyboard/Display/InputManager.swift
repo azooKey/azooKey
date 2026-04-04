@@ -47,14 +47,6 @@ final class InputManager {
         self.kanaKanjiConverter.setKeyboardLanguage(value)
     }
 
-    /// システム側でproxyを操作した結果、`textDidChange`などがよばれてしまう場合に、その呼び出しをスキップするため、フラグを事前に立てる
-    private var previousSystemOperation: SystemOperationType?
-    enum SystemOperationType {
-        case moveCursor
-        case setMarkedText
-        case removeSelection
-    }
-
     // 再変換機能の提供のために用いる辞書
     private var rubyLog: OrderedDictionary<String, String> = [:]
 
@@ -268,12 +260,11 @@ final class InputManager {
         self.updateResult = updateResult
     }
 
-    func getPreviousSystemOperation() -> SystemOperationType? {
-        if let previousSystemOperation {
-            self.previousSystemOperation = nil
-            return previousSystemOperation
-        }
-        return nil
+    @MainActor
+    func consumeExpectedEdit(beforeLeft: String, beforeCenter: String, beforeRight: String, afterLeft: String, afterCenter: String, afterRight: String) -> ExpectedEditTracker.Consumption {
+        let before = ObservedTextState(left: beforeLeft, center: beforeCenter, right: beforeRight)
+        let after = ObservedTextState(left: afterLeft, center: afterCenter, right: afterRight)
+        return self.displayedTextManager.consumeExpectedEdit(before: before, after: after)
     }
 
     /// 結果の更新
@@ -360,9 +351,6 @@ final class InputManager {
     @MainActor func complete(candidate: Candidate) {
         self.updateLog(candidate: candidate)
         self.composingText.prefixComplete(composingCount: candidate.composingCount)
-        if self.displayedTextManager.shouldSkipMarkedTextChange {
-            self.previousSystemOperation = .setMarkedText
-        }
         self.displayedTextManager.updateComposingText(composingText: self.composingText, completedPrefix: candidate.text, isSelected: self.isSelected)
         self.kanaKanjiConverter.updateLearningData(candidate)
         guard !self.composingText.isEmpty else {
@@ -378,6 +366,36 @@ final class InputManager {
             self.liveConversionManager.updateAfterFirstClauseCompletion()
         }
         self.setResult()
+    }
+
+    @MainActor
+    func completeAndStartNewComposition(candidate: Candidate, with text: String, simpleInsert: Bool = false, inputStyle: InputStyle) -> Bool {
+        guard !self.isSelected, !self.shouldDirectInsert(text: text, simpleInsert: simpleInsert) else {
+            return false
+        }
+
+        self.updateLog(candidate: candidate)
+        var composingText = self.composingText
+        composingText.prefixComplete(composingCount: candidate.composingCount)
+        self.kanaKanjiConverter.updateLearningData(candidate)
+
+        if composingText.isEmpty {
+            self.liveConversionManager.stopComposition()
+            self.kanaKanjiConverter.stopComposition()
+            self.conversionCompleted(candidate: candidate)
+        } else {
+            self.kanaKanjiConverter.setCompletedData(candidate)
+            if liveConversionEnabled {
+                self.liveConversionManager.updateAfterFirstClauseCompletion()
+            }
+        }
+
+        self.isSelected = false
+        composingText.insertAtCursorPosition(text, inputStyle: inputStyle)
+        self.composingText = composingText
+        self.displayedTextManager.updateComposingText(completedPrefix: candidate.text, composingText: composingText, newLiveConversionText: nil)
+        self.setResult()
+        return true
     }
 
     /// 入力を停止する。DisplayedTextには特に何もしない。
@@ -448,9 +466,6 @@ final class InputManager {
         self.updateLog(candidate: candidate)
         if shouldModifyDisplayedText {
             self.composingText.prefixComplete(composingCount: candidate.composingCount)
-            if self.displayedTextManager.shouldSkipMarkedTextChange {
-                self.previousSystemOperation = .setMarkedText
-            }
             self.displayedTextManager.updateComposingText(composingText: self.composingText, completedPrefix: candidate.text, isSelected: self.isSelected)
         }
         if self.displayedTextManager.composingText.isEmpty {
@@ -468,7 +483,6 @@ final class InputManager {
 
     @MainActor func deleteSelection() {
         // 選択部分を削除する
-        self.previousSystemOperation = .removeSelection
         self.displayedTextManager.deleteBackward(count: 1)
         // 状態をリセットする
         self.composingText.stopComposition()
@@ -484,10 +498,7 @@ final class InputManager {
     ///   - inputStyle: 入力スタイル
     @MainActor func input(text: String, requireSetResult: Bool = true, simpleInsert: Bool = false, inputStyle: InputStyle) {
         // 直接入力の条件
-        if simpleInsert         // flag
-            || text == "\n"     // 改行
-            || text == " " || text == "　" || text == "\t" || text == "\0" // スペース類
-            || self.keyboardLanguage == .none { // 言語がnone
+        if self.shouldDirectInsert(text: text, simpleInsert: simpleInsert) {
             // 必要に応じて確定する
             if !self.isSelected {
                 _ = self.enter()
@@ -508,6 +519,13 @@ final class InputManager {
             // 変換を実施する
             self.setResult()
         }
+    }
+
+    private func shouldDirectInsert(text: String, simpleInsert: Bool) -> Bool {
+        simpleInsert
+            || text == "\n"
+            || text == " " || text == "　" || text == "\t" || text == "\0"
+            || self.keyboardLanguage == .none
     }
 
     /// テキストの進行方向に削除する
@@ -588,9 +606,6 @@ final class InputManager {
             // 文字がもうなかった場合、ここで全て削除して終了
             if self.composingText.isEmpty {
                 // 全て削除する
-                if self.displayedTextManager.shouldSkipMarkedTextChange {
-                    self.previousSystemOperation = .setMarkedText
-                }
                 self.displayedTextManager.updateComposingText(composingText: self.composingText, newLiveConversionText: nil)
                 self.stopComposition()
                 return targetText
@@ -644,9 +659,6 @@ final class InputManager {
             // 文字がもうなかった場合
             if self.composingText.isEmpty {
                 // 全て削除する
-                if self.displayedTextManager.shouldSkipMarkedTextChange {
-                    self.previousSystemOperation = .setMarkedText
-                }
                 self.displayedTextManager.updateComposingText(composingText: self.composingText, newLiveConversionText: nil)
                 self.stopComposition()
             }
@@ -851,8 +863,6 @@ final class InputManager {
         if count == 0 {
             return
         }
-        // カーソルを移動した直後、挙動が不安定であるため、スキップを登録する
-        self.previousSystemOperation = .moveCursor
         // 入力中の文字が空の場合は普通に動かす
         if composingText.isEmpty {
             self.displayedTextManager.moveCursor(count: count)
@@ -890,7 +900,7 @@ final class InputManager {
             return displayCursorBarAutomatically ? [.setCursorBar(.on)] : []
         }
         let actualCount = composingText.moveCursorFromCursorPosition(count: count)
-        self.previousSystemOperation = self.displayedTextManager.updateComposingText(composingText: self.composingText, userMovedCount: count, adjustedMovedCount: actualCount) ? .moveCursor : nil
+        _ = self.displayedTextManager.updateComposingText(composingText: self.composingText, userMovedCount: count, adjustedMovedCount: actualCount)
         setResult()
         return [.setCursorBar(.off), .setTabBar(.off)]
     }
@@ -990,9 +1000,6 @@ final class InputManager {
 
         // 表示を更新する
         if !self.isSelected {
-            if self.displayedTextManager.shouldSkipMarkedTextChange {
-                self.previousSystemOperation = .setMarkedText
-            }
             if liveConversionEnabled {
                 let liveConversionText = self.liveConversionManager.updateWithNewResults(inputData, results.mainResults, firstClauseResults: results.firstClauseResults, convertTargetCursorPosition: inputData.convertTargetCursorPosition, convertTarget: inputData.convertTarget)
                 self.displayedTextManager.updateComposingText(composingText: self.composingText, newLiveConversionText: liveConversionText)

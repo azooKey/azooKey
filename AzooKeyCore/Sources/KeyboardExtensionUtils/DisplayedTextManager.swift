@@ -24,6 +24,7 @@ final public class DisplayedTextManager {
     private(set) public var displayedLiveConversionText: String?
     /// テキストを変更するたびに増やす値
     private var textChangedCount = 0
+    private var expectedEditTracker = ExpectedEditTracker()
 
     /// `textChangedCount`のgetter。
     public func getTextChangedCount() -> Int {
@@ -99,7 +100,9 @@ final public class DisplayedTextManager {
     @MainActor public func stopComposition() {
         debug("DisplayedTextManager.stopComposition")
         if self.isMarkedTextEnabled {
-            self.proxy?.unmarkText()
+            self.observeExpectedEdit(label: "unmarkText") {
+                self.proxy?.unmarkText()
+            }
         } else {
             // Do nothing
         }
@@ -143,14 +146,49 @@ final public class DisplayedTextManager {
     @MainActor private func updateMarkedText() {
         let text = self.displayedLiveConversionText ?? self.composingText.convertTarget
         let cursorPosition = self.displayedLiveConversionText.map(NSString.init(string:))?.length ?? NSString(string: String(self.composingText.convertTarget.prefix(self.composingText.convertTargetCursorPosition))).length
+        let before = self.observedTextState()
         self.proxy?.setMarkedText(text, selectedRange: NSRange(location: cursorPosition, length: 0))
+        let after = before.map {
+            self.observedStateByApplyingMarkedText(text, selectedRange: NSRange(location: cursorPosition, length: 0), to: $0)
+        }
+        self.expectedEditTracker.record(before: before, after: after)
     }
 
-    @MainActor public func insertText(_ text: String) {
+    @MainActor
+    private func observedStateByApplyingMarkedText(_ markedText: String, selectedRange: NSRange, to before: ObservedTextState) -> ObservedTextState {
+        let nsText = markedText as NSString
+        let cursorLocation = max(0, min(selectedRange.location, nsText.length))
+        let leftMarkedText = nsText.substring(to: cursorLocation)
+        let rightMarkedText = nsText.substring(from: cursorLocation)
+        return .init(
+            left: before.left + leftMarkedText,
+            center: "",
+            right: rightMarkedText + before.right
+        )
+    }
+
+    @MainActor
+    private func recordExpectedEdit(before: ObservedTextState?, after: ObservedTextState?, label: String) {
+        self.expectedEditTracker.record(before: before, after: after)
+    }
+
+    @MainActor
+    private func observeExpectedEdit<T>(on proxy: (any UITextDocumentProxy)? = nil, label: String, _ body: () -> T) -> T {
+        let before = self.observedTextState(for: proxy)
+        let result = body()
+        let after = self.observedTextState(for: proxy)
+        self.recordExpectedEdit(before: before, after: after, label: label)
+        return result
+    }
+
+    @MainActor
+    public func insertText(_ text: String) {
         guard !text.isEmpty else {
             return
         }
-        self.proxy?.insertText(text)
+        self.observeExpectedEdit(label: "insertText(\(text))") {
+            self.proxy?.insertText(text)
+        }
         self.textChangedCount += 1
     }
 
@@ -159,7 +197,9 @@ final public class DisplayedTextManager {
         guard !text.isEmpty else {
             return
         }
-        self.displayedTextProxy?.insertText(text)
+        self.observeExpectedEdit(on: self.displayedTextProxy, label: "insertMainDisplayText(\(text))") {
+            self.displayedTextProxy?.insertText(text)
+        }
         self.textChangedCount += 1
     }
 
@@ -168,7 +208,9 @@ final public class DisplayedTextManager {
             return
         }
         let offset = self.getActualOffset(count: count)
-        self.proxy?.adjustTextPosition(byCharacterOffset: offset)
+        self.observeExpectedEdit(label: "moveCursor(\(count) -> \(offset))") {
+            self.proxy?.adjustTextPosition(byCharacterOffset: offset)
+        }
         self.textChangedCount += 1
     }
 
@@ -178,7 +220,9 @@ final public class DisplayedTextManager {
             return
         }
         for _ in 0 ..< count {
-            self.proxy?.deleteBackward()
+            self.observeExpectedEdit(label: "deleteBackward") {
+                self.proxy?.deleteBackward()
+            }
         }
         self.textChangedCount += 1
     }
@@ -252,7 +296,9 @@ final public class DisplayedTextManager {
 
             self.moveCursor(count: oldDisplayedText.count - oldCursorPosition)
             self.rawDeleteBackward(count: delete)
-            self.proxy?.insertText(String(input))
+            self.observeExpectedEdit(label: "insertComposingText(\(String(input)))") {
+                self.proxy?.insertText(String(input))
+            }
             self.moveCursor(count: newCursorPosition - newDisplayedText.count)
         }
     }
@@ -262,7 +308,9 @@ final public class DisplayedTextManager {
         self.composingText = composingText
         if delta != 0 {
             let offset = self.getActualOffset(count: delta)
-            self.proxy?.adjustTextPosition(byCharacterOffset: offset)
+            self.observeExpectedEdit(label: "userMovedCursorDelta(\(delta) -> \(offset))") {
+                self.proxy?.adjustTextPosition(byCharacterOffset: offset)
+            }
             return true
         }
         return false
@@ -306,5 +354,47 @@ final public class DisplayedTextManager {
             self.insertText(completedPrefix + String(self.composingText.convertTargetBeforeCursor.suffix(cursorPosition)))
             self.moveCursor(count: composingText.convertTargetCursorPosition - cursorPosition)
         }
+    }
+
+    @MainActor
+    public func updateComposingText(completedPrefix: String, composingText: ComposingText, newLiveConversionText: String?) {
+        if isMarkedTextEnabled {
+            self.insertText(completedPrefix)
+            self.composingText = composingText
+            self.displayedLiveConversionText = newLiveConversionText
+            self.updateMarkedText()
+            return
+        }
+
+        let oldDisplayedText = self.displayedLiveConversionText ?? self.composingText.convertTarget
+        let oldCursorPosition = self.displayedLiveConversionText?.count ?? self.composingText.convertTargetCursorPosition
+        let newDisplayedText = newLiveConversionText ?? composingText.convertTarget
+        let newCursorPosition = newLiveConversionText?.count ?? composingText.convertTargetCursorPosition
+
+        self.moveCursor(count: oldDisplayedText.count - oldCursorPosition)
+        self.rawDeleteBackward(count: oldDisplayedText.count)
+        self.insertText(completedPrefix + newDisplayedText)
+        self.moveCursor(count: newCursorPosition - newDisplayedText.count)
+
+        self.composingText = composingText
+        self.displayedLiveConversionText = newLiveConversionText
+    }
+
+    @MainActor
+    public func consumeExpectedEdit(before: ObservedTextState, after: ObservedTextState) -> ExpectedEditTracker.Consumption {
+        self.expectedEditTracker.consume(before: before, after: after)
+    }
+
+    @MainActor
+    private func observedTextState(for proxy: (any UITextDocumentProxy)? = nil) -> ObservedTextState? {
+        let proxy = proxy ?? self.proxy
+        guard let proxy else {
+            return nil
+        }
+        return .init(
+            left: proxy.documentContextBeforeInput ?? "",
+            center: proxy.selectedText ?? "",
+            right: proxy.documentContextAfterInput ?? ""
+        )
     }
 }
