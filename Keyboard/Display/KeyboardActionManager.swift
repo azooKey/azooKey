@@ -163,7 +163,7 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
             if let candidate = variableStates.resultModel.getSelectedCandidate() {
                 if let candidate = candidate as? Candidate,
                    requireSetResult,
-                   self.inputManager.complete(candidate: candidate, followedBy: input, simpleInsert: simpleInsert, inputStyle: variableStates.inputStyle) {
+                   self.inputManager.completeAndStartNewComposition(candidate: candidate, with: input, simpleInsert: simpleInsert, inputStyle: variableStates.inputStyle) {
                     self.registerActions(candidate.actions.map(\.action), variableStates: variableStates)
                     let (left, center, right) = self.inputManager.getSurroundingText()
                     let target = variableStates.tabManager.existentialTab().replacementTarget
@@ -541,7 +541,6 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
 
     /// 何かが変化する前に状態の保存を行う関数。
     override func notifySomethingWillChange(left: String, center: String, right: String) {
-        debug("[expected-edit]", "notifySomethingWillChange", (left, center, right))
         // self.tempTextDataが`nil`でない場合、上書きせず終了する
         guard self.tempTextData == nil else {
             debug("notifySomethingWillChange: There is already `tempTextData`: \(tempTextData!)")
@@ -631,11 +630,9 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
             afterCenter: a_center,
             afterRight: a_right
         )
-        debug("[expected-edit]", "notifySomethingDidChange.expectedEditConsumption", (tempLeft, b_center, b_right), (a_left, a_center, a_right), expectedEditConsumption)
         switch expectedEditConsumption {
         case .matched(let hasMoreEdits):
             self.tempTextData = hasMoreEdits ? (left: a_left, center: a_center, right: a_right) : nil
-            debug("[expected-edit]", "self-originated edit", (tempLeft, b_center, b_right), (a_left, a_center, a_right))
             return
         case .noMatch:
             break

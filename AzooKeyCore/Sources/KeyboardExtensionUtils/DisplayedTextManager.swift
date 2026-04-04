@@ -151,7 +151,6 @@ final public class DisplayedTextManager {
         let after = before.map {
             self.observedStateByApplyingMarkedText(text, selectedRange: NSRange(location: cursorPosition, length: 0), to: $0)
         }
-        debug("[expected-edit]", "DisplayedTextManager.observeExpectedEdit", "setMarkedText(\(text), cursor:\(cursorPosition))", before as Any, after as Any)
         self.expectedEditTracker.record(before: before, after: after)
     }
 
@@ -170,7 +169,6 @@ final public class DisplayedTextManager {
 
     @MainActor
     private func recordExpectedEdit(before: ObservedTextState?, after: ObservedTextState?, label: String) {
-        debug("[expected-edit]", "DisplayedTextManager.observeExpectedEdit", label, before as Any, after as Any)
         self.expectedEditTracker.record(before: before, after: after)
     }
 
@@ -384,9 +382,7 @@ final public class DisplayedTextManager {
 
     @MainActor
     public func consumeExpectedEdit(before: ObservedTextState, after: ObservedTextState) -> ExpectedEditTracker.Consumption {
-        let consumption = self.expectedEditTracker.consume(before: before, after: after)
-        debug("[expected-edit]", "DisplayedTextManager.consumeExpectedEdit", before, after, consumption)
-        return consumption
+        self.expectedEditTracker.consume(before: before, after: after)
     }
 
     @MainActor

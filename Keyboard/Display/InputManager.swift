@@ -369,7 +369,7 @@ final class InputManager {
     }
 
     @MainActor
-    func complete(candidate: Candidate, followedBy text: String, simpleInsert: Bool = false, inputStyle: InputStyle) -> Bool {
+    func completeAndStartNewComposition(candidate: Candidate, with text: String, simpleInsert: Bool = false, inputStyle: InputStyle) -> Bool {
         guard !self.isSelected, !self.shouldDirectInsert(text: text, simpleInsert: simpleInsert) else {
             return false
         }
