@@ -719,9 +719,10 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
                 return
             }
 
-            // MarkedTextを有効化している場合、テキストの送信等でここに来ることがある
-            @KeyboardSetting(.liveConversion) var liveConversionEnabled
-            if liveConversionEnabled {
+            // MarkedTextを利用する設定では、ホスト側の送信や確定が起きても UITextDocumentProxy からは before/after の差分が見えず、no-op callback としてここに到達することがある。
+            // このとき composition が残っているなら、外部要因で入力が閉じられたとみなして stopComposition し、内部状態をホスト側に合わせる。
+            @KeyboardSetting(.markedTextSetting) var markedTextSetting
+            if markedTextSetting != .disabled, !self.inputManager.composingText.isEmpty {
                 debug("user operation id: 2.5")
                 self.inputManager.stopComposition()
                 return
