@@ -737,7 +737,6 @@ private struct GridFitKeyPlacementEditor: View {
     @State private var widthText: String
     @State private var heightText: String
     @State private var usesFineAdjustment = false
-    @State private var dragStart: GridFitKeyPlacement?
 
     private let horizontalCount: Int
     private let verticalCount: Int
@@ -797,9 +796,6 @@ private struct GridFitKeyPlacementEditor: View {
             Form {
                 Section("配置プレビュー") {
                     placementPreview
-                    Text("青いキーをドラッグして移動できます")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
                 }
                 Section("位置") {
                     decimalStepperField("X座標", text: $xText)
@@ -911,44 +907,11 @@ private struct GridFitKeyPlacementEditor: View {
                         x: unitWidth * CGFloat(frame.x) + 2,
                         y: unitHeight * CGFloat(frame.y) + 2
                     )
-                    .contentShape(Rectangle())
-                    .gesture(
-                        DragGesture()
-                            .onChanged { value in
-                                if dragStart == nil {
-                                    dragStart = placement
-                                }
-                                guard let dragStart else {
-                                    return
-                                }
-                                let deltaX = Double(
-                                    value.translation.width / unitWidth
-                                )
-                                let deltaY = Double(
-                                    value.translation.height / unitHeight
-                                )
-                                xText = decimalString(
-                                    dragStart.x
-                                        + stepped(deltaX)
-                                )
-                                yText = decimalString(
-                                    dragStart.y
-                                        + stepped(deltaY)
-                                )
-                            }
-                            .onEnded { _ in
-                                dragStart = nil
-                            }
-                    )
                 }
             }
             .clipped()
         }
-        .aspectRatio(
-            CGFloat(max(horizontalCount, 1))
-                / CGFloat(max(verticalCount, 1)),
-            contentMode: .fit
-        )
+        .frame(height: 100)
     }
 
     private var movementButtons: some View {
@@ -1060,10 +1023,6 @@ private struct GridFitKeyPlacementEditor: View {
             return
         }
         text.wrappedValue = decimalString(adjusted)
-    }
-
-    private func stepped(_ value: Double) -> Double {
-        (value / adjustmentStep).rounded() * adjustmentStep
     }
 
     private func normalized(_ value: Double) -> Double {
