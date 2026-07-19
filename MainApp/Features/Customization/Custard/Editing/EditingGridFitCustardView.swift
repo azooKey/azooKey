@@ -784,6 +784,11 @@ private struct GridFitKeyPlacementEditor: View {
         guard placement.width > 0, placement.height > 0 else {
             return "横幅と縦幅は0より大きくしてください"
         }
+        guard !occupied.contains(where: {
+            $0.x == placement.x && $0.y == placement.y
+        }) else {
+            return "同じX座標・Y座標のキーがすでにあります"
+        }
         return nil
     }
 
@@ -886,13 +891,6 @@ private struct GridFitKeyPlacementEditor: View {
                     let frame = placement.frame
                     RoundedRectangle(cornerRadius: 5)
                     .fill(Color.accentColor.opacity(0.75))
-                    .overlay {
-                        Image(
-                            systemName:
-                                "arrow.up.and.down.and.arrow.left.and.right"
-                        )
-                        .foregroundStyle(.white)
-                    }
                     .frame(
                         width: previewKeyWidth(
                             frame,
