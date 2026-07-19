@@ -90,8 +90,11 @@ struct UserDictionaryUpdater {
         let katakanaRuby = data.ruby.toKatakana()
         if data.isVerb {
             let cid = 772
-            let conjunctions = ConjunctionBuilder.getConjugations(data: (word: data.word, ruby: katakanaRuby, cid: cid), addStandardForm: true)
-            return conjunctions.map {
+            let conjugations = JapaneseConjugationBuilder.conjugations(
+                for: (word: data.word, ruby: katakanaRuby, cid: cid),
+                includingStandardForm: true
+            )
+            return conjugations.map {
                 "\($0.ruby)\t\($0.word)\t\($0.cid)\t\($0.cid)\t\(501)\t-5.0000"
             }
         }

@@ -1,11 +1,3 @@
-//
-//  ConjunctionBuilder.swift
-//  Keyboard
-//
-//  Created by ensan on 2020/09/10.
-//  Copyright © 2020 ensan. All rights reserved.
-//
-
 import Foundation
 
 private enum 活用の種類 {
@@ -439,7 +431,7 @@ private extension String {
     }
 }
 
-struct ConjunctionBuilder {
+public struct JapaneseConjugationBuilder {
     static private func 動詞情報照会(cid: Int) -> (活用: 活用の種類, 行の名前: 行)? {
         if cid == 583 {
             return (活用: .サ変, 行の名前: .unknown)
@@ -657,10 +649,13 @@ struct ConjunctionBuilder {
         return []
     }
 
-    static func getConjugations(data: (word: String, ruby: String, cid: Int), addStandardForm: Bool = false) -> [(word: String, ruby: String, cid: Int)] {
+    public static func conjugations(
+        for data: (word: String, ruby: String, cid: Int),
+        includingStandardForm: Bool = false
+    ) -> [(word: String, ruby: String, cid: Int)] {
         if let 動詞の情報 = 動詞情報照会(cid: data.cid) {
             let 活用形: [(word: String, ruby: String, cid: Int)] = 活用形取得(データ: data, 活用: 動詞の情報.活用, 行の名前: 動詞の情報.行の名前)
-            if addStandardForm {
+            if includingStandardForm {
                 return 活用形 + [data]
             }
             return 活用形
