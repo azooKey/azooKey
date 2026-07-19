@@ -341,7 +341,10 @@ struct EditingGridFitCustardView: CancelableEditor {
             Button("OK", role: .cancel) {}
         }
         .onAppear {
-            variableStates.setInterfaceSize(orientation: MainAppDesign.keyboardOrientation, screenWidth: SemiStaticStates.shared.screenWidth)
+            variableStates.setContainerWidth(
+                SemiStaticStates.shared.screenWidth,
+                orientation: MainAppDesign.keyboardOrientation
+            )
             if !self.baseSelectionSheetState.hasShown {
                 self.baseSelectionSheetState.showBaseSelectionSheet = true
             }

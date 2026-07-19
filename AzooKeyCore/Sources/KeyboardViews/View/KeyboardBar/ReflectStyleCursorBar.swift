@@ -162,7 +162,7 @@ struct ReflectStyleCursorBar<Extension: ApplicationSpecificKeyboardViewExtension
                     // offsetを計算する
                     // タップした位置を理解する
                     // 左端がx=0の座標系で考える。
-                    let center_x = variableStates.interfacePosition.x + SemiStaticStates.shared.screenWidth / 2
+                    let center_x = variableStates.interfacePosition.x + variableStates.containerWidth / 2
                     let x = value.startLocation.x
                     // あpい|う え
                     // pの位置をタップした場合、このdiffは-1*itemWidthに近い値になる
