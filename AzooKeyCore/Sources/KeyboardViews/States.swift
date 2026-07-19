@@ -42,7 +42,7 @@ public enum ResizingState: Sendable {
     case resizing  // 編集モード
 }
 
-public enum KeyboardOrientation: Sendable {
+public enum KeyboardOrientation: Equatable, Sendable {
     case vertical       // width<height
     case horizontal     // height<width
 }

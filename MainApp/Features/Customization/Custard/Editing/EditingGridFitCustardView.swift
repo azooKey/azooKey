@@ -122,7 +122,13 @@ struct EditingGridFitCustardView: CancelableEditor {
     }
 
     private var interfaceSize: CGSize {
-        .init(width: UIScreen.main.bounds.width, height: Design.keyboardHeight(screenWidth: UIScreen.main.bounds.width, orientation: MainAppDesign.keyboardOrientation))
+        let context = MainAppDesign.keyboardLayoutContext(
+            containerWidth: UIScreen.main.bounds.width
+        )
+        return .init(
+            width: context.containerWidth,
+            height: Design.keyboardHeight(context: context)
+        )
     }
 
     var body: some View {
@@ -185,7 +191,14 @@ struct EditingGridFitCustardView: CancelableEditor {
             .font(.title)
             .padding(.horizontal, 8)
             if !showPreview {
-                let design = TabDependentDesign(width: layout.rowCount, height: layout.columnCount, interfaceSize: interfaceSize, orientation: MainAppDesign.keyboardOrientation)
+                let design = TabDependentDesign(
+                    width: layout.rowCount,
+                    height: layout.columnCount,
+                    interfaceSize: interfaceSize,
+                    layoutContext: MainAppDesign.keyboardLayoutContext(
+                        containerWidth: interfaceSize.width
+                    )
+                )
                 let unifiedModels = editingInterface.unifiedKeyModels(extension: AzooKeyKeyboardViewExtension.self)
                 UnifiedKeysView(models: unifiedModels, tabDesign: design) { (view: UnifiedGenericKeyView<AzooKeyKeyboardViewExtension>, pos: UnifiedPositionSpecifier) in
                     let x = Int(pos.x)

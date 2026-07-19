@@ -105,5 +105,12 @@ let package = Package(
             ],
             swiftSettings: swiftSettings
         ),
+        .testTarget(
+            name: "KeyboardViewsTests",
+            dependencies: [
+                "KeyboardViews",
+            ],
+            swiftSettings: swiftSettings
+        ),
     ]
 )

@@ -135,16 +135,34 @@ public extension CustardInterface {
             }
         }
     }
-    func tabDesign(interfaceSize: CGSize, keyboardOrientation: KeyboardOrientation) -> TabDependentDesign {
+    func tabDesign(
+        interfaceSize: CGSize,
+        layoutContext: KeyboardLayoutContext
+    ) -> TabDependentDesign {
         switch self.keyLayout {
         case let .gridFit(value):
-            return TabDependentDesign(width: value.rowCount, height: value.columnCount, interfaceSize: interfaceSize, orientation: keyboardOrientation)
+            return TabDependentDesign(
+                width: value.rowCount,
+                height: value.columnCount,
+                interfaceSize: interfaceSize,
+                layoutContext: layoutContext
+            )
         case let .gridScroll(value):
             switch value.direction {
             case .vertical:
-                return TabDependentDesign(width: CGFloat(Int(value.rowCount)), height: CGFloat(value.columnCount), interfaceSize: interfaceSize, orientation: keyboardOrientation)
+                return TabDependentDesign(
+                    width: CGFloat(Int(value.rowCount)),
+                    height: CGFloat(value.columnCount),
+                    interfaceSize: interfaceSize,
+                    layoutContext: layoutContext
+                )
             case .horizontal:
-                return TabDependentDesign(width: CGFloat(value.rowCount), height: CGFloat(Int(value.columnCount)), interfaceSize: interfaceSize, orientation: keyboardOrientation)
+                return TabDependentDesign(
+                    width: CGFloat(value.rowCount),
+                    height: CGFloat(Int(value.columnCount)),
+                    interfaceSize: interfaceSize,
+                    layoutContext: layoutContext
+                )
             }
         }
     }
@@ -211,7 +229,10 @@ extension CustardInterfaceKey {
 struct CustomKeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>: View {
     private let custard: Custard
     private var tabDesign: TabDependentDesign {
-        custard.interface.tabDesign(interfaceSize: variableStates.interfaceSize, keyboardOrientation: variableStates.keyboardOrientation)
+        custard.interface.tabDesign(
+            interfaceSize: variableStates.interfaceSize,
+            layoutContext: variableStates.layoutContext
+        )
     }
     @EnvironmentObject private var variableStates: VariableStates
     @State private var activeSuggestKeys: Set<String> = []

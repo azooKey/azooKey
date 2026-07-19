@@ -67,7 +67,24 @@ struct EditingScrollCustardView: CancelableEditor {
     }
 
     private var interfaceSize: CGSize {
-        .init(width: UIScreen.main.bounds.width, height: Design.keyboardHeight(screenWidth: UIScreen.main.bounds.width, orientation: MainAppDesign.keyboardOrientation))
+        let context = MainAppDesign.keyboardLayoutContext(
+            containerWidth: UIScreen.main.bounds.width
+        )
+        return .init(
+            width: context.containerWidth,
+            height: Design.keyboardHeight(context: context)
+        )
+    }
+
+    private var tabDesign: TabDependentDesign {
+        .init(
+            width: Double(editingItem.rowCount) ?? 4,
+            height: Double(editingItem.columnCount) ?? 8,
+            interfaceSize: interfaceSize,
+            layoutContext: MainAppDesign.keyboardLayoutContext(
+                containerWidth: interfaceSize.width
+            )
+        )
     }
 
     var body: some View {
@@ -174,7 +191,7 @@ struct EditingScrollCustardView: CancelableEditor {
                     models: self.editingItem.keys.map {
                         ($0.model, $0.id)
                     },
-                    tabDesign: .init(width: Double(editingItem.rowCount) ?? 4, height: Double(editingItem.columnCount) ?? 8, interfaceSize: interfaceSize, orientation: .vertical),
+                    tabDesign: tabDesign,
                     layout: .init(
                         direction: editingItem.direction,
                         rowCount: Double(editingItem.rowCount) ?? 4,

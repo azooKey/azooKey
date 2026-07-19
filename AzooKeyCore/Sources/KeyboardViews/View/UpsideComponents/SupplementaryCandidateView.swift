@@ -11,7 +11,10 @@ struct SupplementaryCandidateView<Extension: ApplicationSpecificKeyboardViewExte
     }
 
     private var buttonHeight: CGFloat {
-        Design.keyboardBarHeight(interfaceHeight: variableStates.interfaceSize.height, orientation: variableStates.keyboardOrientation) * 0.6
+        Design.keyboardBarHeight(
+            interfaceHeight: variableStates.interfaceSize.height,
+            context: variableStates.layoutContext
+        ) * 0.6
     }
 
     private var horizontalSpacing: CGFloat { 12 }

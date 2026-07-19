@@ -177,7 +177,12 @@ struct ClipboardHistoryTab<Extension: ApplicationSpecificKeyboardViewExtension>:
                 VStack {
                     tileGridView
                     HStack {
-                        let design = TabDependentDesign(width: 3, height: 7, interfaceSize: variableStates.interfaceSize, orientation: .vertical)
+                        let design = TabDependentDesign(
+                            width: 3,
+                            height: 7,
+                            interfaceSize: variableStates.interfaceSize,
+                            layoutContext: variableStates.layoutContext
+                        )
                         backTabKey(design)
                         enterKey(design)
                         deleteKey(design)
@@ -187,7 +192,12 @@ struct ClipboardHistoryTab<Extension: ApplicationSpecificKeyboardViewExtension>:
                 HStack {
                     tileGridView
                     VStack {
-                        let design = TabDependentDesign(width: 8, height: 3, interfaceSize: variableStates.interfaceSize, orientation: .horizontal)
+                        let design = TabDependentDesign(
+                            width: 8,
+                            height: 3,
+                            interfaceSize: variableStates.interfaceSize,
+                            layoutContext: variableStates.layoutContext
+                        )
                         backTabKey(design)
                         deleteKey(design)
                         enterKey(design)

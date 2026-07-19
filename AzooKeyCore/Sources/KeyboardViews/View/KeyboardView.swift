@@ -38,7 +38,10 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
         if current > 0 {
             return current
         }
-        let baseHeight = Design.keyboardHeight(screenWidth: variableStates.containerWidth, orientation: variableStates.keyboardOrientation, upsideComponent: nil)
+        let baseHeight = Design.keyboardHeight(
+            context: variableStates.layoutContext,
+            upsideComponent: nil
+        )
         let scaledHeight = baseHeight * variableStates.heightScaleFromKeyboardHeightSetting
         return scaledHeight
     }
@@ -47,7 +50,10 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
         guard let component = variableStates.upsideComponent else {
             return 0
         }
-        return Design.upsideComponentHeight(component, orientation: variableStates.keyboardOrientation)
+        return Design.upsideComponentHeight(
+            component,
+            context: variableStates.layoutContext
+        )
     }
 
     private var totalBackgroundHeight: CGFloat {
@@ -109,7 +115,12 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
                             ReportSuggestionView<Extension>(content: content)
                         }
                     }
-                    .frame(height: Design.upsideComponentHeight(upsideComponent, orientation: variableStates.keyboardOrientation))
+                    .frame(
+                        height: Design.upsideComponentHeight(
+                            upsideComponent,
+                            context: variableStates.layoutContext
+                        )
+                    )
                 }
                 // キーボード本体部分を新しいVStackで囲み、モディファイアをこちらに移動
                 VStack(spacing: 0) {
@@ -119,7 +130,12 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
                         ExpandedResultView<Extension>(isResultViewExpanded: $isResultViewExpanded)
                     } else {
                         KeyboardBarView<Extension>(isResultViewExpanded: $isResultViewExpanded)
-                            .frame(height: Design.keyboardBarHeight(interfaceHeight: variableStates.interfaceSize.height, orientation: variableStates.keyboardOrientation))
+                            .frame(
+                                height: Design.keyboardBarHeight(
+                                    interfaceHeight: variableStates.interfaceSize.height,
+                                    context: variableStates.layoutContext
+                                )
+                            )
                             // バーのタッチ判定領域はpaddingより前まで
                             .contentShape(Rectangle())
                             .padding(.vertical, 6)
@@ -132,10 +148,7 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
                     position: $variableStates.interfacePosition,
                     initialSize: CGSize(
                         width: variableStates.containerWidth,
-                        height: Design.keyboardHeight(
-                            screenWidth: variableStates.containerWidth,
-                            orientation: variableStates.keyboardOrientation
-                        )
+                        height: Design.keyboardHeight(context: variableStates.layoutContext)
                     ),
                     extension: Extension.self
                 )
@@ -174,7 +187,12 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
         width: Int,
         height: Int
     ) -> some View {
-        let design = TabDependentDesign(width: width, height: height, interfaceSize: variableStates.interfaceSize, orientation: variableStates.keyboardOrientation)
+        let design = TabDependentDesign(
+            width: width,
+            height: height,
+            interfaceSize: variableStates.interfaceSize,
+            layoutContext: variableStates.layoutContext
+        )
         let unifiedModels: [(UnifiedPositionSpecifier, any UnifiedKeyModelProtocol<Extension>)] = modelsDict.map { (pos, model) in (pos, model) }
         UnifiedKeysView(models: unifiedModels, tabDesign: design) { keyView, _ in keyView }
     }

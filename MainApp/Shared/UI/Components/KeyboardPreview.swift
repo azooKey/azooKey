@@ -45,12 +45,21 @@ struct KeyboardPreview: View {
     }
 
     var body: some View {
+        let context = MainAppDesign.keyboardLayoutContext(
+            containerWidth: SemiStaticStates.shared.screenWidth
+        )
         KeyboardView<AzooKeyKeyboardViewExtension>(defaultTab: defaultTab)
             .environmentObject(variableStates)
             .themeEnvironment(theme)
             .environment(\.showMessage, false)
             .scaleEffect(scale)
-            .frame(width: SemiStaticStates.shared.screenWidth * scale, height: Design.keyboardScreenHeight(upsideComponent: nil, orientation: MainAppDesign.keyboardOrientation) * scale)
+            .frame(
+                width: context.containerWidth * scale,
+                height: Design.keyboardScreenHeight(
+                    context: context,
+                    upsideComponent: nil
+                ) * scale
+            )
             .onAppear {
                 variableStates.resultModel.setResults([
                     CandidateMock(text: "azooKey"),

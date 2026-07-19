@@ -17,10 +17,16 @@ struct UpsideSearchView<Extension: ApplicationSpecificKeyboardViewExtension>: Vi
     @State private var searchQuery = ""
     private let target: [ConverterBehaviorSemantics.ReplacementTarget]
     private var buttonHeight: CGFloat {
-        Design.keyboardBarHeight(interfaceHeight: variableStates.interfaceSize.height, orientation: variableStates.keyboardOrientation) * 0.9
+        Design.keyboardBarHeight(
+            interfaceHeight: variableStates.interfaceSize.height,
+            context: variableStates.layoutContext
+        ) * 0.9
     }
     private var searchBarHeight: CGFloat {
-        Design.keyboardBarHeight(interfaceHeight: variableStates.interfaceSize.height, orientation: variableStates.keyboardOrientation) * 0.8
+        Design.keyboardBarHeight(
+            interfaceHeight: variableStates.interfaceSize.height,
+            context: variableStates.layoutContext
+        ) * 0.8
     }
 
     init(target: [ConverterBehaviorSemantics.ReplacementTarget]) {

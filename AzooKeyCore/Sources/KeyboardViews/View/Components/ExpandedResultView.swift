@@ -18,10 +18,16 @@ struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: 
         Self.registerResults(results: variableStates.resultModel.results, interfaceWidth: variableStates.interfaceSize.width)
     }
     private var buttonWidth: CGFloat {
-        Design.keyboardBarHeight(interfaceHeight: variableStates.interfaceSize.height, orientation: variableStates.keyboardOrientation) * 0.5
+        Design.keyboardBarHeight(
+            interfaceHeight: variableStates.interfaceSize.height,
+            context: variableStates.layoutContext
+        ) * 0.5
     }
     private var buttonHeight: CGFloat {
-        Design.keyboardBarHeight(interfaceHeight: variableStates.interfaceSize.height, orientation: variableStates.keyboardOrientation) * 0.6
+        Design.keyboardBarHeight(
+            interfaceHeight: variableStates.interfaceSize.height,
+            context: variableStates.layoutContext
+        ) * 0.6
     }
 
     @Environment(Extension.Theme.self) private var theme

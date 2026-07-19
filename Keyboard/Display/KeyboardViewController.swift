@@ -156,7 +156,10 @@ final class KeyboardViewController: UIInputViewController {
                 // In resizing mode use the dynamic maxH; otherwise default to interfaceSize.height
                 // 1. upsideComponentの高さを計算する（存在しない場合は0）
                 let upsideComponentHeight = upsideComponent.map { component in
-                    Design.upsideComponentHeight(component, orientation: KeyboardViewController.variableStates.keyboardOrientation)
+                    Design.upsideComponentHeight(
+                        component,
+                        context: KeyboardViewController.variableStates.layoutContext
+                    )
                 } ?? 0
 
                 let bodyHeight = (state == .resizing) ? maxH : interfaceSize.height
@@ -428,8 +431,9 @@ final class KeyboardViewController: UIInputViewController {
 
     func prepareScreenHeight(for component: UpsideComponent?) {
         let variableStates = KeyboardViewController.variableStates
-        let orientation = variableStates.keyboardOrientation
-        let componentHeight = component.map { Design.upsideComponentHeight($0, orientation: orientation) } ?? 0
+        let componentHeight = component.map {
+            Design.upsideComponentHeight($0, context: variableStates.layoutContext)
+        } ?? 0
         let bodyHeight: CGFloat
         if variableStates.resizingState == .resizing {
             bodyHeight = variableStates.maximumHeight

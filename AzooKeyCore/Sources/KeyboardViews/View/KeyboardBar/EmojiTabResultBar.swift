@@ -17,10 +17,16 @@ struct EmojiTabResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: V
     @EnvironmentObject private var variableStates: VariableStates
     @Namespace private var namespace
     private var buttonHeight: CGFloat {
-        Design.keyboardBarHeight(interfaceHeight: variableStates.interfaceSize.height, orientation: variableStates.keyboardOrientation) * 0.9
+        Design.keyboardBarHeight(
+            interfaceHeight: variableStates.interfaceSize.height,
+            context: variableStates.layoutContext
+        ) * 0.9
     }
     private var searchBarHeight: CGFloat {
-        Design.keyboardBarHeight(interfaceHeight: variableStates.interfaceSize.height, orientation: variableStates.keyboardOrientation) * 0.8
+        Design.keyboardBarHeight(
+            interfaceHeight: variableStates.interfaceSize.height,
+            context: variableStates.layoutContext
+        ) * 0.8
     }
     private var searchBarDesign: InKeyboardSearchBar<Extension>.Configuration {
         .init(placeholder: "絵文字を検索", theme: theme)

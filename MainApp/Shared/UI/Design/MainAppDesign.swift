@@ -6,9 +6,12 @@
 //  Copyright © 2023 ensan. All rights reserved.
 //
 
+import CoreGraphics
+import enum KeyboardViews.KeyboardLayoutIdiom
+import struct KeyboardViews.KeyboardLayoutContext
+import enum KeyboardViews.KeyboardOrientation
 import class UIKit.UIDevice
 import enum UIKit.UIDeviceOrientation
-import enum KeyboardViews.KeyboardOrientation
 
 enum MainAppDesign {
     static let imageMaximumWidth: Double = 500
@@ -19,5 +22,14 @@ enum MainAppDesign {
         } else {
             return UIDevice.current.orientation == UIDeviceOrientation.unknown ? .vertical : (UIDevice.current.orientation == UIDeviceOrientation.portrait ? .vertical : .horizontal)
         }
+    }
+
+    @MainActor
+    static func keyboardLayoutContext(containerWidth: CGFloat) -> KeyboardLayoutContext {
+        KeyboardLayoutContext(
+            containerWidth: containerWidth,
+            orientation: keyboardOrientation,
+            idiom: .current
+        )
     }
 }
