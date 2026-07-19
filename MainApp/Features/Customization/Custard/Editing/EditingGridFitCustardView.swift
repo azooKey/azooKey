@@ -336,7 +336,22 @@ struct EditingGridFitCustardView: CancelableEditor {
                         }
                     } else {
                         NavigationLink {
-                            CustardInterfaceKeyEditor(data: $editingItem.keys[.gridFit(x: x, y: y)])
+                            GridFitCustardKeyEditor(
+                                position: .gridFit(x: x, y: y),
+                                keyData: $editingItem.keys[
+                                    .gridFit(x: x, y: y)
+                                ],
+                                horizontalCount: layout.rowCount,
+                                verticalCount: layout.columnCount,
+                                occupied: activeKeyFrames(
+                                    excluding: .gridFit(x: x, y: y)
+                                )
+                            ) { placement in
+                                applyPlacement(
+                                    placement,
+                                    replacing: .gridFit(x: x, y: y)
+                                )
+                            }
                         } label: {
                             view.disabled(true).border(Color.primary)
                         }
@@ -730,6 +745,85 @@ struct EditingGridFitCustardView: CancelableEditor {
 }
 
 @MainActor
+private struct GridFitCustardKeyEditor: View {
+    @Environment(\.dismiss) private var dismiss
+    @Binding private var keyData: UserMadeKeyData
+    @State private var placementEditorTarget: GridFitPlacementEditorTarget?
+    @State private var pendingPlacement: GridFitKeyPlacement?
+
+    private let position: KeyPosition
+    private let horizontalCount: Int
+    private let verticalCount: Int
+    private let occupied: [GridFitPositionSpecifier]
+    private let onSavePlacement: (GridFitKeyPlacement) -> Void
+
+    init(
+        position: KeyPosition,
+        keyData: Binding<UserMadeKeyData>,
+        horizontalCount: Int,
+        verticalCount: Int,
+        occupied: [GridFitPositionSpecifier],
+        onSavePlacement: @escaping (GridFitKeyPlacement) -> Void
+    ) {
+        self.position = position
+        self._keyData = keyData
+        self.horizontalCount = horizontalCount
+        self.verticalCount = verticalCount
+        self.occupied = occupied
+        self.onSavePlacement = onSavePlacement
+    }
+
+    var body: some View {
+        CustardInterfaceKeyEditor(data: $keyData)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("配置", systemImage: "square.resize") {
+                        showPlacementEditor()
+                    }
+                }
+            }
+            .sheet(
+                item: $placementEditorTarget,
+                onDismiss: applyPendingPlacement
+            ) { target in
+                GridFitKeyPlacementEditor(
+                    initialPlacement: target.placement,
+                    horizontalCount: horizontalCount,
+                    verticalCount: verticalCount,
+                    occupied: occupied,
+                    isNewKey: false
+                ) { placement in
+                    pendingPlacement = placement
+                }
+            }
+    }
+
+    private func showPlacementEditor() {
+        guard case let .gridFit(x, y) = position else {
+            return
+        }
+        placementEditorTarget = .init(
+            originalPosition: position,
+            placement: .init(
+                x: x,
+                y: y,
+                width: keyData.width,
+                height: keyData.height
+            )
+        )
+    }
+
+    private func applyPendingPlacement() {
+        guard let pendingPlacement else {
+            return
+        }
+        self.pendingPlacement = nil
+        onSavePlacement(pendingPlacement)
+        dismiss()
+    }
+}
+
+@MainActor
 private struct GridFitKeyPlacementEditor: View {
     @Environment(\.dismiss) private var dismiss
     @State private var xText: String
@@ -801,6 +895,13 @@ private struct GridFitKeyPlacementEditor: View {
             Form {
                 Section("配置プレビュー") {
                     placementPreview
+                    if let inputErrorMessage {
+                        Label(
+                            inputErrorMessage,
+                            systemImage: "exclamationmark.triangle"
+                        )
+                        .foregroundStyle(.red)
+                    }
                 }
                 Section("位置") {
                     decimalStepperField("X座標", text: $xText)
@@ -827,15 +928,6 @@ private struct GridFitKeyPlacementEditor: View {
                         "0.1刻みで微調整",
                         isOn: $usesFineAdjustment
                     )
-                }
-                if let inputErrorMessage {
-                    Section {
-                        Label(
-                            inputErrorMessage,
-                            systemImage: "exclamationmark.triangle"
-                        )
-                        .foregroundStyle(.red)
-                    }
                 }
             }
             .navigationTitle(isNewKey ? "キーを追加" : "キーの配置")
