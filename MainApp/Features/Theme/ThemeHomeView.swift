@@ -163,7 +163,7 @@ struct ThemeHomeView: View {
         let tab = tab
         ForEach(manager.indices.reversed(), id: \.self) { index in
             if let theme = theme(at: index) {
-                ThemeRowLayout {
+                ThemeRowLayout(spacing: 8) {
                     ZStack {
                         KeyboardPreview(
                             theme: theme,
