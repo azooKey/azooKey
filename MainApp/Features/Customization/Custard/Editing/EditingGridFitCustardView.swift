@@ -758,24 +758,9 @@ private struct GridFitCustardKeyEditor: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Button {
-                    opensPlacementEditorOnDismiss = true
-                    dismiss()
-                } label: {
-                    Label(
-                        "位置とサイズを編集",
-                        systemImage:
-                            "arrow.up.left.and.arrow.down.right"
-                    )
-                }
-                .buttonStyle(.bordered)
-                Spacer()
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
-            CustardInterfaceKeyEditor(data: $keyData)
+        CustardInterfaceKeyEditor(data: $keyData) {
+            opensPlacementEditorOnDismiss = true
+            dismiss()
         }
         .onDisappear {
             if opensPlacementEditorOnDismiss {

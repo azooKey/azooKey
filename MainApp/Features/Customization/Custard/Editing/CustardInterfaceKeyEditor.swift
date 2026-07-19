@@ -16,13 +16,19 @@ struct CustardInterfaceKeyEditor: View {
     @StateObject private var state: CustardInterfaceKeyEditingState
     @State private var usesFineSizeAdjustment = false
     private let target: Target
+    private let onEditPlacement: (() -> Void)?
 
-    init(data: Binding<UserMadeKeyData>, target: Target = .flick) {
+    init(
+        data: Binding<UserMadeKeyData>,
+        target: Target = .flick,
+        onEditPlacement: (() -> Void)? = nil
+    ) {
         self._keyData = data
         self._state = StateObject(
             wrappedValue: CustardInterfaceKeyEditingState(model: data.wrappedValue.model)
         )
         self.target = target
+        self.onEditPlacement = onEditPlacement
     }
 
     private var screenWidth: CGFloat {
@@ -284,6 +290,7 @@ struct CustardInterfaceKeyEditor: View {
 
     private var systemKeyEditor: some View {
         Form {
+            placementEditorSection
             Section {
                 keyPicker
             }
@@ -303,6 +310,7 @@ struct CustardInterfaceKeyEditor: View {
 
     private func customKeyEditor(position: FlickKeyPosition) -> some View {
         Form {
+            placementEditorSection
             inputSection(position: position)
             CustardKeyLabelEditorSection(
                 selection: labelSelection(position: position),
@@ -518,6 +526,7 @@ struct CustardInterfaceKeyEditor: View {
         let id = state.longpressIDs.indices.contains(index) ? state.longpressIDs[index] : nil
 
         return Form {
+            placementEditorSection
             Section {
                 let actions = variation.wrappedValue[.pressAction]
                 if CustardInterfaceKeyEditingService.isInputActionEditable(actions) {
@@ -577,6 +586,31 @@ struct CustardInterfaceKeyEditor: View {
                     )
                 }
                 .foregroundStyle(.red)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var placementEditorSection: some View {
+        if let onEditPlacement {
+            Section("配置") {
+                Button {
+                    onEditPlacement()
+                } label: {
+                    HStack {
+                        Label(
+                            "位置とサイズ",
+                            systemImage:
+                                "arrow.up.left.and.arrow.down.right"
+                        )
+                        Spacer()
+                        Image(systemName: "chevron.forward")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.tertiary)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
             }
         }
     }
