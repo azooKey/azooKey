@@ -12,6 +12,67 @@ import SwiftUI
 import SwiftUIUtils
 import SwiftUtils
 
+private struct EqualWidthHStack: Layout {
+    var spacing: CGFloat = 0
+
+    func sizeThatFits(
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout ()
+    ) -> CGSize {
+        guard !subviews.isEmpty else {
+            return .zero
+        }
+        let totalSpacing = spacing * CGFloat(subviews.count - 1)
+        let width = proposal.width ?? (
+            subviews.map { $0.sizeThatFits(.unspecified).width }.max() ?? 0
+        ) * CGFloat(subviews.count) + totalSpacing
+        let itemWidth = max(0, (width - totalSpacing) / CGFloat(subviews.count))
+        let itemProposal = ProposedViewSize(
+            width: itemWidth,
+            height: proposal.height
+        )
+        let height = subviews.map {
+            $0.sizeThatFits(itemProposal).height
+        }.max() ?? 0
+        return CGSize(width: width, height: height)
+    }
+
+    func placeSubviews(
+        in bounds: CGRect,
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout ()
+    ) {
+        guard !subviews.isEmpty else {
+            return
+        }
+        let totalSpacing = spacing * CGFloat(subviews.count - 1)
+        let itemWidth = max(
+            0,
+            (bounds.width - totalSpacing) / CGFloat(subviews.count)
+        )
+        let itemProposal = ProposedViewSize(
+            width: itemWidth,
+            height: bounds.height
+        )
+        for (index, subview) in subviews.enumerated() {
+            let itemHeight = subview.sizeThatFits(itemProposal).height
+            subview.place(
+                at: CGPoint(
+                    x: bounds.minX + CGFloat(index) * (itemWidth + spacing),
+                    y: bounds.midY
+                ),
+                anchor: .leading,
+                proposal: ProposedViewSize(
+                    width: itemWidth,
+                    height: itemHeight
+                )
+            )
+        }
+    }
+}
+
 @MainActor
 struct ThemeHomeView: View {
     enum Path: Hashable {
@@ -62,11 +123,11 @@ struct ThemeHomeView: View {
         let tab = tab
         ForEach(manager.indices.reversed(), id: \.self) { index in
             if let theme = theme(at: index) {
-                HStack(spacing: 0) {
+                EqualWidthHStack {
                     ZStack {
                         KeyboardPreview(
                             theme: theme,
-                            sizing: .thumbnail(scale: 0.6),
+                            sizing: .fitToExtension,
                             defaultTab: tab
                         )
                             .disabled(true)
@@ -103,7 +164,6 @@ struct ThemeHomeView: View {
                                 .matchedGeometryEffect(id: "selected_theme_dark", in: namespace)
                         }
                     }
-                    .frame(maxWidth: .infinity)
                     VStack {
                         if manager.selectedIndex == manager.selectedIndexInDarkMode {
                             if manager.selectedIndex != index {
@@ -132,7 +192,6 @@ struct ThemeHomeView: View {
                     }
                     .labelStyle(.iconOnly)
                     .buttonStyle(LargeButtonStyle(backgroundColor: .systemGray5))
-                    .frame(maxWidth: .infinity)
                 }
                 .contextMenu {
                     if self.manager.selectedIndex == self.manager.selectedIndexInDarkMode {

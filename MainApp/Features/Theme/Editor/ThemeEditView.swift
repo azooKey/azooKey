@@ -196,7 +196,11 @@ struct ThemeEditView: CancelableEditor {
                         return .custard((try? CustardManager.load().custard(identifier: identifier)) ?? .errorMessage)
                     }
                 }()
-                KeyboardPreview(theme: self.theme, defaultTab: tab)
+                KeyboardPreview(
+                    theme: self.theme,
+                    sizing: .fitToExtension,
+                    defaultTab: tab
+                )
             }
             .background(Color.secondarySystemBackground)
             .onChange(of: trimmedImage) { (_, value) in
