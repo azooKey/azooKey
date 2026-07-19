@@ -402,7 +402,6 @@ struct EditingGridFitCustardView: CancelableEditor {
         VStack {
             CenterAlignedView {
                 KeyboardPreview(
-                    sizing: .thumbnail(scale: 0.7),
                     defaultTab: .custard(custard)
                 )
             }

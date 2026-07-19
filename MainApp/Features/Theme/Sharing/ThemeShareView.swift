@@ -36,14 +36,17 @@ struct ThemeShareView: View {
     private var shareImage: ShareImage
 
     @MainActor @ViewBuilder private var keyboardPreview: some View {
-        KeyboardPreview(theme: theme, sizing: .thumbnail(scale: 0.9))
+        KeyboardPreview(theme: theme)
     }
 
     @MainActor @ViewBuilder private var captureKeyboardPreview: some View {
+        let resolvedSize = KeyboardPreviewSizing.resolvedExtensionSize(
+            fallbackWidth: previewContainerWidth
+        )
         KeyboardPreview(
             theme: theme,
-            sizing: .fixed(
-                containerWidth: previewContainerWidth,
+            sizing: .render(
+                resolvedSize: resolvedSize,
                 scale: 0.9
             )
         )

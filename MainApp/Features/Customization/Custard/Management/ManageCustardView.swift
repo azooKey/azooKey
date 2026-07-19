@@ -284,7 +284,6 @@ struct ManageCustardView: View {
                         Text("「\(custard.metadata.display_name)(\(custard.identifier))」の読み込みに成功しました")
                         CenterAlignedView {
                             KeyboardPreview(
-                                sizing: .thumbnail(scale: 0.7),
                                 defaultTab: .custard(custard)
                             )
                         }
@@ -536,7 +535,6 @@ struct URLImportCustardView: View {
                         Text("「\(custard.metadata.display_name)(\(custard.identifier))」の読み込みに成功しました")
                         CenterAlignedView {
                             KeyboardPreview(
-                                sizing: .thumbnail(scale: 0.7),
                                 defaultTab: .custard(custard)
                             )
                         }

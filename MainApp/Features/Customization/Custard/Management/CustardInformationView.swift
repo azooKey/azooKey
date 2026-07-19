@@ -150,7 +150,6 @@ struct CustardInformationView: View {
 
     private var keyboardPreview: some View {
         KeyboardPreview(
-            sizing: .thumbnail(scale: 0.7),
             defaultTab: .custard(custard)
         )
     }
