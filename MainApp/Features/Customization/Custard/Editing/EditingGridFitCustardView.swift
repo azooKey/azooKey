@@ -18,6 +18,33 @@ extension CustardInterfaceCustomKey {
     static let empty: Self = .init(design: .init(label: .text(""), color: .normal), press_actions: [.input("")], longpress_actions: .none, variations: [])
 }
 
+private struct GridFitKeyPlacement: Equatable, Sendable {
+    var x: Double
+    var y: Double
+    var width: Double
+    var height: Double
+
+    var frame: GridFitPositionSpecifier {
+        .init(x: x, y: y, width: width, height: height)
+    }
+}
+
+private struct GridFitPlacementEditorTarget: Identifiable {
+    let id = UUID()
+    var originalPosition: KeyPosition?
+    var placement: GridFitKeyPlacement
+}
+
+private func gridFramesIntersect(
+    _ lhs: GridFitPositionSpecifier,
+    _ rhs: GridFitPositionSpecifier
+) -> Bool {
+    lhs.x < rhs.x + rhs.width
+        && rhs.x < lhs.x + lhs.width
+        && lhs.y < rhs.y + rhs.height
+        && rhs.y < lhs.y + lhs.height
+}
+
 fileprivate extension Dictionary where Key == KeyPosition, Value == UserMadeKeyData {
     subscript(key: Key) -> Value {
         get {
@@ -52,6 +79,7 @@ struct EditingGridFitCustardView: CancelableEditor {
     // MARK: UI表示系
     @State private var showPreview = false
     @State private var baseSelectionSheetState = BaseSelectionSheetState()
+    @State private var placementEditorTarget: GridFitPlacementEditorTarget?
     private struct BaseSelectionSheetState: Sendable, Equatable, Hashable {
         var showBaseSelectionSheet = false
         var hasShown = false
@@ -104,18 +132,107 @@ struct EditingGridFitCustardView: CancelableEditor {
         self.isNewItem = editingItem == nil
     }
 
-    private func isCovered(at position: (x: Double, y: Double)) -> Bool {
-        editingItem.keys.contains { key, data in
-            guard case let .gridFit(x, y) = key,
-                  key != .gridFit(x: position.x, y: position.y),
-                  !editingItem.emptyKeys.contains(key) else {
+    private func gridFrame(
+        position: KeyPosition,
+        data: UserMadeKeyData
+    ) -> GridFitPositionSpecifier? {
+        guard case let .gridFit(x, y) = position else {
+            return nil
+        }
+        return .init(x: x, y: y, width: data.width, height: data.height)
+    }
+
+    private func activeKeyFrames(
+        excluding excludedPosition: KeyPosition? = nil
+    ) -> [GridFitPositionSpecifier] {
+        editingItem.keys.compactMap { position, data in
+            guard position != excludedPosition,
+                  !editingItem.emptyKeys.contains(position) else {
+                return nil
+            }
+            return gridFrame(position: position, data: data)
+        }
+    }
+
+    private func defaultKeyPlacement() -> GridFitKeyPlacement {
+        if let position = editingItem.emptyKeys.first,
+           editingItem.keys[position] != nil,
+           case let .gridFit(x, y) = position {
+            return .init(x: x, y: y, width: 1, height: 1)
+        }
+
+        let occupied = activeKeyFrames()
+        for y in 0 ..< layout.columnCount {
+            for x in 0 ..< layout.rowCount {
+                let placement = GridFitKeyPlacement(
+                    x: Double(x),
+                    y: Double(y),
+                    width: 1,
+                    height: 1
+                )
+                if !occupied.contains(where: {
+                    gridFramesIntersect($0, placement.frame)
+                }) {
+                    return placement
+                }
+            }
+        }
+        return .init(x: 0, y: 0, width: 1, height: 1)
+    }
+
+    private func showPlacementEditor(for position: KeyPosition? = nil) {
+        if let position,
+           let data = editingItem.keys[position],
+           case let .gridFit(x, y) = position {
+            placementEditorTarget = .init(
+                originalPosition: position,
+                placement: .init(
+                    x: x,
+                    y: y,
+                    width: data.width,
+                    height: data.height
+                )
+            )
+        } else {
+            placementEditorTarget = .init(
+                originalPosition: nil,
+                placement: defaultKeyPlacement()
+            )
+        }
+    }
+
+    private func applyPlacement(
+        _ placement: GridFitKeyPlacement,
+        replacing originalPosition: KeyPosition?
+    ) {
+        let keyData: UserMadeKeyData
+        if let originalPosition,
+           let originalData = editingItem.keys.removeValue(
+               forKey: originalPosition
+           ) {
+            editingItem.emptyKeys.remove(originalPosition)
+            keyData = originalData
+        } else {
+            keyData = .init(model: .custom(.empty), width: 1, height: 1)
+        }
+
+        let overlappingDeletedKeys = editingItem.emptyKeys.filter { position in
+            guard let data = editingItem.keys[position],
+                  let frame = gridFrame(position: position, data: data) else {
                 return false
             }
-            return x < position.x + 1
-                && position.x < x + data.width
-                && y < position.y + 1
-                && position.y < y + data.height
+            return gridFramesIntersect(frame, placement.frame)
         }
+        for position in overlappingDeletedKeys {
+            editingItem.emptyKeys.remove(position)
+            editingItem.keys[position] = nil
+        }
+
+        editingItem.keys[.gridFit(x: placement.x, y: placement.y)] = .init(
+            model: keyData.model,
+            width: placement.width,
+            height: placement.height
+        )
     }
 
     private var interfaceSize: CGSize {
@@ -179,6 +296,9 @@ struct EditingGridFitCustardView: CancelableEditor {
                         showPreview = false
                     }
                 } else {
+                    Button("キーを追加", systemImage: "plus.square") {
+                        showPlacementEditor()
+                    }
                     Button("プレビュー", systemImage: "play.circle") {
                         showPreview = true
                     }
@@ -201,19 +321,18 @@ struct EditingGridFitCustardView: CancelableEditor {
                     let x = Double(pos.x)
                     let y = Double(pos.y)
                     if editingItem.emptyKeys.contains(.gridFit(x: x, y: y)) {
-                        if !isCovered(at: (x, y)) {
-                            Button {
-                                editingItem.emptyKeys.remove(.gridFit(x: x, y: y))
-                            } label: {
-                                view.disabled(true)
-                                    .opacity(0)
-                                    .overlay {
-                                        Rectangle().stroke(style: .init(lineWidth: 2, dash: [5]))
-                                    }
-                                    .overlay {
-                                        Image(systemName: "plus.circle").foregroundStyle(.accentColor)
-                                    }
-                            }
+                        Button {
+                            editingItem.emptyKeys.remove(.gridFit(x: x, y: y))
+                        } label: {
+                            view.disabled(true)
+                                .opacity(0)
+                                .overlay {
+                                    Rectangle().stroke(style: .init(lineWidth: 2, dash: [5]))
+                                }
+                                .overlay {
+                                    Image(systemName: "arrow.uturn.backward.circle")
+                                        .foregroundStyle(.accentColor)
+                                }
                         }
                     } else {
                         NavigationLink {
@@ -231,6 +350,11 @@ struct EditingGridFitCustardView: CancelableEditor {
                                 }
                             }
                             .disabled(self.manager.editorState.copiedKey == nil)
+                            Button("配置を変更", systemImage: "square.resize") {
+                                showPlacementEditor(
+                                    for: .gridFit(x: x, y: y)
+                                )
+                            }
                             Button("下に行を追加", systemImage: "plus") {
                                 insertRow(at: Int(y.rounded(.down)) + 1)
                             }
@@ -297,33 +421,54 @@ struct EditingGridFitCustardView: CancelableEditor {
                 SemiStaticStates.shared.screenWidth,
                 orientation: MainAppDesign.keyboardOrientation
             )
+            normalizeEmptyKeys()
             if !self.baseSelectionSheetState.hasShown {
                 self.baseSelectionSheetState.showBaseSelectionSheet = true
             }
         }
-        .sheet(isPresented: self.$baseSelectionSheetState.showBaseSelectionSheet, onDismiss: {
-            self.baseSelectionSheetState.hasShown = true
-        }) {
-            NavigationStack {
-                List {
-                    ForEach(baseCustards, id: \.identifier) {custard in
-                        custardSelectionView(for: custard)
-                    }
-                    ForEach(manager.availableCustards, id: \.self) {identifier in
-                        if let custard = self.getCustard(identifier: identifier),
-                           case .gridFit = custard.interface.keyLayout {
+        .sheet(
+            isPresented: self.$baseSelectionSheetState.showBaseSelectionSheet,
+            onDismiss: {
+                self.baseSelectionSheetState.hasShown = true
+            },
+            content: {
+                NavigationStack {
+                    List {
+                        ForEach(baseCustards, id: \.identifier) {custard in
                             custardSelectionView(for: custard)
                         }
+                        ForEach(manager.availableCustards, id: \.self) {identifier in
+                            if let custard = self.getCustard(identifier: identifier),
+                               case .gridFit = custard.interface.keyLayout {
+                                custardSelectionView(for: custard)
+                            }
+                        }
                     }
+                    .navigationTitle("ベースを選ぶ")
+                    Button("ベース無しで始める", systemImage: "xmark") {
+                        self.baseSelectionSheetState.showBaseSelectionSheet = false
+                        self.baseSelectionSheetState.hasShown = true
+                    }
+                    .foregroundStyle(.white)
+                    .buttonStyle(LargeButtonStyle(backgroundColor: .blue))
+                    .padding(.horizontal)
                 }
-                .navigationTitle("ベースを選ぶ")
-                Button("ベース無しで始める", systemImage: "xmark") {
-                    self.baseSelectionSheetState.showBaseSelectionSheet = false
-                    self.baseSelectionSheetState.hasShown = true
-                }
-                .foregroundStyle(.white)
-                .buttonStyle(LargeButtonStyle(backgroundColor: .blue))
-                .padding(.horizontal)
+            }
+        )
+        .sheet(item: $placementEditorTarget) { target in
+            GridFitKeyPlacementEditor(
+                initialPlacement: target.placement,
+                horizontalCount: layout.rowCount,
+                verticalCount: layout.columnCount,
+                occupied: activeKeyFrames(
+                    excluding: target.originalPosition
+                ),
+                isNewKey: target.originalPosition == nil
+            ) { placement in
+                applyPlacement(
+                    placement,
+                    replacing: target.originalPosition
+                )
             }
         }
     }
@@ -495,19 +640,31 @@ struct EditingGridFitCustardView: CancelableEditor {
 
     private func updateModel() {
         let layout = layout
+        var frames = editingItem.keys.compactMap { position, data in
+            gridFrame(position: position, data: data)
+        }
         (0..<layout.rowCount).forEach {x in
             (0..<layout.columnCount).forEach {y in
                 let position = KeyPosition.gridFit(
                     x: Double(x),
                     y: Double(y)
                 )
-                if !editingItem.keys.keys.contains(position) {
-                    editingItem.keys[position] = .init(
-                        model: .custom(.empty),
-                        width: 1,
-                        height: 1
-                    )
+                let frame = GridFitPositionSpecifier(
+                    x: Double(x),
+                    y: Double(y)
+                )
+                guard !editingItem.keys.keys.contains(position),
+                      !frames.contains(where: {
+                          gridFramesIntersect($0, frame)
+                      }) else {
+                    return
                 }
+                editingItem.keys[position] = .init(
+                    model: .custom(.empty),
+                    width: 1,
+                    height: 1
+                )
+                frames.append(frame)
             }
         }
         for key in editingItem.keys.keys {
@@ -518,11 +675,40 @@ struct EditingGridFitCustardView: CancelableEditor {
                 || Double(layout.rowCount) <= x
                 || y < 0
                 || Double(layout.columnCount) <= y {
-                if editingItem.keys[key] == Self.emptyKey {
+                if let data = editingItem.keys[key],
+                   isEmptyUnitKey(data) {
                     editingItem.keys[key] = nil
+                    editingItem.emptyKeys.remove(key)
                 }
             }
         }
+    }
+
+    private func normalizeEmptyKeys() {
+        editingItem.emptyKeys = editingItem.emptyKeys.filter {
+            editingItem.keys[$0] != nil
+        }
+        let activeFrames = activeKeyFrames()
+        let obsoletePositions = editingItem.emptyKeys.filter { position in
+            guard let data = editingItem.keys[position],
+                  isEmptyUnitKey(data),
+                  let frame = gridFrame(position: position, data: data) else {
+                return false
+            }
+            return activeFrames.contains(where: {
+                gridFramesIntersect($0, frame)
+            })
+        }
+        for position in obsoletePositions {
+            editingItem.emptyKeys.remove(position)
+            editingItem.keys[position] = nil
+        }
+    }
+
+    private func isEmptyUnitKey(_ data: UserMadeKeyData) -> Bool {
+        data.model == .custom(.empty)
+            && data.width == 1
+            && data.height == 1
     }
 
     private func save() {
@@ -540,5 +726,363 @@ struct EditingGridFitCustardView: CancelableEditor {
 
     func cancel() {
         // required for `CancelableEditor` conformance, but in this view, it is treated by `EditCancelButton`
+    }
+}
+
+@MainActor
+private struct GridFitKeyPlacementEditor: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var xText: String
+    @State private var yText: String
+    @State private var widthText: String
+    @State private var heightText: String
+    @State private var usesFineAdjustment = false
+    @State private var dragStart: GridFitKeyPlacement?
+
+    private let horizontalCount: Int
+    private let verticalCount: Int
+    private let occupied: [GridFitPositionSpecifier]
+    private let isNewKey: Bool
+    private let onSave: (GridFitKeyPlacement) -> Void
+
+    init(
+        initialPlacement: GridFitKeyPlacement,
+        horizontalCount: Int,
+        verticalCount: Int,
+        occupied: [GridFitPositionSpecifier],
+        isNewKey: Bool,
+        onSave: @escaping (GridFitKeyPlacement) -> Void
+    ) {
+        self._xText = State(initialValue: String(initialPlacement.x))
+        self._yText = State(initialValue: String(initialPlacement.y))
+        self._widthText = State(initialValue: String(initialPlacement.width))
+        self._heightText = State(initialValue: String(initialPlacement.height))
+        self.horizontalCount = horizontalCount
+        self.verticalCount = verticalCount
+        self.occupied = occupied
+        self.isNewKey = isNewKey
+        self.onSave = onSave
+    }
+
+    private var placement: GridFitKeyPlacement? {
+        guard let x = decimalValue(xText),
+              let y = decimalValue(yText),
+              let width = decimalValue(widthText),
+              let height = decimalValue(heightText),
+              x.isFinite,
+              y.isFinite,
+              width.isFinite,
+              height.isFinite else {
+            return nil
+        }
+        return .init(x: x, y: y, width: width, height: height)
+    }
+
+    private var inputErrorMessage: String? {
+        guard let placement else {
+            return "すべての項目に数値を入力してください"
+        }
+        guard placement.width > 0, placement.height > 0 else {
+            return "横幅と縦幅は0より大きくしてください"
+        }
+        return nil
+    }
+
+    private var adjustmentStep: Double {
+        usesFineAdjustment ? 0.1 : 1
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("配置プレビュー") {
+                    placementPreview
+                    Text("青いキーをドラッグして移動できます")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Section("位置") {
+                    decimalField("X座標", text: $xText)
+                    decimalField("Y座標", text: $yText)
+                    movementButtons
+                    Text("左上をX: 0、Y: 0とするグリッド座標です")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Section("サイズ") {
+                    Stepper(
+                        "横幅: \(widthText)",
+                        onIncrement: {
+                            adjustText(
+                                $widthText,
+                                by: adjustmentStep,
+                                mustRemainPositive: true
+                            )
+                        },
+                        onDecrement: {
+                            adjustText(
+                                $widthText,
+                                by: -adjustmentStep,
+                                mustRemainPositive: true
+                            )
+                        }
+                    )
+                    Stepper(
+                        "縦幅: \(heightText)",
+                        onIncrement: {
+                            adjustText(
+                                $heightText,
+                                by: adjustmentStep,
+                                mustRemainPositive: true
+                            )
+                        },
+                        onDecrement: {
+                            adjustText(
+                                $heightText,
+                                by: -adjustmentStep,
+                                mustRemainPositive: true
+                            )
+                        }
+                    )
+                    decimalField("横幅を直接入力", text: $widthText)
+                    decimalField("縦幅を直接入力", text: $heightText)
+                }
+                Section {
+                    Toggle(
+                        "0.1刻みで微調整",
+                        isOn: $usesFineAdjustment
+                    )
+                }
+                if let inputErrorMessage {
+                    Section {
+                        Label(
+                            inputErrorMessage,
+                            systemImage: "exclamationmark.triangle"
+                        )
+                        .foregroundStyle(.red)
+                    }
+                }
+            }
+            .navigationTitle(isNewKey ? "キーを追加" : "キーの配置")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("キャンセル") {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("完了") {
+                        guard let placement, inputErrorMessage == nil else {
+                            return
+                        }
+                        onSave(placement)
+                        dismiss()
+                    }
+                    .disabled(inputErrorMessage != nil)
+                }
+            }
+        }
+    }
+
+    private var placementPreview: some View {
+        GeometryReader { geometry in
+            let unitWidth = geometry.size.width
+                / CGFloat(max(horizontalCount, 1))
+            let unitHeight = geometry.size.height
+                / CGFloat(max(verticalCount, 1))
+            ZStack(alignment: .topLeading) {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color.secondarySystemBackground)
+                ForEach(Array(occupied.enumerated()), id: \.offset) { _, frame in
+                    RoundedRectangle(cornerRadius: 5)
+                    .fill(Color.secondary.opacity(0.35))
+                    .frame(
+                        width: previewKeyWidth(
+                            frame,
+                            unitWidth: unitWidth
+                        ),
+                        height: previewKeyHeight(
+                            frame,
+                            unitHeight: unitHeight
+                        )
+                    )
+                    .offset(
+                        x: unitWidth * CGFloat(frame.x) + 2,
+                        y: unitHeight * CGFloat(frame.y) + 2
+                    )
+                }
+                if let placement {
+                    let frame = placement.frame
+                    RoundedRectangle(cornerRadius: 5)
+                    .fill(Color.accentColor.opacity(0.75))
+                    .overlay {
+                        Image(
+                            systemName:
+                                "arrow.up.and.down.and.arrow.left.and.right"
+                        )
+                        .foregroundStyle(.white)
+                    }
+                    .frame(
+                        width: previewKeyWidth(
+                            frame,
+                            unitWidth: unitWidth
+                        ),
+                        height: previewKeyHeight(
+                            frame,
+                            unitHeight: unitHeight
+                        )
+                    )
+                    .offset(
+                        x: unitWidth * CGFloat(frame.x) + 2,
+                        y: unitHeight * CGFloat(frame.y) + 2
+                    )
+                    .contentShape(Rectangle())
+                    .gesture(
+                        DragGesture()
+                            .onChanged { value in
+                                if dragStart == nil {
+                                    dragStart = placement
+                                }
+                                guard let dragStart else {
+                                    return
+                                }
+                                let deltaX = Double(
+                                    value.translation.width / unitWidth
+                                )
+                                let deltaY = Double(
+                                    value.translation.height / unitHeight
+                                )
+                                xText = decimalString(
+                                    dragStart.x
+                                        + stepped(deltaX)
+                                )
+                                yText = decimalString(
+                                    dragStart.y
+                                        + stepped(deltaY)
+                                )
+                            }
+                            .onEnded { _ in
+                                dragStart = nil
+                            }
+                    )
+                }
+            }
+            .clipped()
+        }
+        .aspectRatio(
+            CGFloat(max(horizontalCount, 1))
+                / CGFloat(max(verticalCount, 1)),
+            contentMode: .fit
+        )
+    }
+
+    private var movementButtons: some View {
+        Grid(horizontalSpacing: 12, verticalSpacing: 8) {
+            GridRow {
+                Color.clear.frame(width: 44, height: 1)
+                movementButton(
+                    "上へ移動",
+                    systemImage: "arrow.up",
+                    x: 0,
+                    y: -adjustmentStep
+                )
+                Color.clear.frame(width: 44, height: 1)
+            }
+            GridRow {
+                movementButton(
+                    "左へ移動",
+                    systemImage: "arrow.left",
+                    x: -adjustmentStep,
+                    y: 0
+                )
+                movementButton(
+                    "下へ移動",
+                    systemImage: "arrow.down",
+                    x: 0,
+                    y: adjustmentStep
+                )
+                movementButton(
+                    "右へ移動",
+                    systemImage: "arrow.right",
+                    x: adjustmentStep,
+                    y: 0
+                )
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private func movementButton(
+        _ title: LocalizedStringKey,
+        systemImage: String,
+        x: Double,
+        y: Double
+    ) -> some View {
+        Button {
+            adjustText($xText, by: x)
+            adjustText($yText, by: y)
+        } label: {
+            Label(title, systemImage: systemImage)
+                .labelStyle(.iconOnly)
+                .frame(width: 44, height: 36)
+        }
+        .buttonStyle(.bordered)
+    }
+
+    private func previewKeyWidth(
+        _ frame: GridFitPositionSpecifier,
+        unitWidth: CGFloat
+    ) -> CGFloat {
+        max(4, unitWidth * CGFloat(frame.width) - 4)
+    }
+
+    private func previewKeyHeight(
+        _ frame: GridFitPositionSpecifier,
+        unitHeight: CGFloat
+    ) -> CGFloat {
+        max(4, unitHeight * CGFloat(frame.height) - 4)
+    }
+
+    private func decimalField(
+        _ title: LocalizedStringKey,
+        text: Binding<String>
+    ) -> some View {
+        LabeledContent(title) {
+            TextField("0", text: text)
+                .keyboardType(.decimalPad)
+                .multilineTextAlignment(.trailing)
+        }
+    }
+
+    private func adjustText(
+        _ text: Binding<String>,
+        by delta: Double,
+        mustRemainPositive: Bool = false
+    ) {
+        guard let value = decimalValue(text.wrappedValue) else {
+            return
+        }
+        let adjusted = normalized(value + delta)
+        guard !mustRemainPositive || adjusted > 0 else {
+            return
+        }
+        text.wrappedValue = decimalString(adjusted)
+    }
+
+    private func stepped(_ value: Double) -> Double {
+        (value / adjustmentStep).rounded() * adjustmentStep
+    }
+
+    private func normalized(_ value: Double) -> Double {
+        (value * 1_000_000).rounded() / 1_000_000
+    }
+
+    private func decimalString(_ value: Double) -> String {
+        String(normalized(value))
+    }
+
+    private func decimalValue(_ text: String) -> Double? {
+        Double(text.replacingOccurrences(of: ",", with: "."))
     }
 }

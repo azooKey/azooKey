@@ -34,7 +34,7 @@ final class UserMadeCustardTests: XCTestCase {
 
     func test_fractionalGridFitEditingDataRoundTrips() throws {
         var original = makeGridFitCustard(keyStyle: .pcStyle)
-        original.keys[.gridFit(x: 1.5, y: 2)] = .init(
+        original.keys[.gridFit(x: 1.5, y: 2.3)] = .init(
             model: .system(.qwertySpace),
             width: 1.4,
             height: 0.5
@@ -54,15 +54,15 @@ final class UserMadeCustardTests: XCTestCase {
         XCTAssertEqual(decoded.keyStyle, original.keyStyle)
         XCTAssertEqual(decoded.emptyKeys, original.emptyKeys)
         XCTAssertEqual(
-            decoded.keys[.gridFit(x: 1.5, y: 2)]?.model,
+            decoded.keys[.gridFit(x: 1.5, y: 2.3)]?.model,
             .system(.qwertySpace)
         )
         XCTAssertEqual(
-            decoded.keys[.gridFit(x: 1.5, y: 2)]?.width,
+            decoded.keys[.gridFit(x: 1.5, y: 2.3)]?.width,
             1.4
         )
         XCTAssertEqual(
-            decoded.keys[.gridFit(x: 1.5, y: 2)]?.height,
+            decoded.keys[.gridFit(x: 1.5, y: 2.3)]?.height,
             0.5
         )
     }
@@ -139,6 +139,7 @@ final class UserMadeCustardTests: XCTestCase {
             editingData.keys[.gridFit(x: 0, y: 0)]?.model,
             .system(.enter)
         )
+        XCTAssertTrue(editingData.emptyKeys.isEmpty)
     }
 
     func test_defaultQwertyCustardsCanBeConvertedForEditing() throws {

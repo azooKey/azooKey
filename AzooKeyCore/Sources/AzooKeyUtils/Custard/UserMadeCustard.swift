@@ -248,7 +248,6 @@ public extension Custard {
             return nil
         }
         var keys: [KeyPosition: UserMadeKeyData] = [:]
-        var emptyKeys = Set<KeyPosition>()
         for (position, key) in self.interface.keys {
             guard case let .gridFit(value) = position,
                   value.width > 0,
@@ -261,29 +260,6 @@ public extension Custard {
                 height: value.height
             )
         }
-        for x in 0 ..< layout.rowCount {
-            for y in 0 ..< layout.columnCount {
-                let cellPosition = KeyPosition.gridFit(
-                    x: Double(x),
-                    y: Double(y)
-                )
-                guard keys[cellPosition] == nil else {
-                    continue
-                }
-                let cellIsCovered = keys.contains { position, data in
-                    guard case let .gridFit(keyX, keyY) = position else {
-                        return false
-                    }
-                    return keyX < Double(x + 1)
-                        && Double(x) < keyX + data.width
-                        && keyY < Double(y + 1)
-                        && Double(y) < keyY + data.height
-                }
-                if cellIsCovered {
-                    emptyKeys.insert(cellPosition)
-                }
-            }
-        }
         return UserMadeGridFitCustard(
             tabName: self.identifier,
             rowCount: layout.rowCount.description,
@@ -291,7 +267,6 @@ public extension Custard {
             inputStyle: self.input_style,
             language: self.language,
             keys: keys,
-            emptyKeys: emptyKeys,
             keyStyle: .init(self.interface.keyStyle),
             addTabBarAutomatically: true
         )
