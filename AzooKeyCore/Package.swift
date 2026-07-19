@@ -33,6 +33,10 @@ let package = Package(
             name: "KeyboardExtensionUtils",
             targets: ["KeyboardExtensionUtils"]
         ),
+        .library(
+            name: "CustardKit",
+            targets: ["CustardKit"]
+        ),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -41,9 +45,13 @@ let package = Package(
         // MARK: For develop branch, you can use `revision:` specification.
         // MARK: For main branch, you must use `upToNextMinor` specification.
         .package(url: "https://github.com/azooKey/AzooKeyKanaKanjiConverter", revision: "1def030b6697fb3811f2ae642719811db6b70c3e", traits: ["ZenzaiCPU"]),
-        .package(url: "https://github.com/azooKey/CustardKit", revision: "7bddc14eb3f8f0145c6f3a4fea20cf394f8104e8"),
     ],
     targets: [
+        .target(
+            name: "CustardKit",
+            dependencies: [],
+            swiftSettings: swiftSettings
+        ),
         .target(
             name: "SwiftUIUtils",
             dependencies: [
@@ -67,8 +75,8 @@ let package = Package(
                 "SwiftUIUtils",
                 "KeyboardThemes",
                 "KeyboardExtensionUtils",
+                "CustardKit",
                 .product(name: "KanaKanjiConverterModule", package: "AzooKeyKanaKanjiConverter"),
-                .product(name: "CustardKit", package: "CustardKit"),
             ],
             resources: [],
             swiftSettings: swiftSettings
@@ -76,6 +84,7 @@ let package = Package(
         .target(
             name: "AzooKeyUtils",
             dependencies: [
+                "CustardKit",
                 "KeyboardThemes",
                 "KeyboardViews",
             ],
@@ -85,10 +94,17 @@ let package = Package(
         .target(
             name: "KeyboardExtensionUtils",
             dependencies: [
-                .product(name: "CustardKit", package: "CustardKit"),
+                "CustardKit",
                 .product(name: "KanaKanjiConverterModule", package: "AzooKeyKanaKanjiConverter"),
             ],
             resources: [],
+            swiftSettings: swiftSettings
+        ),
+        .testTarget(
+            name: "CustardKitTests",
+            dependencies: [
+                "CustardKit",
+            ],
             swiftSettings: swiftSettings
         ),
         .testTarget(
@@ -102,6 +118,8 @@ let package = Package(
             name: "AzooKeyUtilsTests",
             dependencies: [
                 "AzooKeyUtils",
+                "CustardKit",
+                "KeyboardViews",
             ],
             swiftSettings: swiftSettings
         ),
