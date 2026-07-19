@@ -27,43 +27,70 @@ private struct CandidateMock: ResultViewItemData {
 enum KeyboardPreviewSizing: Equatable {
     case responsive
     case thumbnail(scale: CGFloat)
+    case fitToExtension
     case fixed(containerWidth: CGFloat, scale: CGFloat)
 
     fileprivate var initialContainerWidth: CGFloat? {
         switch self {
-        case .responsive, .thumbnail:
+        case .responsive, .thumbnail, .fitToExtension:
             nil
         case let .fixed(containerWidth, _):
             containerWidth
         }
     }
 
-    fileprivate var scale: CGFloat {
+    fileprivate var staticScale: CGFloat? {
         switch self {
         case .responsive:
             1
         case let .thumbnail(scale), let .fixed(_, scale):
             max(scale, 0.01)
+        case .fitToExtension:
+            nil
         }
     }
 
     fileprivate var measuresAvailableWidth: Bool {
         switch self {
-        case .responsive, .thumbnail:
+        case .responsive, .thumbnail, .fitToExtension:
             true
         case .fixed:
             false
         }
     }
 
-    fileprivate func containerWidth(for measuredWidth: CGFloat) -> CGFloat {
+    @MainActor
+    fileprivate func resolvedContainerSize(
+        for measuredWidth: CGFloat
+    ) -> CGSize {
         switch self {
         case .responsive:
-            measuredWidth
+            return CGSize(width: measuredWidth, height: 0)
         case .thumbnail:
-            measuredWidth / scale
+            return CGSize(
+                width: measuredWidth / (staticScale ?? 1),
+                height: 0
+            )
+        case .fitToExtension:
+            let orientation = MainAppDesign.keyboardOrientation
+            if let size = SharedStore.resolvedKeyboardSize(
+                orientation: orientation
+            ) {
+                return size
+            }
+            let context = MainAppDesign.keyboardLayoutContext(
+                containerWidth: measuredWidth
+            )
+            return CGSize(
+                width: measuredWidth,
+                height: Design.keyboardHeight(
+                    context: context,
+                    upsideComponent: nil
+                ) * CGFloat(AzooKeySettingProvider.keyboardHeight)
+                    + Design.keyboardScreenBottomPadding
+            )
         case let .fixed(containerWidth, _):
-            containerWidth
+            return CGSize(width: containerWidth, height: 0)
         }
     }
 }
@@ -72,9 +99,11 @@ enum KeyboardPreviewSizing: Equatable {
 struct KeyboardPreview: View {
     private let theme: AzooKeyTheme
 
+    @Environment(\.scenePhase) private var scenePhase
     private let sizing: KeyboardPreviewSizing
     private let defaultTab: KeyboardTab.ExistentialTab?
     @State private var availableWidth: CGFloat
+    @State private var measuredDisplayWidth: CGFloat = 0
     @StateObject private var variableStates: VariableStates
 
     init(
@@ -119,7 +148,7 @@ struct KeyboardPreview: View {
                             width: availableWidth,
                             height: keyboardHeight
                         )
-                        .scaleEffect(sizing.scale, anchor: .topLeading)
+                        .scaleEffect(displayScale, anchor: .topLeading)
                         .frame(
                             width: displaySize.width,
                             height: displaySize.height,
@@ -128,11 +157,20 @@ struct KeyboardPreview: View {
                 }
             }
             .onGeometryChange(for: CGFloat.self) { proxy in
-                sizing.measuresAvailableWidth
-                    ? sizing.containerWidth(for: proxy.size.width)
-                    : 0
-            } action: { containerWidth in
-                guard sizing.measuresAvailableWidth, containerWidth > 0 else {
+                sizing.measuresAvailableWidth ? proxy.size.width : 0
+            } action: { displayWidth in
+                guard sizing.measuresAvailableWidth, displayWidth > 0 else {
+                    return
+                }
+                measuredDisplayWidth = displayWidth
+                updateLayout(for: displayWidth)
+            }
+            .onChange(of: sizing) { _, sizing in
+                if sizing.measuresAvailableWidth, measuredDisplayWidth > 0 {
+                    updateLayout(for: measuredDisplayWidth)
+                    return
+                }
+                guard let containerWidth = sizing.initialContainerWidth else {
                     return
                 }
                 updateContainerWidth(containerWidth)
@@ -142,7 +180,13 @@ struct KeyboardPreview: View {
                     for: UIDevice.orientationDidChangeNotification
                 )
             ) { _ in
-                updateContainerWidth(availableWidth)
+                updateCurrentLayout()
+            }
+            .onChange(of: scenePhase) { _, scenePhase in
+                guard scenePhase == .active else {
+                    return
+                }
+                updateCurrentLayout()
             }
     }
 
@@ -152,12 +196,45 @@ struct KeyboardPreview: View {
 
     private var displaySize: CGSize {
         CGSize(
-            width: availableWidth * sizing.scale,
-            height: keyboardHeight * sizing.scale
+            width: availableWidth * displayScale,
+            height: keyboardHeight * displayScale
         )
     }
 
-    private func updateContainerWidth(_ width: CGFloat) {
+    private var displayScale: CGFloat {
+        if let staticScale = sizing.staticScale {
+            return staticScale
+        }
+        guard availableWidth > 0 else {
+            return 0
+        }
+        return measuredDisplayWidth / availableWidth
+    }
+
+    private func updateLayout(for displayWidth: CGFloat) {
+        let resolvedSize = sizing.resolvedContainerSize(
+            for: displayWidth
+        )
+        updateContainerWidth(
+            resolvedSize.width,
+            resolvedKeyboardHeight: resolvedSize.height > 0
+                ? resolvedSize.height
+                : nil
+        )
+    }
+
+    private func updateCurrentLayout() {
+        if sizing.measuresAvailableWidth, measuredDisplayWidth > 0 {
+            updateLayout(for: measuredDisplayWidth)
+        } else if let containerWidth = sizing.initialContainerWidth {
+            updateContainerWidth(containerWidth)
+        }
+    }
+
+    private func updateContainerWidth(
+        _ width: CGFloat,
+        resolvedKeyboardHeight: CGFloat? = nil
+    ) {
         guard width > 0 else {
             return
         }
@@ -168,5 +245,11 @@ struct KeyboardPreview: View {
             width,
             orientation: MainAppDesign.keyboardOrientation
         )
+        if let resolvedKeyboardHeight {
+            variableStates.interfaceSize.height = max(
+                0,
+                resolvedKeyboardHeight - Design.keyboardScreenBottomPadding
+            )
+        }
     }
 }
