@@ -214,6 +214,7 @@ struct CustardInterfaceKeyEditor: View {
                 .custom(.flickSpace()),
                 .custom(.flickDelete()),
                 .system(.changeKeyboard),
+                .system(.qwertyLanguageSwitch),
                 .system(.flickKogaki),
                 .system(.flickKutoten),
                 .system(.flickHiraTab),
@@ -231,6 +232,9 @@ struct CustardInterfaceKeyEditor: View {
             Text("空白キー").tag(CustardInterfaceKey.custom(.flickSpace()))
             Text("次候補キー").tag(CustardInterfaceKey.system(.nextCandidate))
             Text("地球儀キー").tag(CustardInterfaceKey.system(.changeKeyboard))
+            Text("QWERTY言語切り替えキー").tag(
+                CustardInterfaceKey.system(.qwertyLanguageSwitch)
+            )
             Text("小書き・濁点化キー").tag(CustardInterfaceKey.system(.flickKogaki))
             Text("大文字・小文字キー").tag(CustardInterfaceKey.system(.upperLower))
             Text("句読点キー").tag(CustardInterfaceKey.system(.flickKutoten))

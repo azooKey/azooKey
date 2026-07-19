@@ -110,4 +110,58 @@ final class UserMadeCustardTests: XCTestCase {
             )
         }
     }
+
+    func test_defaultQwertyCustardsUseStandardLanguageKeys() {
+        assertLanguageKey(
+            in: .qwertyJapanese,
+            at: .init(x: 0, y: 2, width: 3)
+        )
+        assertLanguageKey(
+            in: .qwertyEnglish,
+            at: .init(x: 0, y: 2, width: 3)
+        )
+        for custard in [Custard.qwertyNumbers, .qwertySymbols] {
+            assertLanguageKey(
+                in: custard,
+                at: .init(x: 0, y: 3, width: 3)
+            )
+        }
+    }
+
+    func test_defaultQwertyCustardsUseStandardBottomRowGeometry() throws {
+        let positions = [
+            GridFitPositionSpecifier(x: 0, y: 3, width: 3),
+            GridFitPositionSpecifier(x: 3, y: 3, width: 3),
+            GridFitPositionSpecifier(x: 6, y: 3, width: 8),
+            GridFitPositionSpecifier(x: 14, y: 3, width: 6),
+        ]
+
+        for custard in [
+            Custard.qwertyJapanese,
+            .qwertyEnglish,
+            .qwertyNumbers,
+            .qwertySymbols,
+        ] {
+            for position in positions {
+                XCTAssertNotNil(
+                    custard.interface.keys[.gridFit(position)],
+                    "\(custard.identifier): \(position)"
+                )
+            }
+        }
+    }
+
+    private func assertLanguageKey(
+        in custard: Custard,
+        at position: GridFitPositionSpecifier,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        XCTAssertEqual(
+            custard.interface.keys[.gridFit(position)],
+            .system(.qwertyLanguageSwitch),
+            file: file,
+            line: line
+        )
+    }
 }

@@ -8,8 +8,7 @@ public extension Custard {
 }
 
 private enum DefaultQwertyCustards {
-    /// Custardのgrid-fitは整数座標のみ対応するため、標準QWERTYの小数座標を2倍して近似する。
-    private static let horizontalScale = 2.0
+    /// 標準QWERTYの横幅を20分割した整数グリッドで表現する。
     private static let layout = CustardInterfaceLayout.gridFit(
         .init(rowCount: 20, columnCount: 4)
     )
@@ -21,11 +20,7 @@ private enum DefaultQwertyCustards {
                 variations: ["ー", "。", "、", "！", "？", "・"]
             )
         )
-        keys[position(0, 2, width: 1.4)] = languageKey(
-            primary: "日",
-            secondary: "英",
-            destination: .user_english
-        )
+        keys[position(0, 2, width: 3)] = .system(.qwertyLanguageSwitch)
         addThirdRowLetters(to: &keys)
         addBottomRow(
             to: &keys,
@@ -46,11 +41,7 @@ private enum DefaultQwertyCustards {
 
     static var english: Custard {
         var keys = letterKeys(secondRowTrailingKey: .system(.upperLower))
-        keys[position(0, 2, width: 1.4)] = languageKey(
-            primary: "英",
-            secondary: "日",
-            destination: .user_japanese
-        )
+        keys[position(0, 2, width: 3)] = .system(.qwertyLanguageSwitch)
         addThirdRowLetters(to: &keys)
         addBottomRow(
             to: &keys,
@@ -84,7 +75,7 @@ private enum DefaultQwertyCustards {
             ["0", "０", "〇", "⓪"],
         ]
         for (index, variations) in numberVariations.enumerated() {
-            keys[position(Double(index), 0)] = inputKey(
+            keys[position(index * 2, 0)] = inputKey(
                 variations[0],
                 variations: variations
             )
@@ -103,13 +94,13 @@ private enum DefaultQwertyCustards {
             ("&", ["&", "＆"]),
         ]
         for (index, item) in secondRow.enumerated() {
-            keys[position(Double(index), 1)] = inputKey(
+            keys[position(index * 2, 1)] = inputKey(
                 item.0,
                 variations: item.1
             )
         }
 
-        keys[position(0, 2, width: 1.4)] = tabKey(
+        keys[position(0, 2, width: 3)] = tabKey(
             label: .text("#+="),
             destination: .qwerty_symbols
         )
@@ -126,15 +117,11 @@ private enum DefaultQwertyCustards {
                 variations: item.1
             )
         }
-        keys[position(8.6, 2, width: 1.4)] = deleteKey
+        keys[position(17, 2, width: 3)] = deleteKey
 
         addBottomRow(
             to: &keys,
-            leadingKey: languageKey(
-                primary: "日",
-                secondary: "英",
-                destination: .user_japanese
-            ),
+            leadingKey: .system(.qwertyLanguageSwitch),
             spaceLabel: "空白"
         )
         return custard(
@@ -161,7 +148,7 @@ private enum DefaultQwertyCustards {
             ("=", ["＝", "≡", "≒", "≠"]),
         ]
         for (index, item) in firstRow.enumerated() {
-            keys[position(Double(index), 0)] = inputKey(
+            keys[position(index * 2, 0)] = inputKey(
                 item.0,
                 variations: item.1
             )
@@ -180,13 +167,13 @@ private enum DefaultQwertyCustards {
             ("€", ["¥", "￥", "$", "＄", "€", "₿", "£", "¤"]),
         ]
         for (index, item) in secondRow.enumerated() {
-            keys[position(Double(index), 1)] = inputKey(
+            keys[position(index * 2, 1)] = inputKey(
                 item.0,
                 variations: item.1
             )
         }
 
-        keys[position(0, 2, width: 1.4)] = tabKey(
+        keys[position(0, 2, width: 3)] = tabKey(
             label: .systemImage("textformat.123"),
             destination: .qwerty_numbers
         )
@@ -203,15 +190,11 @@ private enum DefaultQwertyCustards {
                 variations: item.1
             )
         }
-        keys[position(8.6, 2, width: 1.4)] = deleteKey
+        keys[position(17, 2, width: 3)] = deleteKey
 
         addBottomRow(
             to: &keys,
-            leadingKey: languageKey(
-                primary: "日",
-                secondary: "英",
-                destination: .user_japanese
-            ),
+            leadingKey: .system(.qwertyLanguageSwitch),
             spaceLabel: "空白"
         )
         return custard(
@@ -251,12 +234,12 @@ private enum DefaultQwertyCustards {
     ) -> [CustardKeyPositionSpecifier: CustardInterfaceKey] {
         var keys: [CustardKeyPositionSpecifier: CustardInterfaceKey] = [:]
         for (index, letter) in ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"].enumerated() {
-            keys[position(Double(index), 0)] = inputKey(letter)
+            keys[position(index * 2, 0)] = inputKey(letter)
         }
         for (index, letter) in ["a", "s", "d", "f", "g", "h", "j", "k", "l"].enumerated() {
-            keys[position(Double(index), 1)] = inputKey(letter)
+            keys[position(index * 2, 1)] = inputKey(letter)
         }
-        keys[position(9, 1)] = secondRowTrailingKey
+        keys[position(18, 1)] = secondRowTrailingKey
         return keys
     }
 
@@ -264,9 +247,9 @@ private enum DefaultQwertyCustards {
         to keys: inout [CustardKeyPositionSpecifier: CustardInterfaceKey]
     ) {
         for (index, letter) in ["z", "x", "c", "v", "b", "n", "m"].enumerated() {
-            keys[position(1.5 + Double(index), 2)] = inputKey(letter)
+            keys[position(3 + index * 2, 2)] = inputKey(letter)
         }
-        keys[position(8.6, 2, width: 1.4)] = deleteKey
+        keys[position(17, 2, width: 3)] = deleteKey
     }
 
     private static func addBottomRow(
@@ -274,10 +257,10 @@ private enum DefaultQwertyCustards {
         leadingKey: CustardInterfaceKey,
         spaceLabel: String
     ) {
-        keys[position(0, 3, width: 1.5)] = leadingKey
-        keys[position(1.5, 3, width: 1.5)] = .system(.changeKeyboard)
-        keys[position(3, 3, width: 4.5)] = spaceKey(label: spaceLabel)
-        keys[position(7.5, 3, width: 2.5)] = .system(.enter)
+        keys[position(0, 3, width: 3)] = leadingKey
+        keys[position(3, 3, width: 3)] = .system(.changeKeyboard)
+        keys[position(6, 3, width: 8)] = spaceKey(label: spaceLabel)
+        keys[position(14, 3, width: 6)] = .system(.enter)
     }
 
     private static func inputKey(
@@ -317,24 +300,6 @@ private enum DefaultQwertyCustards {
         )
     }
 
-    private static func languageKey(
-        primary: String,
-        secondary: String,
-        destination: TabData.SystemTab
-    ) -> CustardInterfaceKey {
-        .custom(
-            .init(
-                design: .init(
-                    label: .mainAndSub(primary, secondary),
-                    color: .special
-                ),
-                press_actions: [.moveTab(.system(destination))],
-                longpress_actions: .none,
-                variations: []
-            )
-        )
-    }
-
     private static func spaceKey(label: String) -> CustardInterfaceKey {
         .custom(
             .init(
@@ -360,24 +325,24 @@ private enum DefaultQwertyCustards {
         )
     }
 
-    private static let punctuationGeometry: [(x: Double, width: Double)] = [
-        (1.5, 1.5),
-        (3, 1.5),
-        (4.5, 1),
-        (5.5, 1.5),
-        (7, 1.5),
+    private static let punctuationGeometry: [(x: Int, width: Int)] = [
+        (3, 3),
+        (6, 3),
+        (9, 2),
+        (11, 3),
+        (14, 3),
     ]
 
     private static func position(
-        _ x: Double,
+        _ x: Int,
         _ y: Int,
-        width: Double = 1
+        width: Int = 2
     ) -> CustardKeyPositionSpecifier {
         .gridFit(
             .init(
-                x: Int((x * horizontalScale).rounded()),
+                x: x,
                 y: y,
-                width: Int((width * horizontalScale).rounded())
+                width: width
             )
         )
     }

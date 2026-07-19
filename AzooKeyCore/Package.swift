@@ -50,6 +50,7 @@ let package = Package(
         .target(
             name: "CustardKit",
             dependencies: [],
+            exclude: ["README.md"],
             swiftSettings: swiftSettings
         ),
         .target(

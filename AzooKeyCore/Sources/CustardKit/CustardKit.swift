@@ -451,6 +451,9 @@ public enum CustardInterfaceSystemKey: Codable, Equatable, Hashable, Sendable {
     /// - the globe key
     case changeKeyboard
 
+    /// - the QWERTY language switch key
+    case qwertyLanguageSwitch
+
     /// - the enter key that changes its label in condition
     case enter
 
@@ -480,6 +483,7 @@ public extension CustardInterfaceSystemKey {
 
     private enum ValueType: String, Codable {
         case change_keyboard
+        case qwerty_language_switch
         case enter
         case upper_lower
         case next_candidate
@@ -493,6 +497,7 @@ public extension CustardInterfaceSystemKey {
     private var valueType: ValueType {
         switch self {
         case .changeKeyboard: return .change_keyboard
+        case .qwertyLanguageSwitch: return .qwerty_language_switch
         case .enter: return .enter
         case .upperLower: return .upper_lower
         case .nextCandidate: return .next_candidate
@@ -517,6 +522,8 @@ public extension CustardInterfaceSystemKey {
             self = .enter
         case .change_keyboard:
             self = .changeKeyboard
+        case .qwerty_language_switch:
+            self = .qwertyLanguageSwitch
         case .upper_lower:
             self = .upperLower
         case .next_candidate:

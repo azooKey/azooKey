@@ -87,6 +87,10 @@ public extension CustardInterface {
                     }
                 case .changeKeyboard:
                     UnifiedChangeKeyboardKeyModel<Extension>()
+                case .qwertyLanguageSwitch:
+                    QwertyLanguageSwitchKeyModel<Extension>(
+                        languages: (.ja_JP, .en_US)
+                    )
                 case .flickKogaki:
                     FlickKogakiKeyModel<Extension>()
                 case .flickKutoten:
@@ -197,6 +201,12 @@ extension CustardInterfaceKey {
             switch value {
             case .changeKeyboard:
                 return SimpleChangeKeyboardKeyModel()
+            case .qwertyLanguageSwitch:
+                return SimpleKeyModel(
+                    keyLabelType: .text("あA"),
+                    unpressedKeyColorType: .special,
+                    pressActions: [.moveTab(.system(.user_english))]
+                )
             case .enter:
                 return SimpleEnterKeyModel()
             case .upperLower:
