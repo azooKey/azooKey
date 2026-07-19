@@ -13,7 +13,7 @@ import SwiftUI
 
 struct SettingsHomeView: View {
     @State private var searchQuery: String = ""
-    @State private var path: [CustomizationHomeView.Path] = []
+    @State private var path: [SettingsRoute] = []
     @Environment(\.requestReview) var requestReview
     @EnvironmentObject private var appStates: MainAppStates
     private func canFlickLayout(_ layout: LanguageLayout) -> Bool {
@@ -195,7 +195,9 @@ struct SettingsHomeView: View {
 
                 Section("カスタムタブ") {
                     NavigationLink("カスタムタブの管理") {
-                        ManageCustardView(manager: $appStates.custardManager, path: $path)
+                        ManageCustardView(manager: $appStates.custardManager) {
+                            path.append(.custardInformation($0))
+                        }
                     }
                 }
                 .searchKeys("カスタムタブ", "タブ", "カスタマイズ")
@@ -240,13 +242,15 @@ struct SettingsHomeView: View {
             .searchQuery(searchQuery.isEmpty ? nil : searchQuery.toKatakana())
             .navigationTitle("設定")
             .navigationBarTitleDisplayMode(.large)
-            .navigationDestination(for: CustomizationHomeView.Path.self) { destination in
+            .navigationDestination(for: SettingsRoute.self) { destination in
                 switch destination {
-                case let .information(identifier):
+                case let .custardInformation(identifier):
                     if let custard = try? appStates.custardManager.custard(identifier: identifier) {
-                        CustardInformationView(custard: custard, path: $path)
+                        CustardInformationView(custard: custard) {
+                            path.append(.custardInformation($0))
+                        }
                     }
-                case .zenzaiSettings:
+                case .zenzai:
                     ZenzaiSettingView()
                 }
             }
@@ -256,13 +260,13 @@ struct SettingsHomeView: View {
                 }
                 // Handle pending deep link when Settings tab appears
                 if appStates.deepLink == .settingsZenzai {
-                    path.append(.zenzaiSettings)
+                    path.append(.zenzai)
                     appStates.deepLink = nil
                 }
             }
             .onChange(of: appStates.deepLink) { _, newValue in
                 if newValue == .settingsZenzai {
-                    path.append(.zenzaiSettings)
+                    path.append(.zenzai)
                     appStates.deepLink = nil
                 }
             }

@@ -46,9 +46,8 @@ struct EditingGridFitCustardView: CancelableEditor {
     @Binding private var manager: CustardManager
 
     // MARK: 遷移
-    private let shouldJustDimiss: Bool
     private let isNewItem: Bool
-    @Binding private var path: [CustomizationHomeView.Path]
+    private let onFinishEditing: ((String) -> Void)?
     @Environment(\.dismiss) var dismiss
 
     // MARK: UI表示系
@@ -97,10 +96,9 @@ struct EditingGridFitCustardView: CancelableEditor {
         )
     }
 
-    init(manager: Binding<CustardManager>, editingItem: UserMadeGridFitCustard? = nil, path: Binding<[CustomizationHomeView.Path]>?) {
+    init(manager: Binding<CustardManager>, editingItem: UserMadeGridFitCustard? = nil, onFinishEditing: ((String) -> Void)? = nil) {
         self._manager = manager
-        self.shouldJustDimiss = path == nil
-        self._path = path ?? .constant([])
+        self.onFinishEditing = onFinishEditing
         self.baseSelectionSheetState = .init(hasShown: editingItem != nil)  // 編集の場合はすでにbase選択は終わったと考える
         self.base = editingItem ?? Self.emptyItem
         self._editingItem = State(initialValue: self.base)
@@ -330,10 +328,10 @@ struct EditingGridFitCustardView: CancelableEditor {
                     } else {
                         self.save()
                         let saved = custard
-                        if self.shouldJustDimiss {
-                            dismiss()
+                        if let onFinishEditing {
+                            onFinishEditing(saved.identifier)
                         } else {
-                            path.append(.information(saved.identifier))
+                            dismiss()
                         }
                     }
                 }

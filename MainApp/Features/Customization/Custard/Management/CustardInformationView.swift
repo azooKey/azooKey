@@ -114,7 +114,7 @@ private final class ShareURL {
 
 struct CustardInformationView: View {
     private let initialCustard: Custard
-    @Binding private var path: [CustomizationHomeView.Path]
+    private let onFinishEditing: (String) -> Void
     @State private var showActivityView = false
     @State private var exportedData = ShareURL()
     @State private var added = false
@@ -139,9 +139,9 @@ struct CustardInformationView: View {
 
     @State private var shareImage: CustardShareImage?
 
-    init(custard: Custard, path: Binding<[CustomizationHomeView.Path]> = .constant([])) {
+    init(custard: Custard, onFinishEditing: @escaping (String) -> Void) {
         self.initialCustard = custard
-        self._path = path
+        self.onFinishEditing = onFinishEditing
     }
 
     private var custard: Custard {
@@ -200,18 +200,18 @@ struct CustardInformationView: View {
                     switch userdata {
                     case let .gridScroll(value):
                         NavigationLink("編集する") {
-                            EditingScrollCustardView(manager: $appStates.custardManager, editingItem: value, path: $path)
+                            EditingScrollCustardView(manager: $appStates.custardManager, editingItem: value, onFinishEditing: onFinishEditing)
                         }
                         .foregroundStyle(.accentColor)
                     case let .tenkey(value):
                         NavigationLink("編集する") {
-                            EditingGridFitCustardView(manager: $appStates.custardManager, editingItem: value, path: $path)
+                            EditingGridFitCustardView(manager: $appStates.custardManager, editingItem: value, onFinishEditing: onFinishEditing)
                         }
                         .foregroundStyle(.accentColor)
                     }
                 } else if let editingItem = custard.userMadeTenKeyCustard {
                     NavigationLink("編集する") {
-                        EditingGridFitCustardView(manager: $appStates.custardManager, editingItem: editingItem, path: $path)
+                        EditingGridFitCustardView(manager: $appStates.custardManager, editingItem: editingItem, onFinishEditing: onFinishEditing)
                     }
                     .foregroundStyle(.accentColor)
                 }

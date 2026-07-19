@@ -53,16 +53,14 @@ struct EditingScrollCustardView: CancelableEditor {
     @State private var dragFrom: UUID?
     @StateObject private var variableStates = VariableStates(clipboardHistoryManagerConfig: ClipboardHistoryManagerConfig(), tabManagerConfig: TabManagerConfig(), userDefaults: UserDefaults.standard)
     // MARK: 遷移
-    private let shouldJustDimiss: Bool
     private let isNewItem: Bool
-    @Binding private var path: [CustomizationHomeView.Path]
+    private let onFinishEditing: ((String) -> Void)?
     @Environment(\.dismiss) var dismiss
     @State private var showDuplicateAlert = false
 
-    init(manager: Binding<CustardManager>, editingItem: UserMadeGridScrollCustard? = nil, path: Binding<[CustomizationHomeView.Path]>?) {
+    init(manager: Binding<CustardManager>, editingItem: UserMadeGridScrollCustard? = nil, onFinishEditing: ((String) -> Void)? = nil) {
         self._manager = manager
-        self.shouldJustDimiss = path == nil
-        self._path = path ?? .constant([])
+        self.onFinishEditing = onFinishEditing
         self.base = editingItem ?? Self.emptyItem
         self._editingItem = State(initialValue: self.base)
         self.isNewItem = editingItem == nil
@@ -231,10 +229,10 @@ struct EditingScrollCustardView: CancelableEditor {
                     } else {
                         self.save()
                         let saved = makeCustard(data: editingItem)
-                        if self.shouldJustDimiss {
-                            dismiss()
+                        if let onFinishEditing {
+                            onFinishEditing(saved.identifier)
                         } else {
-                            path.append(.information(saved.identifier))
+                            dismiss()
                         }
                     }
                 }

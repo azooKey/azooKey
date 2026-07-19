@@ -12,14 +12,9 @@ import SwiftUI
 import SwiftUIUtils
 
 struct CustomizationHomeView: View {
-    enum Path: Hashable {
-        case information(String)
-        case zenzaiSettings
-    }
-
     @EnvironmentObject private var appStates: MainAppStates
     @Environment(\.requestReview) var requestReview
-    @State private var path: [Path] = []
+    @State private var path: [CustomizationRoute] = []
 
     var body: some View {
         ZStack {
@@ -30,15 +25,21 @@ struct CustomizationHomeView: View {
                             .listRowSeparator(.hidden, edges: .bottom)
                         Text("好きな文字や文章を並べたオリジナルのタブを作成することができます。")
                         NavigationLink("カスタムタブの管理") {
-                            ManageCustardView(manager: $appStates.custardManager, path: $path)
+                            ManageCustardView(manager: $appStates.custardManager) {
+                                path.append(.custardInformation($0))
+                            }
                         }
                         .foregroundStyle(.accentColor)
                         NavigationLink("定型文タブを作る") {
-                            EditingScrollCustardView(manager: $appStates.custardManager, path: $path)
+                            EditingScrollCustardView(manager: $appStates.custardManager) {
+                                path.append(.custardInformation($0))
+                            }
                         }
                         .foregroundStyle(.accentColor)
                         NavigationLink("カスタムタブを作る") {
-                            EditingGridFitCustardView(manager: $appStates.custardManager, path: $path)
+                            EditingGridFitCustardView(manager: $appStates.custardManager) {
+                                path.append(.custardInformation($0))
+                            }
                         }
                         .foregroundStyle(.accentColor)
                     }
@@ -72,14 +73,14 @@ struct CustomizationHomeView: View {
                         requestReview()
                     }
                 }
-                .navigationDestination(for: Path.self) { destination in
+                .navigationDestination(for: CustomizationRoute.self) { destination in
                     switch destination {
-                    case let .information(identifier):
+                    case let .custardInformation(identifier):
                         if let custard = try? appStates.custardManager.custard(identifier: identifier) {
-                            CustardInformationView(custard: custard, path: $path)
+                            CustardInformationView(custard: custard) {
+                                path.append(.custardInformation($0))
+                            }
                         }
-                    case .zenzaiSettings:
-                        ZenzaiSettingView()
                     }
                 }
             }

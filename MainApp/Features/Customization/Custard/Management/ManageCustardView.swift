@@ -149,16 +149,16 @@ struct ManageCustardView: View {
     @State private var renamingName: String = ""
     @State private var showDuplicateNameAlert = false
     @Binding private var manager: CustardManager
-    @Binding private var path: [CustomizationHomeView.Path]
+    private let onFinishEditing: (String) -> Void
     @State private var webCustards: WebCustardList = .init(last_update: "", custards: [])
     @State private var showDocumentPicker = false
     @State private var showURLImportAlert = false
     @State private var showRecommendedImportDialog = false
     @State private var selectedDocument: Data = Data()
     @State private var addTabBar = true
-    init(manager: Binding<CustardManager>, path: Binding<[CustomizationHomeView.Path]>) {
+    init(manager: Binding<CustardManager>, onFinishEditing: @escaping (String) -> Void) {
         self._manager = manager
-        self._path = path
+        self.onFinishEditing = onFinishEditing
     }
 
     private var tabList: some View {
@@ -170,7 +170,7 @@ struct ManageCustardView: View {
                     ForEach(manager.availableCustards, id: \.self) {identifier in
                         if let custard = self.getCustard(identifier: identifier) {
                             NavigationLink(identifier) {
-                                CustardInformationView(custard: custard, path: $path)
+                                CustardInformationView(custard: custard, onFinishEditing: onFinishEditing)
                             }
                             .contextMenu {
                                 if let metadata = manager.metadata[custard.identifier],
@@ -179,17 +179,17 @@ struct ManageCustardView: View {
                                     switch userdata {
                                     case let .gridScroll(value):
                                         NavigationLink("編集") {
-                                            EditingScrollCustardView(manager: $manager, editingItem: value, path: $path)
+                                            EditingScrollCustardView(manager: $manager, editingItem: value, onFinishEditing: onFinishEditing)
                                         }
                                     case let .tenkey(value):
                                         NavigationLink("編集") {
-                                            EditingGridFitCustardView(manager: $manager, editingItem: value, path: $path)
+                                            EditingGridFitCustardView(manager: $manager, editingItem: value, onFinishEditing: onFinishEditing)
                                         }
                                     }
                                     Divider()
                                 } else if let editingItem = custard.userMadeTenKeyCustard {
                                     NavigationLink("編集") {
-                                        EditingGridFitCustardView(manager: $manager, editingItem: editingItem, path: $path)
+                                        EditingGridFitCustardView(manager: $manager, editingItem: editingItem, onFinishEditing: onFinishEditing)
                                     }
                                     Divider()
                                 }
@@ -229,12 +229,12 @@ struct ManageCustardView: View {
         ToolbarItem(placement: .topBarTrailing) {
             Menu {
                 NavigationLink {
-                    EditingScrollCustardView(manager: $manager, path: $path)
+                    EditingScrollCustardView(manager: $manager, onFinishEditing: onFinishEditing)
                 } label: {
                     Label("定型文タブの作成", systemImage: "text.badge.plus")
                 }
                 NavigationLink {
-                    EditingGridFitCustardView(manager: $manager, path: $path)
+                    EditingGridFitCustardView(manager: $manager, onFinishEditing: onFinishEditing)
                 } label: {
                     Label("カスタムタブの作成", systemImage: "keyboard")
                 }
