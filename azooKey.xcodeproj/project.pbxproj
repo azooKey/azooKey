@@ -13,12 +13,9 @@
 		1A2E58592951EC87004F959B /* (null) in Sources */ = {isa = PBXBuildFile; };
 		1A2E585A2951EC87004F959B /* (null) in Sources */ = {isa = PBXBuildFile; };
 		1A2E585F2951ED56004F959B /* (null) in Sources */ = {isa = PBXBuildFile; };
-		1A3DC1CA2500D44B002CAA93 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A3DC1C92500D44B002CAA93 /* ContentView.swift */; };
 		1A3DC1CC2500D44E002CAA93 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A3DC1CB2500D44E002CAA93 /* Assets.xcassets */; };
 		1A3DC2002500D488002CAA93 /* Keyboard.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1A3DC1F92500D488002CAA93 /* Keyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		1A5B1CE026D1E495007D4E1C /* MainApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5B1CDF26D1E495007D4E1C /* MainApp.swift */; };
 		1A60058525275CB9008E2B92 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 1A60058425275CB9008E2B92 /* Settings.bundle */; };
-		1A64A897257B4AFD0022C081 /* UpdateInformationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A64A896257B4AFD0022C081 /* UpdateInformationView.swift */; };
 		1A7F37742A683428009AC382 /* SwiftUIUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 1A7F37732A683428009AC382 /* SwiftUIUtils */; };
 		1A7F37812A698741009AC382 /* KeyboardThemes in Frameworks */ = {isa = PBXBuildFile; productRef = 1A7F37802A698741009AC382 /* KeyboardThemes */; };
 		1A7F37832A69874C009AC382 /* KeyboardThemes in Frameworks */ = {isa = PBXBuildFile; productRef = 1A7F37822A69874C009AC382 /* KeyboardThemes */; };
@@ -106,16 +103,13 @@
 /* Begin PBXFileReference section */
 		1A09112B2A20B13C00ABFC72 /* Dictionary */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Dictionary; path = ../azooKey_dictionary_storage/Dictionary; sourceTree = "<group>"; };
 		1A3DC1C22500D44A002CAA93 /* azooKey.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = azooKey.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		1A3DC1C92500D44B002CAA93 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		1A3DC1CB2500D44E002CAA93 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1A3DC1D32500D44E002CAA93 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1A3DC1D82500D44E002CAA93 /* azooKeyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = azooKeyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A3DC1E32500D44E002CAA93 /* azooKeyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = azooKeyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A3DC1F92500D488002CAA93 /* Keyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Keyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A3DC1FD2500D488002CAA93 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1A5B1CDF26D1E495007D4E1C /* MainApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainApp.swift; sourceTree = "<group>"; };
 		1A60058425275CB9008E2B92 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
-		1A64A896257B4AFD0022C081 /* UpdateInformationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateInformationView.swift; sourceTree = "<group>"; };
 		1AC03158251103EF004CA505 /* Designs.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Designs.xcassets; sourceTree = "<group>"; };
 		1AC0315E25120AA2004CA505 /* azooKey.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = azooKey.entitlements; sourceTree = "<group>"; };
 		1AC0315F25120B3B004CA505 /* Keyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Keyboard.entitlements; sourceTree = "<group>"; };
@@ -168,18 +162,12 @@
 		55252D7C2DBCC53800F0C8CA /* EmojiDictionary */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); name = EmojiDictionary; path = azooKey_emoji_dictionary_storage/EmojiDictionary; sourceTree = SOURCE_ROOT; };
 		5568293C2E82E77600F08475 /* Resources */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (5568293F2E82E78500F08475 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Resources; sourceTree = "<group>"; };
 		559E8F3E2CAC294600E016FA /* Display */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (559E8F492CAC294600E016FA /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Display; sourceTree = "<group>"; };
-		559E8F4C2CAC295000E016FA /* InternalSetting */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = InternalSetting; sourceTree = "<group>"; };
-		559E8F542CAC295500E016FA /* Utils */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Utils; sourceTree = "<group>"; };
-		559E8F6A2CAC296000E016FA /* General */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = General; sourceTree = "<group>"; };
-		559E8F7B2CAC297900E016FA /* DataUpdateView */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = DataUpdateView; sourceTree = "<group>"; };
-		559E8F872CAC297900E016FA /* Theme */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Theme; sourceTree = "<group>"; };
-		559E8F8F2CAC297900E016FA /* EnableAzooKeyView */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = EnableAzooKeyView; sourceTree = "<group>"; };
-		559E8FBD2CAC297900E016FA /* Setting */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Setting; sourceTree = "<group>"; };
-		559E8FE22CAC297900E016FA /* Customize */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Customize; sourceTree = "<group>"; };
-		559E902B2CAC29AC00E016FA /* Tips */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Tips; sourceTree = "<group>"; };
 		559E90562CAC29E400E016FA /* Preview Content */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "Preview Content"; sourceTree = "<group>"; };
 		559E905E2CAC29E900E016FA /* azooKeyTests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (559E90622CAC29E900E016FA /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = azooKeyTests; sourceTree = "<group>"; };
 		559E90652CAC29EC00E016FA /* MainAppUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (559E90672CAC29EC00E016FA /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = MainAppUITests; sourceTree = "<group>"; };
+		55A000012F00000100000001 /* App */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = App; sourceTree = "<group>"; };
+		55A000012F00000100000002 /* Features */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Features; sourceTree = "<group>"; };
+		55A000012F00000100000003 /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -254,19 +242,10 @@
 			isa = PBXGroup;
 			children = (
 				1AC0315E25120AA2004CA505 /* azooKey.entitlements */,
-				1A5B1CDF26D1E495007D4E1C /* MainApp.swift */,
-				1A3DC1C92500D44B002CAA93 /* ContentView.swift */,
-				559E8F4C2CAC295000E016FA /* InternalSetting */,
-				559E8F542CAC295500E016FA /* Utils */,
+				55A000012F00000100000001 /* App */,
+				55A000012F00000100000002 /* Features */,
+				55A000012F00000100000003 /* Shared */,
 				1A9B09BD25600445004203BB /* DataSet */,
-				559E8F6A2CAC296000E016FA /* General */,
-				559E902B2CAC29AC00E016FA /* Tips */,
-				559E8F872CAC297900E016FA /* Theme */,
-				559E8FE22CAC297900E016FA /* Customize */,
-				559E8FBD2CAC297900E016FA /* Setting */,
-				559E8F7B2CAC297900E016FA /* DataUpdateView */,
-				559E8F8F2CAC297900E016FA /* EnableAzooKeyView */,
-				1A64A896257B4AFD0022C081 /* UpdateInformationView.swift */,
 				5568293C2E82E77600F08475 /* Resources */,
 				1A3DC1CB2500D44E002CAA93 /* Assets.xcassets */,
 				1A60058425275CB9008E2B92 /* Settings.bundle */,
@@ -342,15 +321,9 @@
 			);
 			fileSystemSynchronizedGroups = (
 				55252D7C2DBCC53800F0C8CA /* EmojiDictionary */,
-				559E8F4C2CAC295000E016FA /* InternalSetting */,
-				559E8F542CAC295500E016FA /* Utils */,
-				559E8F6A2CAC296000E016FA /* General */,
-				559E8F7B2CAC297900E016FA /* DataUpdateView */,
-				559E8F872CAC297900E016FA /* Theme */,
-				559E8F8F2CAC297900E016FA /* EnableAzooKeyView */,
-				559E8FBD2CAC297900E016FA /* Setting */,
-				559E8FE22CAC297900E016FA /* Customize */,
-				559E902B2CAC29AC00E016FA /* Tips */,
+				55A000012F00000100000001 /* App */,
+				55A000012F00000100000002 /* Features */,
+				55A000012F00000100000003 /* Shared */,
 				559E90562CAC29E400E016FA /* Preview Content */,
 			);
 			name = azooKey;
@@ -580,9 +553,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1A64A897257B4AFD0022C081 /* UpdateInformationView.swift in Sources */,
-				1A5B1CE026D1E495007D4E1C /* MainApp.swift in Sources */,
-				1A3DC1CA2500D44B002CAA93 /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
