@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftUIUtils
 
 struct TabBarSystemIconNews: View {
-    @EnvironmentObject private var appStates: MainAppStates
+    @EnvironmentObject private var keyboardConfiguration: KeyboardConfigurationState
 
     var body: some View {
         TipsContentView("タブバーでアイコンを使う") {
@@ -20,7 +20,7 @@ struct TabBarSystemIconNews: View {
             }
             .listRowSeparator(.hidden, edges: .bottom)
             NavigationLink("タブバーを編集") {
-                EditingTabBarView(manager: $appStates.custardManager)
+                EditingTabBarView(manager: $keyboardConfiguration.custardManager)
             }
             .foregroundStyle(.accentColor)
         }

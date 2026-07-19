@@ -17,12 +17,7 @@ private struct Item: Identifiable {
 }
 
 struct CustomizationWalkthroughView: View {
-    @Binding private var isShowing: Bool
-    @EnvironmentObject private var appStates: MainAppStates
-
-    init(isShowing: Binding<Bool>) {
-        self._isShowing = isShowing
-    }
+    @EnvironmentObject private var walkthrough: CustomizationWalkthroughState
 
     private let items: [Item] = [
         .init(
@@ -44,61 +39,51 @@ struct CustomizationWalkthroughView: View {
     ]
 
     var body: some View {
-        if appStates.internalSettingManager.walkthroughState.shouldDisplay(identifier: .extensions) {
-            GeometryReader {geometry in
-                ScrollView {
-                    VStack(spacing: 20) {
-                        // アイコンの辺の長さ
-                        let length = geometry.size.width / 4.8
-                        Image(systemName: "gearshape.2.fill")
-                            .font(.system(size: length / 2, weight: .bold, design: .default))
-                            .background {
-                                RoundedRectangle(cornerRadius: length * 0.17)
-                                    .fill(Color.systemGray5)
-                                    .frame(width: length, height: length)
-                            }
-                        Text("azooKeyを拡張する").font(.largeTitle.bold())
-                            .padding()
-                        let imagesFont: Font = Font.system(size: length / 2.4, weight: .light, design: .default)
-                        VStack(alignment: .leading, spacing: 20) {
-                            ForEach(items) {item in
-                                HStack {
-                                    Image(systemName: item.image)
-                                        .font(imagesFont)
-                                        .frame(width: geometry.size.width / 7.0, height: geometry.size.width / 7.0)
-                                        .foregroundStyle(.blue)
-                                    VStack(alignment: .leading) {
-                                        Text(item.headline)
-                                            .font(.subheadline.bold())
-                                        Text(item.body)
-                                            .foregroundStyle(.gray)
-                                            .font(.subheadline)
-                                    }
+        GeometryReader {geometry in
+            ScrollView {
+                VStack(spacing: 20) {
+                    // アイコンの辺の長さ
+                    let length = geometry.size.width / 4.8
+                    Image(systemName: "gearshape.2.fill")
+                        .font(.system(size: length / 2, weight: .bold, design: .default))
+                        .background {
+                            RoundedRectangle(cornerRadius: length * 0.17)
+                                .fill(Color.systemGray5)
+                                .frame(width: length, height: length)
+                        }
+                    Text("azooKeyを拡張する").font(.largeTitle.bold())
+                        .padding()
+                    let imagesFont: Font = Font.system(size: length / 2.4, weight: .light, design: .default)
+                    VStack(alignment: .leading, spacing: 20) {
+                        ForEach(items) {item in
+                            HStack {
+                                Image(systemName: item.image)
+                                    .font(imagesFont)
+                                    .frame(width: geometry.size.width / 7.0, height: geometry.size.width / 7.0)
+                                    .foregroundStyle(.blue)
+                                VStack(alignment: .leading) {
+                                    Text(item.headline)
+                                        .font(.subheadline.bold())
+                                    Text(item.body)
+                                        .foregroundStyle(.gray)
+                                        .font(.subheadline)
                                 }
-                                .padding(.horizontal, 20)
-                                .lineLimit(nil)
-                                .fixedSize(horizontal: false, vertical: true)
                             }
+                            .padding(.horizontal, 20)
+                            .lineLimit(nil)
+                            .fixedSize(horizontal: false, vertical: true)
                         }
-                        Button("始める") {
-                            isShowing = false
-                        }
-                        .buttonStyle(LargeButtonStyle(backgroundColor: .blue))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 20)
-                        .padding(.top, 30)
                     }
-                    .background(Color.background)
-                    .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
-                }
-            }
-            .onChange(of: isShowing) { (_, value) in
-                // コードの明確化のためにfalseと比較している
-                if value == false {
-                    appStates.internalSettingManager.update(\.walkthroughState) {value in
-                        value.done(identifier: .extensions)
+                    Button("始める") {
+                        walkthrough.isPresented = false
                     }
+                    .buttonStyle(LargeButtonStyle(backgroundColor: .blue))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 30)
                 }
+                .background(Color.background)
+                .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
             }
         }
     }

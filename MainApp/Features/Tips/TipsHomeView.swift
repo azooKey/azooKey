@@ -10,15 +10,15 @@ import KeyboardViews
 import SwiftUI
 
 struct TipsHomeView: View {
-    @EnvironmentObject private var appStates: MainAppStates
+    @EnvironmentObject private var onboarding: OnboardingState
     var body: some View {
         NavigationStack {
             Form {
                 Section("キーボードを使えるようにする") {
-                    if !appStates.isKeyboardActivated {
+                    if !onboarding.isKeyboardActivated {
                         Text("キーボードを有効化する")
                             .onTapGesture {
-                                appStates.requireFirstOpenView = true
+                                onboarding.present()
                             }
                     }
                     NavigationLink("入力方法を選ぶ", destination: SelectInputStyleTipsView())

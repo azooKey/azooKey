@@ -19,7 +19,7 @@ struct ThemeHomeView: View {
     }
 
     @Namespace private var namespace
-    @EnvironmentObject private var appStates: MainAppStates
+    @EnvironmentObject private var keyboardConfiguration: KeyboardConfigurationState
     @State private var manager = ThemeIndexManager.load()
 
     @State private var editViewIndex: Int?
@@ -47,7 +47,7 @@ struct ThemeHomeView: View {
     }
 
     private var tab: KeyboardTab.ExistentialTab {
-        switch appStates.japaneseLayout {
+        switch keyboardConfiguration.japaneseLayout {
         case .flick:
             return .flick_hira
         case .qwerty:

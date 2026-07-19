@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct FlickCustardBaseSelectionNews: View {
-    @EnvironmentObject private var appStates: MainAppStates
+    @EnvironmentObject private var keyboardConfiguration: KeyboardConfigurationState
 
     var body: some View {
         TipsContentView("フリック式のカスタムタブを作るのが簡単になりました！") {
@@ -13,7 +13,7 @@ struct FlickCustardBaseSelectionNews: View {
                 .listRowSeparator(.hidden, edges: .bottom)
             Text("好きな文字や文章を並べたオリジナルのタブを作成することができます。")
             NavigationLink("フリック式のカスタムタブを作る") {
-                EditingGridFitCustardView(manager: $appStates.custardManager)
+                EditingGridFitCustardView(manager: $keyboardConfiguration.custardManager)
             }
             .foregroundStyle(.accentColor)
         }

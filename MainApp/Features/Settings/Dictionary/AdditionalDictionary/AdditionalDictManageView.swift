@@ -239,14 +239,14 @@ struct AdditionalDictManageViewMain: View {
 }
 
 struct AdditionalDictManageView: View {
-    @EnvironmentObject private var appStates: MainAppStates
+    @EnvironmentObject private var reviewPrompt: RequestReviewManager
     var body: some View {
         Form {
             AdditionalDictManageViewMain()
         }
         .navigationBarTitle(Text("絵文字と顔文字"), displayMode: .inline)
         .onDisappear {
-            appStates.requestReviewManager.shouldTryRequestReview = true
+            reviewPrompt.shouldTryRequestReview = true
         }
     }
 }

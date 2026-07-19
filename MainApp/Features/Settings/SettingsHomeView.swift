@@ -13,9 +13,10 @@ import SwiftUI
 
 struct SettingsHomeView: View {
     @State private var searchQuery: String = ""
-    @State private var path: [SettingsRoute] = []
     @Environment(\.requestReview) var requestReview
-    @EnvironmentObject private var appStates: MainAppStates
+    @EnvironmentObject private var router: AppRouter
+    @EnvironmentObject private var keyboardConfiguration: KeyboardConfigurationState
+    @EnvironmentObject private var reviewPrompt: RequestReviewManager
     private func canFlickLayout(_ layout: LanguageLayout) -> Bool {
         if layout == .flick {
             return true
@@ -41,7 +42,7 @@ struct SettingsHomeView: View {
     }
 
     var body: some View {
-        NavigationStack(path: $path) {
+        NavigationStack(path: $router.settingsPath) {
             Form {
                 Section("キーボードの種類") {
                     NavigationLink("キーボードの種類を設定する") {
@@ -61,11 +62,11 @@ struct SettingsHomeView: View {
                 Section("カスタムキー") {
                     CustomKeysSettingView(settingAdaptive: true)
                         .searchKeys("カスタムキー", "カスタマイズ")
-                    if !self.isCustard(appStates.japaneseLayout) || !self.isCustard(appStates.englishLayout) {
+                    if !self.isCustard(keyboardConfiguration.japaneseLayout) || !self.isCustard(keyboardConfiguration.englishLayout) {
                         BoolSettingView(.useNextCandidateKey)
                             .searchKeys("次候補キー")
                     }
-                    if self.canQwertyLayout(appStates.englishLayout) {
+                    if self.canQwertyLayout(keyboardConfiguration.englishLayout) {
                         BoolSettingView(.useShiftKey)
                             .searchKeys("シフトキー")
                         // Version 2.2.2以前にインストールしており、UseShiftKey.valueがtrueの人にのみこのオプションを表示する
@@ -74,7 +75,7 @@ struct SettingsHomeView: View {
                                 .searchKeys("シフトキー")
                         }
                     }
-                    if !SemiStaticStates.shared.needsInputModeSwitchKey, self.canFlickLayout(appStates.japaneseLayout) {
+                    if !SemiStaticStates.shared.needsInputModeSwitchKey, self.canFlickLayout(keyboardConfiguration.japaneseLayout) {
                         BoolSettingView(.enablePasteButton)
                             .searchKeys("ペーストボタン", "ペーストキー", "貼り付け")
                     }
@@ -93,7 +94,7 @@ struct SettingsHomeView: View {
                         .searchKeys("ペースト", "コピー履歴", "クリップボード履歴", "履歴")
                     }
                     NavigationLink("タブバーを編集") {
-                        EditingTabBarView(manager: $appStates.custardManager)
+                        EditingTabBarView(manager: $keyboardConfiguration.custardManager)
                     }
                     .searchKeys("タブバー", "バー")
                 }
@@ -126,7 +127,7 @@ struct SettingsHomeView: View {
                 Section("操作性") {
                     BoolSettingView(.hideResetButtonInOneHandedMode)
                         .searchKeys("片手モード", "解除ボタン")
-                    if self.canFlickLayout(appStates.japaneseLayout) {
+                    if self.canFlickLayout(keyboardConfiguration.japaneseLayout) {
                         FlickSensitivitySettingView(.flickSensitivity)
                             .searchKeys("フリックの感度", "感度")
                     }
@@ -195,8 +196,8 @@ struct SettingsHomeView: View {
 
                 Section("カスタムタブ") {
                     NavigationLink("カスタムタブの管理") {
-                        ManageCustardView(manager: $appStates.custardManager) {
-                            path.append(.custardInformation($0))
+                        ManageCustardView(manager: $keyboardConfiguration.custardManager) {
+                            router.settingsPath.append(.custardInformation($0))
                         }
                     }
                 }
@@ -245,9 +246,9 @@ struct SettingsHomeView: View {
             .navigationDestination(for: SettingsRoute.self) { destination in
                 switch destination {
                 case let .custardInformation(identifier):
-                    if let custard = try? appStates.custardManager.custard(identifier: identifier) {
+                    if let custard = try? keyboardConfiguration.custardManager.custard(identifier: identifier) {
                         CustardInformationView(custard: custard) {
-                            path.append(.custardInformation($0))
+                            router.settingsPath.append(.custardInformation($0))
                         }
                     }
                 case .zenzai:
@@ -255,19 +256,8 @@ struct SettingsHomeView: View {
                 }
             }
             .onAppear {
-                if appStates.requestReviewManager.shouldTryRequestReview, appStates.requestReviewManager.shouldRequestReview() {
+                if reviewPrompt.shouldTryRequestReview, reviewPrompt.shouldRequestReview() {
                     requestReview()
-                }
-                // Handle pending deep link when Settings tab appears
-                if appStates.deepLink == .settingsZenzai {
-                    path.append(.zenzai)
-                    appStates.deepLink = nil
-                }
-            }
-            .onChange(of: appStates.deepLink) { _, newValue in
-                if newValue == .settingsZenzai {
-                    path.append(.zenzai)
-                    appStates.deepLink = nil
                 }
             }
         }

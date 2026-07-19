@@ -10,7 +10,7 @@ import KeyboardViews
 import SwiftUI
 
 struct FullAccessTipsView: View {
-    @EnvironmentObject private var appStates: MainAppStates
+    @EnvironmentObject private var keyboardConfiguration: KeyboardConfigurationState
     private func canFlickLayout(_ layout: LanguageLayout) -> Bool {
         if layout == .flick {
             return true
@@ -34,7 +34,7 @@ struct FullAccessTipsView: View {
             if SemiStaticStates.shared.hapticsAvailable {
                 BoolSettingView(.enableKeyHaptics)
             }
-            if !SemiStaticStates.shared.needsInputModeSwitchKey, self.canFlickLayout(appStates.japaneseLayout) {
+            if !SemiStaticStates.shared.needsInputModeSwitchKey, self.canFlickLayout(keyboardConfiguration.japaneseLayout) {
                 BoolSettingView(.enablePasteButton)
             }
             BoolSettingView(.enableClipboardHistoryManagerTab)

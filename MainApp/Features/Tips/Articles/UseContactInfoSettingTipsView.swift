@@ -10,8 +10,6 @@ import SwiftUI
 import class KeyboardViews.SemiStaticStates
 
 struct UseContactInfoSettingTipsView: View {
-    @EnvironmentObject private var appStates: MainAppStates
-
     var body: some View {
         TipsContentView("変換に連絡先データを利用") {
             TipsContentParagraph {

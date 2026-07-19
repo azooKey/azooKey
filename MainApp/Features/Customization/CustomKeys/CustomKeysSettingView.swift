@@ -10,7 +10,7 @@ import KeyboardViews
 import SwiftUI
 
 struct CustomKeysSettingView: View {
-    @EnvironmentObject private var appStates: MainAppStates
+    @EnvironmentObject private var keyboardConfiguration: KeyboardConfigurationState
 
     private var settingAdaptive: Bool
 
@@ -43,9 +43,9 @@ struct CustomKeysSettingView: View {
     }
 
     var body: some View {
-        let hasJapaneseFlick = self.canFlickLayout(appStates.japaneseLayout)
-        let hasCustard = self.isCustard(appStates.japaneseLayout) || self.isCustard(appStates.englishLayout)
-        let hasQwerty = self.canQwertyLayout(appStates.japaneseLayout) || self.canQwertyLayout(appStates.englishLayout)
+        let hasJapaneseFlick = self.canFlickLayout(keyboardConfiguration.japaneseLayout)
+        let hasCustard = self.isCustard(keyboardConfiguration.japaneseLayout) || self.isCustard(keyboardConfiguration.englishLayout)
+        let hasQwerty = self.canQwertyLayout(keyboardConfiguration.japaneseLayout) || self.canQwertyLayout(keyboardConfiguration.englishLayout)
         if hasJapaneseFlick || hasCustard || !self.settingAdaptive {
             ImageSlideshowView(pictures: [.flickCustomKeySetting0, .flickCustomKeySetting1, .flickCustomKeySetting2])
                 .listRowSeparator(.hidden, edges: .bottom)

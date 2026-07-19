@@ -78,7 +78,8 @@ private struct ThemeFontDoubleTranslator: Intertranslator {
 }
 
 struct ThemeEditView: CancelableEditor {
-    @EnvironmentObject private var appStates: MainAppStates
+    @EnvironmentObject private var keyboardConfiguration: KeyboardConfigurationState
+    @EnvironmentObject private var reviewPrompt: RequestReviewManager
 
     let base: AzooKeyTheme
     @State private var theme: AzooKeyTheme = .base
@@ -186,7 +187,7 @@ struct ThemeEditView: CancelableEditor {
                     }
                 }
                 let tab: KeyboardTab.ExistentialTab = {
-                    switch appStates.japaneseLayout {
+                    switch keyboardConfiguration.japaneseLayout {
                     case .flick:
                         return .flick_hira
                     case .qwerty:
@@ -256,7 +257,7 @@ struct ThemeEditView: CancelableEditor {
         case .themeShareView:
             ThemeShareView(theme: self.theme, shareImage: shareImage) {
                 self.dismiss()
-                appStates.requestReviewManager.shouldTryRequestReview = true
+                reviewPrompt.shouldTryRequestReview = true
             }
             .navigationBarTitle(Text("完了"), displayMode: .inline)
             .navigationBarItems(leading: EmptyView(), trailing: EmptyView())

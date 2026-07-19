@@ -1,8 +1,6 @@
 import SwiftUI
 
 struct FlickDakutenKeyNews: View {
-    @EnvironmentObject private var appStates: MainAppStates
-
     var body: some View {
         TipsContentView("日本語フリックのカスタムキーで「濁点化」をサポート") {
             TipsContentParagraph {

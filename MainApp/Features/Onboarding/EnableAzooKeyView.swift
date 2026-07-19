@@ -20,10 +20,10 @@ enum EnableAzooKeyViewProgress: String, Hashable, Codable, Sendable {
 
 @MainActor
 struct EnableAzooKeyView: View {
-    @EnvironmentObject private var appStates: MainAppStates
+    @EnvironmentObject private var onboarding: OnboardingState
     @State private var step: EnableAzooKeyViewProgress = .menu {
         didSet {
-            self.appStates.setTutorialProgress(step)
+            self.onboarding.setTutorialProgress(step)
         }
     }
     @State private var text = ""
@@ -80,7 +80,7 @@ struct EnableAzooKeyView: View {
                             EnableAzooKeyViewText("この設定をしないとキーボードが使えません", with: "exclamationmark.triangle.fill")
                             CenterAlignedView {
                                 EnableAzooKeyViewButton("閉じる", systemName: "xmark", style: .destructive) {
-                                    appStates.requireFirstOpenView = false
+                                    onboarding.dismiss()
                                 }
                             }
                         }
@@ -125,7 +125,7 @@ struct EnableAzooKeyView: View {
                                 EnableAzooKeyViewText("azooKeyが開かれました！", with: "checkmark")
                                 CenterAlignedView {
                                     EnableAzooKeyViewButton("始める", systemName: "arrowshape.turn.up.right.fill") {
-                                        appStates.requireFirstOpenView = false
+                                        onboarding.dismiss()
                                     }
                                 }
                             } else {
@@ -135,7 +135,7 @@ struct EnableAzooKeyView: View {
                                 .textFieldStyle(.roundedBorder)
                                 .submitLabel(.continue)
                                 .onSubmit {
-                                    appStates.requireFirstOpenView = false
+                                    onboarding.dismiss()
                                 }
                             if !showDoneMessage {
                                 CenterAlignedView {
@@ -146,7 +146,7 @@ struct EnableAzooKeyView: View {
                             if !showDoneMessage {
                                 CenterAlignedView {
                                     EnableAzooKeyViewButton("始める", systemName: "arrowshape.turn.up.right.fill") {
-                                        appStates.requireFirstOpenView = false
+                                        onboarding.dismiss()
                                     }
                                 }
                             }
@@ -178,10 +178,10 @@ struct EnableAzooKeyView: View {
         .animation(.spring(), value: showDoneMessage)
         .task {
             // 0.2秒に一度チェックを挟んでkeyboardの状態をチェックする
-            while !Task.isCancelled && !appStates.isKeyboardActivated {
+            while !Task.isCancelled && !onboarding.isKeyboardActivated {
                 if SharedStore.checkKeyboardActivation() {
                     self.step = .setting
-                    appStates.isKeyboardActivated = true
+                    onboarding.markKeyboardActivated()
                 }
                 do {
                     try await Task.sleep(nanoseconds: 0_200_000_000)

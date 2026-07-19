@@ -27,7 +27,7 @@ extension LanguageLayout {
 
 @MainActor
 struct LanguageLayoutSettingView<SettingKey: LanguageLayoutKeyboardSetting>: View {
-    @EnvironmentObject private var appStates: MainAppStates
+    @EnvironmentObject private var keyboardConfiguration: KeyboardConfigurationState
     @State private var selection: LanguageLayout = .flick
     @State private var ignoreChange = false
     private let custardManager = CustardManager.load()
@@ -133,13 +133,13 @@ struct LanguageLayoutSettingView<SettingKey: LanguageLayoutKeyboardSetting>: Vie
             SettingKey.value = type
             switch language {
             case .japanese:
-                appStates.japaneseLayout = type
+                keyboardConfiguration.japaneseLayout = type
             case .english:
-                appStates.englishLayout = type
+                keyboardConfiguration.englishLayout = type
             }
             if setTogether {
                 EnglishKeyboardLayout.value = type
-                appStates.englishLayout = type
+                keyboardConfiguration.englishLayout = type
             }
         }
         .onAppear {

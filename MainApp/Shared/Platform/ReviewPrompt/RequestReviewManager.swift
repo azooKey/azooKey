@@ -7,11 +7,13 @@
 //
 
 import Foundation
+import SwiftUI
 
-struct RequestReviewManager {
-    var shouldTryRequestReview: Bool = false
+@MainActor
+final class RequestReviewManager: ObservableObject {
+    @Published var shouldTryRequestReview = false
 
-    mutating func shouldRequestReview() -> Bool {
+    func shouldRequestReview() -> Bool {
         self.shouldTryRequestReview = false
         if let lastDate = UserDefaults.standard.value(forKey: "last_reviewed_date") as? Date {
             if -lastDate.timeIntervalSinceNow < 3000000 {   // 最後に表示してから1ヶ月は再度表示しない

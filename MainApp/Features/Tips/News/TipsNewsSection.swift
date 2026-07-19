@@ -10,16 +10,16 @@ import SwiftUI
 
 struct TipsNewsSection: View {
     @AppStorage("read_terms_of_use_update_2025_05_31") private var readTermsOfUseUpdate_2025_05_31 = false
-    @EnvironmentObject private var appStates: MainAppStates
+    @EnvironmentObject private var keyboardConfiguration: KeyboardConfigurationState
 
     @MainActor
     private var needUseFlickCustomSettingNews: Bool {
-        appStates.japaneseLayout != .qwerty || appStates.englishLayout != .qwerty
+        keyboardConfiguration.japaneseLayout != .qwerty || keyboardConfiguration.englishLayout != .qwerty
     }
 
     @MainActor
     private var needFlickDakutenKeyNews: Bool {
-        appStates.japaneseLayout != .qwerty
+        keyboardConfiguration.japaneseLayout != .qwerty
     }
 
     var body: some View {

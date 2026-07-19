@@ -6,143 +6,46 @@
 //  Copyright © 2020 ensan. All rights reserved.
 //
 
-import AzooKeyUtils
-import KeyboardViews
 import SwiftUI
 
 @MainActor
 struct AppRootView: View {
-    private enum TabSelection {
-        case tips, theme, customize, settings
-    }
-    @EnvironmentObject private var appStates: MainAppStates
-    @State private var selection: TabSelection = .tips
-    @State private var messageManager = MessageManager()
-    @State private var showWalkthrough = false
-    @State private var importFileURL: URL?
+    @EnvironmentObject private var router: AppRouter
+    @EnvironmentObject private var keyboardConfiguration: KeyboardConfigurationState
+    @EnvironmentObject private var onboarding: OnboardingState
+    @EnvironmentObject private var customizationWalkthrough: CustomizationWalkthroughState
 
     var body: some View {
         ZStack {
-            TabView(selection: $selection) {
-                TipsHomeView()
-                    .tabItem {
-                        TabItem(title: "使い方", systemImage: "lightbulb.fill")
-                    }
-                    .tag(TabSelection.tips)
-                ThemeHomeView()
-                    .tabItem {
-                        TabItem(title: "着せ替え", systemImage: "photo")
-                    }
-                    .tag(TabSelection.theme)
-                CustomizationHomeView()
-                    .tabItem {
-                        TabItem(title: "拡張", systemImage: "gearshape.2.fill")
-                    }
-                    .tag(TabSelection.customize)
-                SettingsHomeView()
-                    .tabItem {
-                        TabItem(title: "設定", systemImage: "wrench.fill")
-                    }
-                    .tag(TabSelection.settings)
-            }
+            AppTabView()
             .onAppear {
-                if appStates.isKeyboardActivated && !appStates.tutorialFinishedSuccessfully() {
-                    appStates.requireFirstOpenView = true
-                }
+                onboarding.presentInterruptedTutorialIfNeeded()
             }
             .task {
-                do {
-                    try await HotfixDictionaryV1.updateIfRequired()
-                } catch {
-                    print(error)
-                }
-                UserDictionaryMigrationRunner.runIfNeeded()
+                await AppLaunchTasks.performMaintenance()
             }
-            .fullScreenCover(isPresented: $appStates.requireFirstOpenView, content: {
-                // キーボードは有効化されているが正しく終了していない場合
-                if appStates.isKeyboardActivated && !appStates.tutorialFinishedSuccessfully() {
-                    // 「最初の設定」を再表示する
-                    EnableAzooKeyView(resumeProgress: .setting)
-                } else {
-                    // 最初からやる
-                    EnableAzooKeyView()
-                }
+            .fullScreenCover(isPresented: $onboarding.isPresented, content: {
+                EnableAzooKeyView(resumeProgress: onboarding.resumeProgress)
             })
-            .onChange(of: selection) { (_, value) in
-                if value == .customize {
-                    if appStates.internalSettingManager.walkthroughState.shouldDisplay(identifier: .extensions) {
-                        self.showWalkthrough = true
-                    }
+            .onChange(of: router.selectedTab) { _, selectedTab in
+                if selectedTab == .customization {
+                    customizationWalkthrough.presentIfNeeded()
                 }
             }
-            .onOpenURL { url in
-                if url.scheme == "azooKey" {
-                    // Deep link handling for azooKey scheme
-                    let host = url.host?.lowercased()
-                    let last = url.lastPathComponent.lowercased()
-                    if host == "settings" && last == "zenzai" {
-                        // Switch to Settings tab and request navigation to Zenzai settings
-                        selection = .settings
-                        appStates.deepLink = .settingsZenzai
-                        return
-                    }
-                }
-                // Non-azooKey scheme: treat as file import
-                if url.scheme != "azooKey" {
-                    importFileURL = url
-                }
-            }
-            .sheet(isPresented: $showWalkthrough, content: {
-                CustomizationWalkthroughView(isShowing: $showWalkthrough)
+            .onOpenURL(perform: router.open)
+            .sheet(isPresented: $customizationWalkthrough.isPresented, onDismiss: {
+                customizationWalkthrough.markDone()
+            }, content: {
+                CustomizationWalkthroughView()
                     .background(Color.background)
             })
-            ForEach(messageManager.necessaryMessages, id: \.id) {data in
-                if messageManager.requireShow(data.id) {
-                    switch data.id {
-                    case .mock, .ver3_0_zenzai_introduction:
-                        EmptyView()
-                    case .ver2_1_emoji_tab:
-                        DataUpdateView(id: data.id, manager: $messageManager) {
-                            var manager = CustardManager.load()
-                            guard var tabBarData = try? manager.tabbar(identifier: 0) else {
-                                return
-                            }
-                            if tabBarData.items.contains(where: {$0.actions.contains(.moveTab(.system(.emoji_tab)))}) {
-                                return
-                            }
-                            tabBarData.items.append(.init(label: .text("絵文字"), pinned: true, actions: [.moveTab(.system(.emoji_tab))]))
-                            tabBarData.lastUpdateDate = .now
-                            try? manager.saveTabBarData(tabBarData: tabBarData)
-                        }
-                    case .ver1_9_user_dictionary_update, .iOS17_4_new_emoji, .iOS18_4_new_emoji, .iOS26_4_new_emoji:
-                        // 絵文字を更新する
-                        DataUpdateView(id: data.id, manager: $messageManager) {
-                            AdditionalDictManager().userDictUpdate()
-                        }
-                    }
-                }
+            AppDataUpdateOverlay()
+            if router.importedFileURL != nil {
+                URLImportCustardView(
+                    manager: $keyboardConfiguration.custardManager,
+                    url: $router.importedFileURL
+                )
             }
-            if importFileURL != nil {
-                URLImportCustardView(manager: $appStates.custardManager, url: $importFileURL)
-            }
-        }
-    }
-}
-
-private struct TabItem: View {
-    init(title: LocalizedStringKey, systemImage: String) {
-        self.title = title
-        self.systemImage = systemImage
-    }
-
-    private let title: LocalizedStringKey
-    private let systemImage: String
-
-    var body: some View {
-        VStack {
-            Image(systemName: systemImage).font(.system(size: 20, weight: .light))
-                .foregroundStyle(.systemGray2)
-            Text(title)
         }
     }
 }

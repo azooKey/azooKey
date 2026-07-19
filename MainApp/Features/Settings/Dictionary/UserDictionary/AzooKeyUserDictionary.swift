@@ -47,12 +47,12 @@ private final class UserDictManagerVariables: ObservableObject {
 
 struct AzooKeyUserDictionaryView: View {
     @ObservedObject private var variables: UserDictManagerVariables = UserDictManagerVariables()
-    @EnvironmentObject private var appStates: MainAppStates
+    @EnvironmentObject private var reviewPrompt: RequestReviewManager
 
     var body: some View {
         UserDictionaryDataListView(variables: variables)
             .onDisappear {
-                appStates.requestReviewManager.shouldTryRequestReview = true
+                reviewPrompt.shouldTryRequestReview = true
             }
     }
 }

@@ -66,7 +66,7 @@ struct FontSizeSettingView<SettingKey: DoubleKeyboardSettingKey>: View {
 
 @MainActor
 private struct KeyView: View {
-    @EnvironmentObject private var appStates: MainAppStates
+    @EnvironmentObject private var keyboardConfiguration: KeyboardConfigurationState
     private let fontSize: CGFloat
 
     init(fontSize: CGFloat) {
@@ -75,7 +75,7 @@ private struct KeyView: View {
 
     private var size: CGSize {
         let screenWidth = UIScreen.main.bounds.width
-        switch appStates.japaneseLayout {
+        switch keyboardConfiguration.japaneseLayout {
         case .flick:
             return CGSize(width: screenWidth / 5.6, height: screenWidth / 8)
         case .qwerty:

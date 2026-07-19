@@ -12,7 +12,8 @@ import SwiftUI
 import SwiftUIUtils
 
 struct CustomizationHomeView: View {
-    @EnvironmentObject private var appStates: MainAppStates
+    @EnvironmentObject private var keyboardConfiguration: KeyboardConfigurationState
+    @EnvironmentObject private var reviewPrompt: RequestReviewManager
     @Environment(\.requestReview) var requestReview
     @State private var path: [CustomizationRoute] = []
 
@@ -25,19 +26,19 @@ struct CustomizationHomeView: View {
                             .listRowSeparator(.hidden, edges: .bottom)
                         Text("好きな文字や文章を並べたオリジナルのタブを作成することができます。")
                         NavigationLink("カスタムタブの管理") {
-                            ManageCustardView(manager: $appStates.custardManager) {
+                            ManageCustardView(manager: $keyboardConfiguration.custardManager) {
                                 path.append(.custardInformation($0))
                             }
                         }
                         .foregroundStyle(.accentColor)
                         NavigationLink("定型文タブを作る") {
-                            EditingScrollCustardView(manager: $appStates.custardManager) {
+                            EditingScrollCustardView(manager: $keyboardConfiguration.custardManager) {
                                 path.append(.custardInformation($0))
                             }
                         }
                         .foregroundStyle(.accentColor)
                         NavigationLink("カスタムタブを作る") {
-                            EditingGridFitCustardView(manager: $appStates.custardManager) {
+                            EditingGridFitCustardView(manager: $keyboardConfiguration.custardManager) {
                                 path.append(.custardInformation($0))
                             }
                         }
@@ -58,7 +59,7 @@ struct CustomizationHomeView: View {
                             Text("フリック入力では左上の「☆123」・ローマ字入力では左下の「123」「#+=」キーを長押ししても表示されます。")
                         }
                         NavigationLink("タブバーを編集") {
-                            EditingTabBarView(manager: $appStates.custardManager)
+                            EditingTabBarView(manager: $keyboardConfiguration.custardManager)
                         }
                         .foregroundStyle(.accentColor)
                     }
@@ -69,14 +70,14 @@ struct CustomizationHomeView: View {
                 }
                 .navigationBarTitle(Text("拡張"), displayMode: .large)
                 .onAppear {
-                    if appStates.requestReviewManager.shouldTryRequestReview, appStates.requestReviewManager.shouldRequestReview() {
+                    if reviewPrompt.shouldTryRequestReview, reviewPrompt.shouldRequestReview() {
                         requestReview()
                     }
                 }
                 .navigationDestination(for: CustomizationRoute.self) { destination in
                     switch destination {
                     case let .custardInformation(identifier):
-                        if let custard = try? appStates.custardManager.custard(identifier: identifier) {
+                        if let custard = try? keyboardConfiguration.custardManager.custard(identifier: identifier) {
                             CustardInformationView(custard: custard) {
                                 path.append(.custardInformation($0))
                             }
