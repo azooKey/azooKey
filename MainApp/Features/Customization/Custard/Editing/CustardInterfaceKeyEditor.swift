@@ -14,6 +14,7 @@ struct CustardInterfaceKeyEditor: View {
 
     @Binding private var keyData: UserMadeKeyData
     @StateObject private var state: CustardInterfaceKeyEditingState
+    @State private var usesFineSizeAdjustment = false
     private let target: Target
 
     init(data: Binding<UserMadeKeyData>, target: Target = .flick) {
@@ -262,14 +263,19 @@ struct CustardInterfaceKeyEditor: View {
             "縦幅: \(formattedSize(keyData.height))",
             value: $keyData.height,
             in: 0.1 ... .greatestFiniteMagnitude,
-            step: 0.1
+            step: sizeAdjustmentStep
         )
         Stepper(
             "横幅: \(formattedSize(keyData.width))",
             value: $keyData.width,
             in: 0.1 ... .greatestFiniteMagnitude,
-            step: 0.1
+            step: sizeAdjustmentStep
         )
+        Toggle("0.1刻みで微調整", isOn: $usesFineSizeAdjustment)
+    }
+
+    private var sizeAdjustmentStep: Double {
+        usesFineSizeAdjustment ? 0.1 : 1
     }
 
     private func formattedSize(_ value: Double) -> String {

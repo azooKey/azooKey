@@ -257,7 +257,8 @@ public struct GridFitPositionSpecifier: Codable, Hashable, Sendable {
         self.y = try container.decode(Double.self, forKey: .y)
         let width = try container.decode(Double.self, forKey: .width)
         let height = try container.decode(Double.self, forKey: .height)
-        (self.width, self.height) = (abs(width), abs(height))
+        self.width = Swift.abs(width)
+        self.height = Swift.abs(height)
     }
 }
 
