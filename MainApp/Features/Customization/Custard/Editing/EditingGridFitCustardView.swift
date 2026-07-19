@@ -337,19 +337,12 @@ struct EditingGridFitCustardView: CancelableEditor {
                     } else {
                         NavigationLink {
                             GridFitCustardKeyEditor(
-                                position: .gridFit(x: x, y: y),
                                 keyData: $editingItem.keys[
                                     .gridFit(x: x, y: y)
-                                ],
-                                horizontalCount: layout.rowCount,
-                                verticalCount: layout.columnCount,
-                                occupied: activeKeyFrames(
-                                    excluding: .gridFit(x: x, y: y)
-                                )
-                            ) { placement in
-                                applyPlacement(
-                                    placement,
-                                    replacing: .gridFit(x: x, y: y)
+                                ]
+                            ) {
+                                showPlacementEditor(
+                                    for: .gridFit(x: x, y: y)
                                 )
                             }
                         } label: {
@@ -365,7 +358,11 @@ struct EditingGridFitCustardView: CancelableEditor {
                                 }
                             }
                             .disabled(self.manager.editorState.copiedKey == nil)
-                            Button("配置を変更", systemImage: "square.resize") {
+                            Button(
+                                "配置を変更",
+                                systemImage:
+                                    "arrow.up.left.and.arrow.down.right"
+                            ) {
                                 showPlacementEditor(
                                     for: .gridFit(x: x, y: y)
                                 )
@@ -748,78 +745,44 @@ struct EditingGridFitCustardView: CancelableEditor {
 private struct GridFitCustardKeyEditor: View {
     @Environment(\.dismiss) private var dismiss
     @Binding private var keyData: UserMadeKeyData
-    @State private var placementEditorTarget: GridFitPlacementEditorTarget?
-    @State private var pendingPlacement: GridFitKeyPlacement?
+    @State private var opensPlacementEditorOnDismiss = false
 
-    private let position: KeyPosition
-    private let horizontalCount: Int
-    private let verticalCount: Int
-    private let occupied: [GridFitPositionSpecifier]
-    private let onSavePlacement: (GridFitKeyPlacement) -> Void
+    private let onEditPlacement: () -> Void
 
     init(
-        position: KeyPosition,
         keyData: Binding<UserMadeKeyData>,
-        horizontalCount: Int,
-        verticalCount: Int,
-        occupied: [GridFitPositionSpecifier],
-        onSavePlacement: @escaping (GridFitKeyPlacement) -> Void
+        onEditPlacement: @escaping () -> Void
     ) {
-        self.position = position
         self._keyData = keyData
-        self.horizontalCount = horizontalCount
-        self.verticalCount = verticalCount
-        self.occupied = occupied
-        self.onSavePlacement = onSavePlacement
+        self.onEditPlacement = onEditPlacement
     }
 
     var body: some View {
-        CustardInterfaceKeyEditor(data: $keyData)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("配置", systemImage: "square.resize") {
-                        showPlacementEditor()
-                    }
+        VStack(spacing: 0) {
+            HStack {
+                Button {
+                    opensPlacementEditorOnDismiss = true
+                    dismiss()
+                } label: {
+                    Label(
+                        "位置とサイズを編集",
+                        systemImage:
+                            "arrow.up.left.and.arrow.down.right"
+                    )
                 }
+                .buttonStyle(.bordered)
+                Spacer()
             }
-            .sheet(
-                item: $placementEditorTarget,
-                onDismiss: applyPendingPlacement
-            ) { target in
-                GridFitKeyPlacementEditor(
-                    initialPlacement: target.placement,
-                    horizontalCount: horizontalCount,
-                    verticalCount: verticalCount,
-                    occupied: occupied,
-                    isNewKey: false
-                ) { placement in
-                    pendingPlacement = placement
-                }
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+            CustardInterfaceKeyEditor(data: $keyData)
+        }
+        .onDisappear {
+            if opensPlacementEditorOnDismiss {
+                opensPlacementEditorOnDismiss = false
+                onEditPlacement()
             }
-    }
-
-    private func showPlacementEditor() {
-        guard case let .gridFit(x, y) = position else {
-            return
         }
-        placementEditorTarget = .init(
-            originalPosition: position,
-            placement: .init(
-                x: x,
-                y: y,
-                width: keyData.width,
-                height: keyData.height
-            )
-        )
-    }
-
-    private func applyPendingPlacement() {
-        guard let pendingPlacement else {
-            return
-        }
-        self.pendingPlacement = nil
-        onSavePlacement(pendingPlacement)
-        dismiss()
     }
 }
 
