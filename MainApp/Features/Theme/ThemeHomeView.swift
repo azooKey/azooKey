@@ -62,7 +62,7 @@ struct ThemeHomeView: View {
         let tab = tab
         ForEach(manager.indices.reversed(), id: \.self) { index in
             if let theme = theme(at: index) {
-                HStack {
+                HStack(spacing: 0) {
                     ZStack {
                         KeyboardPreview(
                             theme: theme,
@@ -103,7 +103,7 @@ struct ThemeHomeView: View {
                                 .matchedGeometryEffect(id: "selected_theme_dark", in: namespace)
                         }
                     }
-                    Spacer()
+                    .frame(maxWidth: .infinity)
                     VStack {
                         if manager.selectedIndex == manager.selectedIndexInDarkMode {
                             if manager.selectedIndex != index {
@@ -132,7 +132,7 @@ struct ThemeHomeView: View {
                     }
                     .labelStyle(.iconOnly)
                     .buttonStyle(LargeButtonStyle(backgroundColor: .systemGray5))
-                    Spacer()
+                    .frame(maxWidth: .infinity)
                 }
                 .contextMenu {
                     if self.manager.selectedIndex == self.manager.selectedIndexInDarkMode {

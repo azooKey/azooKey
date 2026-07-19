@@ -55,6 +55,17 @@ enum KeyboardPreviewSizing: Equatable {
             false
         }
     }
+
+    fileprivate func containerWidth(for measuredWidth: CGFloat) -> CGFloat {
+        switch self {
+        case .responsive:
+            measuredWidth
+        case .thumbnail:
+            measuredWidth / scale
+        case let .fixed(containerWidth, _):
+            containerWidth
+        }
+    }
 }
 
 @MainActor
@@ -117,12 +128,14 @@ struct KeyboardPreview: View {
                 }
             }
             .onGeometryChange(for: CGFloat.self) { proxy in
-                sizing.measuresAvailableWidth ? proxy.size.width : 0
-            } action: { width in
-                guard sizing.measuresAvailableWidth, width > 0 else {
+                sizing.measuresAvailableWidth
+                    ? sizing.containerWidth(for: proxy.size.width)
+                    : 0
+            } action: { containerWidth in
+                guard sizing.measuresAvailableWidth, containerWidth > 0 else {
                     return
                 }
-                updateContainerWidth(width)
+                updateContainerWidth(containerWidth)
             }
             .onReceive(
                 NotificationCenter.default.publisher(
@@ -134,10 +147,7 @@ struct KeyboardPreview: View {
     }
 
     private var keyboardHeight: CGFloat {
-        Design.keyboardScreenHeight(
-            context: variableStates.layoutContext,
-            upsideComponent: nil
-        )
+        variableStates.interfaceSize.height + Design.keyboardScreenBottomPadding
     }
 
     private var displaySize: CGSize {
