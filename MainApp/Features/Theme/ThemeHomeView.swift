@@ -12,8 +12,22 @@ import SwiftUI
 import SwiftUIUtils
 import SwiftUtils
 
-private struct EqualWidthHStack: Layout {
+private struct ThemeRowLayout: Layout {
     var spacing: CGFloat = 0
+
+    private func itemWidths(totalWidth: CGFloat, count: Int) -> [CGFloat] {
+        guard count > 0 else {
+            return []
+        }
+        let contentWidth = max(0, totalWidth - spacing * CGFloat(count - 1))
+        if count == 2 {
+            return [contentWidth * 2 / 3, contentWidth / 3]
+        }
+        return Array(
+            repeating: contentWidth / CGFloat(count),
+            count: count
+        )
+    }
 
     func sizeThatFits(
         proposal: ProposedViewSize,
@@ -24,16 +38,27 @@ private struct EqualWidthHStack: Layout {
             return .zero
         }
         let totalSpacing = spacing * CGFloat(subviews.count - 1)
-        let width = proposal.width ?? (
-            subviews.map { $0.sizeThatFits(.unspecified).width }.max() ?? 0
-        ) * CGFloat(subviews.count) + totalSpacing
-        let itemWidth = max(0, (width - totalSpacing) / CGFloat(subviews.count))
-        let itemProposal = ProposedViewSize(
-            width: itemWidth,
-            height: proposal.height
+        let idealWidths = subviews.map {
+            $0.sizeThatFits(.unspecified).width
+        }
+        let fallbackContentWidth: CGFloat
+        if idealWidths.count == 2 {
+            fallbackContentWidth = max(
+                idealWidths[0] * 3 / 2,
+                idealWidths[1] * 3
+            )
+        } else {
+            fallbackContentWidth = idealWidths.reduce(0, +)
+        }
+        let width = proposal.width ?? fallbackContentWidth + totalSpacing
+        let widths = itemWidths(
+            totalWidth: width,
+            count: subviews.count
         )
-        let height = subviews.map {
-            $0.sizeThatFits(itemProposal).height
+        let height = zip(subviews, widths).map { subview, width in
+            subview.sizeThatFits(
+                ProposedViewSize(width: width, height: proposal.height)
+            ).height
         }.max() ?? 0
         return CGSize(width: width, height: height)
     }
@@ -47,20 +72,21 @@ private struct EqualWidthHStack: Layout {
         guard !subviews.isEmpty else {
             return
         }
-        let totalSpacing = spacing * CGFloat(subviews.count - 1)
-        let itemWidth = max(
-            0,
-            (bounds.width - totalSpacing) / CGFloat(subviews.count)
+        let widths = itemWidths(
+            totalWidth: bounds.width,
+            count: subviews.count
         )
-        let itemProposal = ProposedViewSize(
-            width: itemWidth,
-            height: bounds.height
-        )
+        var x = bounds.minX
         for (index, subview) in subviews.enumerated() {
+            let itemWidth = widths[index]
+            let itemProposal = ProposedViewSize(
+                width: itemWidth,
+                height: bounds.height
+            )
             let itemHeight = subview.sizeThatFits(itemProposal).height
             subview.place(
                 at: CGPoint(
-                    x: bounds.minX + CGFloat(index) * (itemWidth + spacing),
+                    x: x,
                     y: bounds.midY
                 ),
                 anchor: .leading,
@@ -69,6 +95,20 @@ private struct EqualWidthHStack: Layout {
                     height: itemHeight
                 )
             )
+            x += itemWidth + spacing
+        }
+    }
+}
+
+private struct AdaptiveThemeActionLabelStyle: LabelStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 6) {
+                configuration.icon
+                configuration.title
+            }
+            .fixedSize(horizontal: true, vertical: false)
+            configuration.icon
         }
     }
 }
@@ -123,7 +163,7 @@ struct ThemeHomeView: View {
         let tab = tab
         ForEach(manager.indices.reversed(), id: \.self) { index in
             if let theme = theme(at: index) {
-                EqualWidthHStack {
+                ThemeRowLayout {
                     ZStack {
                         KeyboardPreview(
                             theme: theme,
@@ -190,7 +230,7 @@ struct ThemeHomeView: View {
                             }
                         }
                     }
-                    .labelStyle(.iconOnly)
+                    .labelStyle(AdaptiveThemeActionLabelStyle())
                     .buttonStyle(LargeButtonStyle(backgroundColor: .systemGray5))
                 }
                 .contextMenu {
