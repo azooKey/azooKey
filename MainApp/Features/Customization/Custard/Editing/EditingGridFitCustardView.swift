@@ -401,7 +401,10 @@ struct EditingGridFitCustardView: CancelableEditor {
     private func custardSelectionView(for custard: Custard) -> some View {
         VStack {
             CenterAlignedView {
-                KeyboardPreview(scale: 0.7, defaultTab: .custard(custard))
+                KeyboardPreview(
+                    sizing: .thumbnail(scale: 0.7),
+                    defaultTab: .custard(custard)
+                )
             }
             .disabled(true)
             .overlay(alignment: .bottom) {

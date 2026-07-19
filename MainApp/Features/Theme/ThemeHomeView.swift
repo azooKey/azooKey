@@ -64,7 +64,11 @@ struct ThemeHomeView: View {
             if let theme = theme(at: index) {
                 HStack {
                     ZStack {
-                        KeyboardPreview(theme: theme, scale: 0.6, defaultTab: tab)
+                        KeyboardPreview(
+                            theme: theme,
+                            sizing: .thumbnail(scale: 0.6),
+                            defaultTab: tab
+                        )
                             .disabled(true)
                             .overlay {
                                 if manager.selectedIndex == index || manager.selectedIndexInDarkMode == index {
