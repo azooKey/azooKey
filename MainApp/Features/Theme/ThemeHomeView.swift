@@ -100,19 +100,6 @@ private struct ThemeRowLayout: Layout {
     }
 }
 
-private struct AdaptiveThemeActionLabelStyle: LabelStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: 6) {
-                configuration.icon
-                configuration.title
-            }
-            .fixedSize(horizontal: true, vertical: false)
-            configuration.icon
-        }
-    }
-}
-
 @MainActor
 struct ThemeHomeView: View {
     enum Path: Hashable {
@@ -230,7 +217,7 @@ struct ThemeHomeView: View {
                             }
                         }
                     }
-                    .labelStyle(AdaptiveThemeActionLabelStyle())
+                    .labelStyle(.iconOnly)
                     .buttonStyle(LargeButtonStyle(backgroundColor: .systemGray5))
                 }
                 .contextMenu {
