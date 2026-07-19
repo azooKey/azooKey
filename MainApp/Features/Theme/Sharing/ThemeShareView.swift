@@ -32,10 +32,24 @@ struct ThemeShareView: View {
     @State private var showActivityView: Bool = false
     // キャプチャ用
     @State private var captureRect: CGRect = .zero
+    @State private var previewContainerWidth: CGFloat = 0
     private var shareImage: ShareImage
 
     @MainActor @ViewBuilder private var keyboardPreview: some View {
-        KeyboardPreview(theme: theme, scale: 0.9)
+        KeyboardPreview(theme: theme)
+    }
+
+    @MainActor @ViewBuilder private var captureKeyboardPreview: some View {
+        let resolvedSize = KeyboardPreviewSizing.resolvedExtensionSize(
+            fallbackWidth: previewContainerWidth
+        )
+        KeyboardPreview(
+            theme: theme,
+            sizing: .render(
+                resolvedSize: resolvedSize,
+                scale: 0.9
+            )
+        )
     }
     var body: some View {
         VStack {
@@ -45,7 +59,7 @@ struct ThemeShareView: View {
                 .fixedSize(horizontal: false, vertical: true)
 
             Button {
-                let renderer = ImageRenderer(content: keyboardPreview)
+                let renderer = ImageRenderer(content: captureKeyboardPreview)
                 renderer.scale = 3.0
                 if let image = renderer.uiImage {
                     shareImage.setImage(image)
@@ -54,6 +68,7 @@ struct ThemeShareView: View {
             } label: {
                 Label("シェアする", systemImage: "square.and.arrow.up")
             }
+            .disabled(previewContainerWidth <= 0)
             .buttonStyle(ShareButtonStyle())
             keyboardPreview
             Button {
@@ -70,6 +85,11 @@ struct ThemeShareView: View {
                 )
             }
         })
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { width in
+            previewContainerWidth = width
+        }
     }
 
     @MainActor private func shareOnTwitter() {

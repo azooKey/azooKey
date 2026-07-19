@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import KeyboardViews
 import SwiftUtils
 
 public enum SharedStore {
@@ -19,6 +20,53 @@ public enum SharedStore {
     }
     private static let initialAppVersionKey = "InitialAppVersion"
     private static let lastAppVersionKey = "LastAppVersion"
+    private static let resolvedKeyboardSizeVerticalKey = "ResolvedKeyboardSizeVertical"
+    private static let resolvedKeyboardSizeHorizontalKey = "ResolvedKeyboardSizeHorizontal"
+
+    private static func resolvedKeyboardSizeKey(
+        orientation: KeyboardOrientation
+    ) -> String {
+        switch orientation {
+        case .vertical:
+            resolvedKeyboardSizeVerticalKey
+        case .horizontal:
+            resolvedKeyboardSizeHorizontalKey
+        }
+    }
+
+    @MainActor
+    public static func resolvedKeyboardSize(
+        orientation: KeyboardOrientation
+    ) -> CGSize? {
+        guard let value = userDefaults.dictionary(
+            forKey: resolvedKeyboardSizeKey(orientation: orientation)
+        ),
+              let width = value["width"] as? NSNumber,
+              let height = value["height"] as? NSNumber,
+              width.doubleValue > 0,
+              height.doubleValue > 0 else {
+            return nil
+        }
+        return CGSize(width: width.doubleValue, height: height.doubleValue)
+    }
+
+    @MainActor
+    public static func setResolvedKeyboardSize(
+        _ size: CGSize,
+        orientation: KeyboardOrientation
+    ) {
+        guard size.width > 0, size.height > 0 else {
+            return
+        }
+        userDefaults.set(
+            [
+                "width": size.width,
+                "height": size.height,
+            ],
+            forKey: resolvedKeyboardSizeKey(orientation: orientation)
+        )
+    }
+
     public static var currentAppVersion: AppVersion? {
         if let appVersionString = appVersionString {
             return AppVersion(appVersionString)

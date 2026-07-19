@@ -154,7 +154,12 @@ struct EmojiTab<Extension: ApplicationSpecificKeyboardViewExtension>: View {
 
     /// 参考用
     private var keysHeight: CGFloat {
-        TabDependentDesign(width: 1, height: 1, interfaceSize: variableStates.interfaceSize, orientation: variableStates.keyboardOrientation).keysHeight
+        TabDependentDesign(
+            width: 1,
+            height: 1,
+            interfaceSize: variableStates.interfaceSize,
+            layoutContext: variableStates.layoutContext
+        ).keysHeight
     }
 
     private var scrollViewHeight: CGFloat {

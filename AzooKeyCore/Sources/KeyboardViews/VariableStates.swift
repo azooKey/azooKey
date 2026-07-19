@@ -23,8 +23,10 @@ public final class VariableStates: ObservableObject {
         clipboardHistoryManagerConfig: any ClipboardHistoryManagerConfiguration,
         tabManagerConfig: any TabManagerConfiguration,
         userDefaults: UserDefaults,
-        sharedUserDefaults: UserDefaults? = nil
+        sharedUserDefaults: UserDefaults? = nil,
+        layoutIdiom: KeyboardLayoutIdiom? = nil
     ) {
+        self.layoutIdiom = layoutIdiom ?? .current
         self.tabManager = TabManager(config: tabManagerConfig)
         self.clipboardHistoryManager = ClipboardHistoryManager(config: clipboardHistoryManagerConfig)
         self.keyboardInternalSettingManager = KeyboardInternalSettingManager(userDefaults: userDefaults)
@@ -34,10 +36,10 @@ public final class VariableStates: ObservableObject {
             nil
         }
         if let interfaceWidth {
-            self.setInterfaceSize(orientation: orientation ?? .vertical, screenWidth: interfaceWidth)
+            self.setContainerWidth(interfaceWidth, orientation: orientation ?? .vertical)
         } else if let orientation {
             // 小さめの値を適当に入れる
-            self.setInterfaceSize(orientation: orientation, screenWidth: 200)
+            self.setContainerWidth(200, orientation: orientation)
         }
     }
 
@@ -123,6 +125,15 @@ public final class VariableStates: ObservableObject {
 
     @Published public var keyboardLanguage: KeyboardLanguage = .ja_JP
     @Published private(set) public var keyboardOrientation: KeyboardOrientation = .vertical
+    public let layoutIdiom: KeyboardLayoutIdiom
+
+    public var layoutContext: KeyboardLayoutContext {
+        KeyboardLayoutContext(
+            containerWidth: containerWidth,
+            orientation: keyboardOrientation,
+            idiom: layoutIdiom
+        )
+    }
 
     @MainActor private(set) public var keyboardType: UIKeyboardType = .default
     @MainActor @Published private(set) public var textContentType: UITextContentType?
@@ -134,6 +145,7 @@ public final class VariableStates: ObservableObject {
     @Published public var boolStates = BoolStates()
 
     // 片手モードの実行時、キーボードの幅はinterfaceSizeによって決定できる。
+    @Published private(set) public var containerWidth: CGFloat = 0
     @Published public var interfaceSize: CGSize = .zero
     @Published public var interfacePosition: CGPoint = .zero
 
@@ -203,15 +215,12 @@ public final class VariableStates: ObservableObject {
     }
 
     @MainActor public func setResizingMode(_ state: ResizingState) {
-        let baseHeight = Design.keyboardHeight(
-            screenWidth: SemiStaticStates.shared.screenWidth,
-            orientation: self.keyboardOrientation
-        )
+        let baseHeight = Design.keyboardHeight(context: layoutContext)
         switch state {
         case .fullwidth:
             let height = keyboardInternalSettingManager.oneHandedModeSetting.heightItem(orientation: keyboardOrientation).height
             interfaceSize = .init(
-                width: SemiStaticStates.shared.screenWidth,
+                width: containerWidth,
                 height: (height ?? baseHeight) * self.heightScaleFromKeyboardHeightSetting
             )
             interfacePosition = .zero
@@ -223,7 +232,7 @@ public final class VariableStates: ObservableObject {
             // リサイズ開始時は、保存された値から初期状態を読み込むので変更なし
             let item = keyboardInternalSettingManager.oneHandedModeSetting.item(orientation: keyboardOrientation)
             let height = keyboardInternalSettingManager.oneHandedModeSetting.heightItem(orientation: keyboardOrientation).height
-            interfaceSize = CGSize(width: min(item.width, SemiStaticStates.shared.screenWidth), height: (height ?? baseHeight) * heightScaleFromKeyboardHeightSetting)
+            interfaceSize = CGSize(width: min(item.width, containerWidth), height: (height ?? baseHeight) * heightScaleFromKeyboardHeightSetting)
             interfacePosition = item.position
         }
 
@@ -335,28 +344,42 @@ public final class VariableStates: ObservableObject {
         self.inputStyle = style
     }
 
-    @MainActor public func setInterfaceSize(orientation: KeyboardOrientation, screenWidth: CGFloat) {
-        let height = Design.keyboardHeight(screenWidth: screenWidth, orientation: orientation)
+    @MainActor public func setContainerWidth(_ width: CGFloat, orientation: KeyboardOrientation) {
+        guard width > 0 else {
+            return
+        }
+        containerWidth = width
+        let updatedContext = KeyboardLayoutContext(
+            containerWidth: width,
+            orientation: orientation,
+            idiom: layoutIdiom
+        )
+        let height = Design.keyboardHeight(context: updatedContext)
         if self.keyboardOrientation != orientation {
             self.keyboardOrientation = orientation
             self.updateResizingState()
         }
         // 片手モードの処理
         keyboardInternalSettingManager.update(\.oneHandedModeSetting) {value in
-            value.setIfFirst(orientation: orientation, size: .init(width: screenWidth, height: height), position: .zero)
+            value.setIfFirst(orientation: orientation, size: .init(width: width, height: height), position: .zero)
         }
         let idealHeight = keyboardInternalSettingManager.oneHandedModeSetting.heightItem(orientation: orientation).height
-        let ignoreStoredHeight = UIDevice.current.userInterfaceIdiom == .pad && screenWidth < 400
+        let ignoreStoredHeight = layoutIdiom == .pad && width < 400
         let effectiveHeight = (ignoreStoredHeight ? height : (idealHeight ?? height)) * heightScaleFromKeyboardHeightSetting
         switch self.resizingState {
         case .fullwidth:
-            self.interfaceSize = CGSize(width: screenWidth, height: effectiveHeight)
+            self.interfaceSize = CGSize(width: width, height: effectiveHeight)
         case .onehanded, .resizing:
             let item = keyboardInternalSettingManager.oneHandedModeSetting.item(orientation: orientation)
             // 安全のため、指示されたwidth, heightを超える値を許可しない。
-            self.interfaceSize = CGSize(width: min(screenWidth, item.width), height: effectiveHeight)
+            self.interfaceSize = CGSize(width: min(width, item.width), height: effectiveHeight)
             self.interfacePosition = ignoreStoredHeight ? .zero : item.position
         }
+    }
+
+    @available(*, deprecated, renamed: "setContainerWidth(_:orientation:)")
+    @MainActor public func setInterfaceSize(orientation: KeyboardOrientation, screenWidth: CGFloat) {
+        setContainerWidth(screenWidth, orientation: orientation)
     }
 
     @MainActor
@@ -367,8 +390,8 @@ public final class VariableStates: ObservableObject {
             setting.reset(orientation: self.keyboardOrientation)
 
             // ステップ2: 次に、リセットされた項目に「本来のデフォルト値」を再設定する
-            let defaultHeight = Design.keyboardHeight(screenWidth: SemiStaticStates.shared.screenWidth, orientation: self.keyboardOrientation) + Design.keyboardScreenBottomPadding
-            let defaultSize = CGSize(width: SemiStaticStates.shared.screenWidth, height: defaultHeight)
+            let defaultHeight = Design.keyboardHeight(context: layoutContext) + Design.keyboardScreenBottomPadding
+            let defaultSize = CGSize(width: containerWidth, height: defaultHeight)
             setting.setIfFirst(orientation: self.keyboardOrientation, size: defaultSize, position: .zero, forced: true) // forced: trueで確実に上書きする
         }
 

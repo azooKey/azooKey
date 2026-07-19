@@ -12,6 +12,94 @@ import SwiftUI
 import SwiftUIUtils
 import SwiftUtils
 
+private struct ThemeRowLayout: Layout {
+    var spacing: CGFloat = 0
+
+    private func itemWidths(totalWidth: CGFloat, count: Int) -> [CGFloat] {
+        guard count > 0 else {
+            return []
+        }
+        let contentWidth = max(0, totalWidth - spacing * CGFloat(count - 1))
+        if count == 2 {
+            return [contentWidth * 2 / 3, contentWidth / 3]
+        }
+        return Array(
+            repeating: contentWidth / CGFloat(count),
+            count: count
+        )
+    }
+
+    func sizeThatFits(
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout ()
+    ) -> CGSize {
+        guard !subviews.isEmpty else {
+            return .zero
+        }
+        let totalSpacing = spacing * CGFloat(subviews.count - 1)
+        let idealWidths = subviews.map {
+            $0.sizeThatFits(.unspecified).width
+        }
+        let fallbackContentWidth: CGFloat
+        if idealWidths.count == 2 {
+            fallbackContentWidth = max(
+                idealWidths[0] * 3 / 2,
+                idealWidths[1] * 3
+            )
+        } else {
+            fallbackContentWidth = idealWidths.reduce(0, +)
+        }
+        let width = proposal.width ?? fallbackContentWidth + totalSpacing
+        let widths = itemWidths(
+            totalWidth: width,
+            count: subviews.count
+        )
+        let height = zip(subviews, widths).map { subview, width in
+            subview.sizeThatFits(
+                ProposedViewSize(width: width, height: proposal.height)
+            ).height
+        }.max() ?? 0
+        return CGSize(width: width, height: height)
+    }
+
+    func placeSubviews(
+        in bounds: CGRect,
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout ()
+    ) {
+        guard !subviews.isEmpty else {
+            return
+        }
+        let widths = itemWidths(
+            totalWidth: bounds.width,
+            count: subviews.count
+        )
+        var x = bounds.minX
+        for (index, subview) in subviews.enumerated() {
+            let itemWidth = widths[index]
+            let itemProposal = ProposedViewSize(
+                width: itemWidth,
+                height: bounds.height
+            )
+            let itemHeight = subview.sizeThatFits(itemProposal).height
+            subview.place(
+                at: CGPoint(
+                    x: x,
+                    y: bounds.midY
+                ),
+                anchor: .leading,
+                proposal: ProposedViewSize(
+                    width: itemWidth,
+                    height: itemHeight
+                )
+            )
+            x += itemWidth + spacing
+        }
+    }
+}
+
 @MainActor
 struct ThemeHomeView: View {
     enum Path: Hashable {
@@ -62,9 +150,13 @@ struct ThemeHomeView: View {
         let tab = tab
         ForEach(manager.indices.reversed(), id: \.self) { index in
             if let theme = theme(at: index) {
-                HStack {
+                ThemeRowLayout(spacing: 8) {
                     ZStack {
-                        KeyboardPreview(theme: theme, scale: 0.6, defaultTab: tab)
+                        KeyboardPreview(
+                            theme: theme,
+                            sizing: .fitToExtension,
+                            defaultTab: tab
+                        )
                             .disabled(true)
                             .overlay {
                                 if manager.selectedIndex == index || manager.selectedIndexInDarkMode == index {
@@ -99,7 +191,6 @@ struct ThemeHomeView: View {
                                 .matchedGeometryEffect(id: "selected_theme_dark", in: namespace)
                         }
                     }
-                    Spacer()
                     VStack {
                         if manager.selectedIndex == manager.selectedIndexInDarkMode {
                             if manager.selectedIndex != index {
@@ -128,7 +219,6 @@ struct ThemeHomeView: View {
                     }
                     .labelStyle(.iconOnly)
                     .buttonStyle(LargeButtonStyle(backgroundColor: .systemGray5))
-                    Spacer()
                 }
                 .contextMenu {
                     if self.manager.selectedIndex == self.manager.selectedIndexInDarkMode {

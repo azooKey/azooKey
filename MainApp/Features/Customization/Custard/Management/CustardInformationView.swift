@@ -149,7 +149,9 @@ struct CustardInformationView: View {
     }
 
     private var keyboardPreview: some View {
-        KeyboardPreview(scale: 0.7, defaultTab: .custard(custard))
+        KeyboardPreview(
+            defaultTab: .custard(custard)
+        )
     }
 
     var body: some View {

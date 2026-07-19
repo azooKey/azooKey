@@ -16,22 +16,35 @@ public struct TabDependentDesign {
     let horizontalKeyCount: CGFloat
     let verticalKeyCount: CGFloat
     let orientation: KeyboardOrientation
+    let layoutContext: KeyboardLayoutContext
 
     private var interfaceWidth: CGFloat
     private var interfaceHeight: CGFloat
 
-    public init(width: Int, height: Int, interfaceSize: CGSize, orientation: KeyboardOrientation) {
+    public init(
+        width: Int,
+        height: Int,
+        interfaceSize: CGSize,
+        layoutContext: KeyboardLayoutContext
+    ) {
         self.horizontalKeyCount = CGFloat(width)
         self.verticalKeyCount = CGFloat(height)
-        self.orientation = orientation
+        self.orientation = layoutContext.orientation
+        self.layoutContext = layoutContext
         self.interfaceWidth = interfaceSize.width
         self.interfaceHeight = interfaceSize.height
     }
 
-    public init(width: CGFloat, height: CGFloat, interfaceSize: CGSize, orientation: KeyboardOrientation) {
+    public init(
+        width: CGFloat,
+        height: CGFloat,
+        interfaceSize: CGSize,
+        layoutContext: KeyboardLayoutContext
+    ) {
         self.horizontalKeyCount = width
         self.verticalKeyCount = height
-        self.orientation = orientation
+        self.orientation = layoutContext.orientation
+        self.layoutContext = layoutContext
         self.interfaceWidth = interfaceSize.width
         self.interfaceHeight = interfaceSize.height
     }
@@ -60,7 +73,7 @@ public struct TabDependentDesign {
 
     // resultViewの幅を全体から引いたもの。キーを配置して良い部分の高さ。
     @MainActor var keysHeight: CGFloat {
-        interfaceHeight - (Design.keyboardBarHeight(interfaceHeight: interfaceHeight, orientation: orientation) + 12)
+        interfaceHeight - (Design.keyboardBarHeight(interfaceHeight: interfaceHeight, context: layoutContext) + 12)
     }
 
     /// This property is equivarent to `CGSize(width: keyViewWidth, height: keyViewHeight)`. if you want to use only either of two, call `keyViewWidth` or `keyViewHeight` directly.
@@ -108,7 +121,7 @@ public enum Design {
     public static let language = Language.default
 
     /// レイアウトのモード
-    enum LayoutMode {
+    private enum LayoutMode {
         case phoneVertical
         case phoneHorizontal
         case padVertical
@@ -117,21 +130,18 @@ public enum Design {
 
     /// レイアウトモードを決定する
     /// 特に、iPadでフローティングキーボードを利用する場合は`phoneVertical`になる。
-    @MainActor private static func layoutMode(orientation: KeyboardOrientation) -> LayoutMode {
-        // TODO: この実装は検証される必要がある
-        let usePadMode = UIDevice.current.userInterfaceIdiom == .pad
-        // floating keyboardの場合
-        if usePadMode, SemiStaticStates.shared.screenWidth < 400 {
+    private static func layoutMode(context: KeyboardLayoutContext) -> LayoutMode {
+        if context.idiom == .pad, context.containerWidth < 400 {
             return .phoneVertical
         }
-        switch (orientation, usePadMode) {
-        case (.vertical, false):
+        switch (context.orientation, context.idiom) {
+        case (.vertical, .phone):
             return .phoneVertical
-        case (.vertical, true):
+        case (.vertical, .pad):
             return .padVertical
-        case (.horizontal, false):
+        case (.horizontal, .phone):
             return .phoneHorizontal
-        case (.horizontal, true):
+        case (.horizontal, .pad):
             return .padHorizontal
         }
     }
@@ -140,16 +150,22 @@ public enum Design {
     }
 
     /// This property calculate suitable width for normal keyView.
-    @MainActor public static func keyboardScreenHeight(upsideComponent: UpsideComponent?, orientation: KeyboardOrientation) -> CGFloat {
-        keyboardHeight(screenWidth: SemiStaticStates.shared.screenWidth, orientation: orientation, upsideComponent: upsideComponent) + keyboardScreenBottomPadding
+    public static func keyboardScreenHeight(
+        context: KeyboardLayoutContext,
+        upsideComponent: UpsideComponent?
+    ) -> CGFloat {
+        keyboardHeight(context: context, upsideComponent: upsideComponent) + keyboardScreenBottomPadding
     }
 
     /// screenWidthに依存して決定する
     /// 12はresultViewのpadding
-    @MainActor public static func keyboardHeight(screenWidth: CGFloat, orientation: KeyboardOrientation, upsideComponent: UpsideComponent? = nil) -> CGFloat {
+    public static func keyboardHeight(
+        context: KeyboardLayoutContext,
+        upsideComponent: UpsideComponent? = nil
+    ) -> CGFloat {
         let scale: CGFloat
         if let upsideComponent {
-            switch orientation {
+            switch context.orientation {
             case .vertical:
                 scale = min(2.2, 1.0 + upsideComponentScale(upsideComponent).vertical)
             case .horizontal:
@@ -158,9 +174,8 @@ public enum Design {
         } else {
             scale = 1
         }
-        // 安全装置として、widthが本来のscreenWidthを超えないようにする。
-        let width = min(screenWidth, SemiStaticStates.shared.screenWidth)
-        switch layoutMode(orientation: orientation) {
+        let width = max(0, context.containerWidth)
+        switch layoutMode(context: context) {
         case .phoneVertical:
             return 51 / 74 * width * scale + 12
         case .padVertical:
@@ -183,12 +198,19 @@ public enum Design {
         }
     }
 
-    @MainActor static public func upsideComponentHeight(_ component: UpsideComponent, orientation: KeyboardOrientation) -> CGFloat {
-        Design.keyboardHeight(screenWidth: SemiStaticStates.shared.screenWidth, orientation: orientation, upsideComponent: component) - Design.keyboardHeight(screenWidth: SemiStaticStates.shared.screenWidth, orientation: orientation, upsideComponent: nil)
+    public static func upsideComponentHeight(
+        _ component: UpsideComponent,
+        context: KeyboardLayoutContext
+    ) -> CGFloat {
+        Design.keyboardHeight(context: context, upsideComponent: component)
+            - Design.keyboardHeight(context: context, upsideComponent: nil)
     }
     /// バー部分の高さは`interfaceHeight`に基づいて決定する
-    @MainActor static func keyboardBarHeight(interfaceHeight: CGFloat, orientation: KeyboardOrientation) -> CGFloat {
-        switch layoutMode(orientation: orientation) {
+    static func keyboardBarHeight(
+        interfaceHeight: CGFloat,
+        context: KeyboardLayoutContext
+    ) -> CGFloat {
+        switch layoutMode(context: context) {
         case .phoneVertical:
             return (interfaceHeight - 12) * 37 / 204
         // return screenWidth / 8
@@ -204,11 +226,15 @@ public enum Design {
         }
     }
 
-    @MainActor static func largeTextViewFontSize(_ text: String, upsideComponent: UpsideComponent?, orientation: KeyboardOrientation) -> CGFloat {
+    @MainActor static func largeTextViewFontSize(
+        _ text: String,
+        upsideComponent: UpsideComponent?,
+        context: KeyboardLayoutContext
+    ) -> CGFloat {
         let font = UIFont.systemFont(ofSize: 10)
         let size = text.size(withAttributes: [.font: font])
         // 閉じるボタンの高さの分
-        return (self.keyboardScreenHeight(upsideComponent: upsideComponent, orientation: orientation) * 0.85) / size.height * 10
+        return (self.keyboardScreenHeight(context: context, upsideComponent: upsideComponent) * 0.85) / size.height * 10
     }
 
     public enum Fonts: Sendable {

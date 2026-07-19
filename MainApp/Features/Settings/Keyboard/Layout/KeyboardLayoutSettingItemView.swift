@@ -6,11 +6,11 @@
 //  Copyright © 2020 ensan. All rights reserved.
 //
 
+import AzooKeyUtils
+import enum KanaKanjiConverterModule.KeyboardLanguage
 import KeyboardViews
 import SwiftUI
 import SwiftUIUtils
-import enum KanaKanjiConverterModule.KeyboardLanguage
-import AzooKeyUtils
 
 extension LanguageLayout {
     var label: LocalizedStringKey {
@@ -103,7 +103,10 @@ struct LanguageLayoutSettingView<SettingKey: LanguageLayoutKeyboardSetting>: Vie
                     }
                 }
                 CenterAlignedView {
-                    KeyboardPreview(scale: 0.8, defaultTab: tab)
+                    KeyboardPreview(
+                        sizing: .fitToExtension,
+                        defaultTab: tab
+                    )
                         .allowsHitTesting(false)
                         .disabled(true)
                 }
@@ -111,7 +114,10 @@ struct LanguageLayoutSettingView<SettingKey: LanguageLayoutKeyboardSetting>: Vie
                 VStack {
                     Text(labelText)
                     CenterAlignedView {
-                        KeyboardPreview(scale: 0.8, defaultTab: tab)
+                        KeyboardPreview(
+                            sizing: .fitToExtension,
+                            defaultTab: tab
+                        )
                             .allowsHitTesting(false)
                             .disabled(true)
                     }

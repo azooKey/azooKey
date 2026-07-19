@@ -104,8 +104,10 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                 // 縮小禁止（下端ハンドルの場合）
                 let isShrinkOnBottom = !isTopHandle && newHeight < size.height
                 // 最小・最大を超えたらキャンセル
-                let isTooShort = newHeight < Design.keyboardHeight(screenWidth: SemiStaticStates.shared.screenWidth, orientation: variableStates.keyboardOrientation) / 2
-                let isTooTall  = newHeight > variableStates.maximumHeight
+                let isTooShort = newHeight < Design.keyboardHeight(
+                    context: variableStates.layoutContext
+                ) / 2
+                let isTooTall = newHeight > variableStates.maximumHeight
 
                 if isTooShort || isTooTall || isShrinkOnBottom {
                     // 範囲外なら元に戻す
@@ -200,11 +202,15 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                         }
                 }
                 Button {
-                    let screenWidth = UIScreen.main.bounds.width
                     let orientation = variableStates.keyboardOrientation
                     let baseline = Design
-                        .keyboardHeight(screenWidth: screenWidth,
-                                        orientation: orientation) * 2
+                        .keyboardHeight(
+                            context: KeyboardLayoutContext(
+                                containerWidth: variableStates.containerWidth,
+                                orientation: orientation,
+                                idiom: variableStates.layoutIdiom
+                            )
+                        ) * 2
                         + Design.keyboardScreenBottomPadding * 2
 
                     variableStates.maximumHeight = min(

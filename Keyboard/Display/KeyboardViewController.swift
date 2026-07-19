@@ -121,7 +121,7 @@ final class KeyboardViewController: UIInputViewController {
             orientation = baseOrientation
         }
         SemiStaticStates.shared.setScreenWidth(size.width)
-        KeyboardViewController.variableStates.setInterfaceSize(orientation: orientation, screenWidth: size.width)
+        KeyboardViewController.variableStates.setContainerWidth(size.width, orientation: orientation)
         if shouldUpdateHeight {
             self.updateScreenHeight()
         }
@@ -156,13 +156,23 @@ final class KeyboardViewController: UIInputViewController {
                 // In resizing mode use the dynamic maxH; otherwise default to interfaceSize.height
                 // 1. upsideComponentの高さを計算する（存在しない場合は0）
                 let upsideComponentHeight = upsideComponent.map { component in
-                    Design.upsideComponentHeight(component, orientation: KeyboardViewController.variableStates.keyboardOrientation)
+                    Design.upsideComponentHeight(
+                        component,
+                        context: KeyboardViewController.variableStates.layoutContext
+                    )
                 } ?? 0
 
                 let bodyHeight = (state == .resizing) ? maxH : interfaceSize.height
 
                 // 3. 全体の高さを「本体の高さ + upsideComponentの高さ」として計算する
                 let totalHeight = bodyHeight + upsideComponentHeight + Design.keyboardScreenBottomPadding
+                SharedStore.setResolvedKeyboardSize(
+                    CGSize(
+                        width: KeyboardViewController.variableStates.containerWidth,
+                        height: interfaceSize.height + Design.keyboardScreenBottomPadding
+                    ),
+                    orientation: KeyboardViewController.variableStates.keyboardOrientation
+                )
 
                 // 4. 計算した全体の高さを制約に設定する
                 self.setKeyboardHeight(to: totalHeight)
@@ -235,7 +245,10 @@ final class KeyboardViewController: UIInputViewController {
         } else {
             let size = self.rootParentViewController.view.bounds.size
             SemiStaticStates.shared.setScreenWidth(size.width)
-            KeyboardViewController.variableStates.setInterfaceSize(orientation: UIScreen.main.bounds.width < UIScreen.main.bounds.height ? .vertical : .horizontal, screenWidth: size.width)
+            KeyboardViewController.variableStates.setContainerWidth(
+                size.width,
+                orientation: UIScreen.main.bounds.width < UIScreen.main.bounds.height ? .vertical : .horizontal
+            )
         }
         // キーボードのセットアップはこの段階で行う
         self.setupKeyboardView()
@@ -254,7 +267,10 @@ final class KeyboardViewController: UIInputViewController {
             let size = self.rootParentViewController.view.bounds.size
             if size.width < SemiStaticStates.shared.screenWidth {
                 SemiStaticStates.shared.setScreenWidth(size.width)
-                KeyboardViewController.variableStates.setInterfaceSize(orientation: UIScreen.main.bounds.size.width < UIScreen.main.bounds.size.height ? .vertical : .horizontal, screenWidth: size.width)
+                KeyboardViewController.variableStates.setContainerWidth(
+                    size.width,
+                    orientation: UIScreen.main.bounds.size.width < UIScreen.main.bounds.size.height ? .vertical : .horizontal
+                )
                 self.updateScreenHeight()
                 debug(#function, size)
             }
@@ -399,9 +415,15 @@ final class KeyboardViewController: UIInputViewController {
         // 旧OS向けの従来の判定・更新ロジック
         SemiStaticStates.shared.setScreenWidth(size.width)
         if #available(iOS 18, *), UIDevice.current.userInterfaceIdiom == .phone {
-            KeyboardViewController.variableStates.setInterfaceSize(orientation: UIScreen.main.bounds.width < UIScreen.main.bounds.height ? .vertical : .horizontal, screenWidth: size.width)
+            KeyboardViewController.variableStates.setContainerWidth(
+                size.width,
+                orientation: UIScreen.main.bounds.width < UIScreen.main.bounds.height ? .vertical : .horizontal
+            )
         } else {
-            KeyboardViewController.variableStates.setInterfaceSize(orientation: UIScreen.main.bounds.width < UIScreen.main.bounds.height ? .horizontal : .vertical, screenWidth: size.width)
+            KeyboardViewController.variableStates.setContainerWidth(
+                size.width,
+                orientation: UIScreen.main.bounds.width < UIScreen.main.bounds.height ? .horizontal : .vertical
+            )
         }
         self.updateScreenHeight()
     }
@@ -416,8 +438,9 @@ final class KeyboardViewController: UIInputViewController {
 
     func prepareScreenHeight(for component: UpsideComponent?) {
         let variableStates = KeyboardViewController.variableStates
-        let orientation = variableStates.keyboardOrientation
-        let componentHeight = component.map { Design.upsideComponentHeight($0, orientation: orientation) } ?? 0
+        let componentHeight = component.map {
+            Design.upsideComponentHeight($0, context: variableStates.layoutContext)
+        } ?? 0
         let bodyHeight: CGFloat
         if variableStates.resizingState == .resizing {
             bodyHeight = variableStates.maximumHeight
