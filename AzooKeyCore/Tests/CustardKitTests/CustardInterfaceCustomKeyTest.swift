@@ -1,5 +1,5 @@
-import XCTest
 @testable import CustardKit
+import XCTest
 
 final class CustardInterfaceCustomKeyTest: XCTestCase {
     func testDecode() {
@@ -34,6 +34,35 @@ final class CustardInterfaceCustomKeyTest: XCTestCase {
                 )
             )
         }
+        do {
+            let target = """
+            {
+                "design": {"label":{"text": "A"}, "color": "normal"},
+                "press_actions": [{
+                    "type": "input",
+                    "text": "a"
+                }],
+                "longpress_actions": {
+                    "start": [],
+                    "repeat": []
+                },
+                "variations": [],
+                "longpress_variation_direction": "right",
+                "shows_tap_bubble": true
+            }
+            """
+            XCTAssertEqual(
+                CustardInterfaceCustomKey.quickDecode(target: target),
+                .init(
+                    design: .init(label: .text("A"), color: .normal),
+                    press_actions: [.input("a")],
+                    longpress_actions: .none,
+                    variations: [],
+                    longpress_variation_direction: .right,
+                    shows_tap_bubble: true
+                )
+            )
+        }
     }
 
     func testEncode() {
@@ -43,6 +72,17 @@ final class CustardInterfaceCustomKeyTest: XCTestCase {
         }
         do {
             let target = CustardInterfaceCustomKey.flickDelete()
+            XCTAssertEqual(target.quickEncodeDecode(), target)
+        }
+        do {
+            let target = CustardInterfaceCustomKey(
+                design: .init(label: .text("="), color: .normal),
+                press_actions: [.input("=")],
+                longpress_actions: .none,
+                variations: [],
+                longpress_variation_direction: .left,
+                shows_tap_bubble: false
+            )
             XCTAssertEqual(target.quickEncodeDecode(), target)
         }
     }

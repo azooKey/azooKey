@@ -131,9 +131,20 @@ public extension CustardInterface {
                 case .selected: .selected
                 case .unimportant: .unimportant
                 }
-                let needSuggest = switch self.keyStyle {
-                case .tenkeyStyle: false
-                case .pcStyle: val.longpress_actions.isEmpty
+                let defaultNeedSuggest = switch self.keyStyle {
+                case .tenkeyStyle:
+                    false
+                case .pcStyle:
+                    val.longpress_actions.isEmpty
+                }
+                let needSuggest = val.shows_tap_bubble ?? defaultNeedSuggest
+                let linearDirection: VariationsViewDirection = switch val.longpress_variation_direction {
+                case .center, .none:
+                    .center
+                case .right:
+                    .right
+                case .left:
+                    .left
                 }
                 let shouldUppercaseForEnglish: Bool
                 if self.keyStyle == .pcStyle,
@@ -152,7 +163,7 @@ public extension CustardInterface {
                     longPressActions: val.longpress_actions.longpressActionType,
                     flick: flickMap,
                     linearVariations: linear,
-                    linearDirection: .center,
+                    linearDirection: linearDirection,
                     showsTapBubble: needSuggest,
                     colorRole: colorRole,
                     shouldUppercaseForEnglish: shouldUppercaseForEnglish

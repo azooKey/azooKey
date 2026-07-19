@@ -6,9 +6,9 @@
 //  Copyright © 2020 ensan. All rights reserved.
 //
 
+import CustardKit
 import Foundation
 import SwiftUI
-import CustardKit
 
 @MainActor
 public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>: View {
@@ -181,20 +181,24 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
         .frame(height: totalBackgroundHeight)
     }
 
-    @MainActor @ViewBuilder
-    func renderUnified(
-        modelsDict: [UnifiedPositionSpecifier: any UnifiedKeyModelProtocol<Extension>],
-        width: Int,
-        height: Int
-    ) -> some View {
-        let design = TabDependentDesign(
-            width: width,
-            height: height,
-            interfaceSize: variableStates.interfaceSize,
-            layoutContext: variableStates.layoutContext
-        )
-        let unifiedModels: [(UnifiedPositionSpecifier, any UnifiedKeyModelProtocol<Extension>)] = modelsDict.map { (pos, model) in (pos, model) }
-        UnifiedKeysView(models: unifiedModels, tabDesign: design) { keyView, _ in keyView }
+    private var standardEnglishQwertyCustard: Custard {
+        switch Extension.SettingProvider.qwertyShiftBehaviorPreference {
+        case .left:
+            .qwertyEnglish(
+                useShiftKey: true,
+                useDeprecatedShiftKeyBehavior: true
+            )
+        case .leftBottom:
+            .qwertyEnglish(
+                useShiftKey: true,
+                useDeprecatedShiftKeyBehavior: false
+            )
+        case .off:
+            .qwertyEnglish(
+                useShiftKey: false,
+                useDeprecatedShiftKeyBehavior: false
+            )
+        }
     }
 
     @MainActor @ViewBuilder
@@ -207,13 +211,19 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
         case .flick_numbersymbols:
             CustomKeyboardView<Extension>(custard: settingAppliedFlickCustard(.flickNumberSymbols))
         case .qwerty_hira:
-            renderUnified(modelsDict: QwertyLayoutProvider<Extension>.hiraKeyboard(), width: 10, height: 4)
+            CustomKeyboardView<Extension>(custard: .qwertyJapanese)
         case .qwerty_abc:
-            renderUnified(modelsDict: QwertyLayoutProvider<Extension>.abcKeyboard(), width: 10, height: 4)
+            CustomKeyboardView<Extension>(
+                custard: standardEnglishQwertyCustard
+            )
         case .qwerty_numbers:
-            renderUnified(modelsDict: QwertyLayoutProvider<Extension>.numberKeyboard, width: 10, height: 4)
+            CustomKeyboardView<Extension>(
+                custard: .qwertyNumbers(
+                    customKeys: Extension.SettingProvider.numberTabCustomKeysSetting
+                )
+            )
         case .qwerty_symbols:
-            renderUnified(modelsDict: QwertyLayoutProvider<Extension>.symbolsKeyboard(), width: 10, height: 4)
+            CustomKeyboardView<Extension>(custard: .qwertySymbols)
         case let .custard(custard):
             CustomKeyboardView<Extension>(custard: custard)
         case let .special(tab):

@@ -68,7 +68,7 @@ final class UserMadeCustardTests: XCTestCase {
     }
 
     func test_legacyIntegerKeySizeDecodes() throws {
-        let data = try XCTUnwrap(
+        let data = Data(
             """
             {
               "type": "system",
@@ -76,7 +76,7 @@ final class UserMadeCustardTests: XCTestCase {
               "width": 1,
               "height": 2
             }
-            """.data(using: .utf8)
+            """.utf8
         )
 
         let decoded = try JSONDecoder().decode(
@@ -233,6 +233,54 @@ final class UserMadeCustardTests: XCTestCase {
         }
     }
 
+    func test_defaultQwertyCustardsPreserveVariationPresentation() throws {
+        let japaneseLetter = try customKey(
+            in: .qwertyJapanese,
+            at: .init(x: 0, y: 0)
+        )
+        XCTAssertEqual(
+            japaneseLetter.longpress_variation_direction,
+            .right
+        )
+        XCTAssertEqual(japaneseLetter.shows_tap_bubble, true)
+
+        let japaneseBar = try customKey(
+            in: .qwertyJapanese,
+            at: .init(x: 9, y: 1)
+        )
+        XCTAssertEqual(japaneseBar.longpress_variation_direction, .left)
+        XCTAssertEqual(japaneseBar.shows_tap_bubble, true)
+
+        let numberCenter = try customKey(
+            in: .qwertyNumbers,
+            at: .init(x: 4, y: 0)
+        )
+        XCTAssertEqual(numberCenter.longpress_variation_direction, .center)
+        XCTAssertEqual(numberCenter.shows_tap_bubble, true)
+
+        let numberRightEdge = try customKey(
+            in: .qwertyNumbers,
+            at: .init(x: 0, y: 0)
+        )
+        XCTAssertEqual(numberRightEdge.longpress_variation_direction, .right)
+
+        let numberLeftEdge = try customKey(
+            in: .qwertyNumbers,
+            at: .init(x: 9, y: 0)
+        )
+        XCTAssertEqual(numberLeftEdge.longpress_variation_direction, .left)
+
+        let symbolWithoutVariations = try customKey(
+            in: .qwertySymbols,
+            at: .init(x: 0, y: 1)
+        )
+        XCTAssertEqual(
+            symbolWithoutVariations.longpress_variation_direction,
+            .right
+        )
+        XCTAssertEqual(symbolWithoutVariations.shows_tap_bubble, false)
+    }
+
     func test_shiftEnabledEnglishQwertyUsesSystemShiftKey() {
         let custard = Custard.qwertyEnglish(useShiftKey: true)
 
@@ -278,5 +326,27 @@ final class UserMadeCustardTests: XCTestCase {
             file: file,
             line: line
         )
+    }
+
+    private func customKey(
+        in custard: Custard,
+        at position: GridFitPositionSpecifier,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) throws -> CustardInterfaceCustomKey {
+        let interfaceKey = try XCTUnwrap(
+            custard.interface.keys[.gridFit(position)],
+            file: file,
+            line: line
+        )
+        guard case let .custom(key) = interfaceKey else {
+            XCTFail("Expected custom key", file: file, line: line)
+            throw TestError.expectedCustomKey
+        }
+        return key
+    }
+
+    private enum TestError: Error {
+        case expectedCustomKey
     }
 }

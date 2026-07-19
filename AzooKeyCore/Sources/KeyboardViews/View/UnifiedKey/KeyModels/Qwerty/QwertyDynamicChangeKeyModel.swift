@@ -1,8 +1,8 @@
 import CustardKit
 import Foundation
+import enum KanaKanjiConverterModule.KeyboardLanguage
 import KeyboardThemes
 import SwiftUI
-import enum KanaKanjiConverterModule.KeyboardLanguage
 
 struct QwertyDynamicChangeKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: UnifiedKeyModelProtocol {
     private enum TabRole {
@@ -41,7 +41,7 @@ struct QwertyDynamicChangeKeyModel<Extension: ApplicationSpecificKeyboardViewExt
         if SemiStaticStates.shared.needsInputModeSwitchKey {
             switch tabRole(states: states) {
             case .english:
-                if QwertyLayoutProvider<Extension>.shiftBehaviorPreference() != .leftbottom || states.boolStates.isShifted || states.boolStates.isCapsLocked {
+                if Extension.SettingProvider.qwertyShiftBehaviorPreference != .leftBottom || states.boolStates.isShifted || states.boolStates.isCapsLocked {
                     [] // system globe
                 } else {
                     [.moveTab(.system(.qwerty_numbers))]
@@ -54,7 +54,7 @@ struct QwertyDynamicChangeKeyModel<Extension: ApplicationSpecificKeyboardViewExt
             case .hiragana:
                 [.moveTab(.system(.qwerty_symbols))]
             case .english:
-                if QwertyLayoutProvider<Extension>.shiftBehaviorPreference() != .leftbottom || states.boolStates.isShifted || states.boolStates.isCapsLocked {
+                if Extension.SettingProvider.qwertyShiftBehaviorPreference != .leftBottom || states.boolStates.isShifted || states.boolStates.isCapsLocked {
                     [.moveTab(.system(.qwerty_symbols))]
                 } else {
                     [.moveTab(.system(.qwerty_numbers))]
@@ -68,7 +68,7 @@ struct QwertyDynamicChangeKeyModel<Extension: ApplicationSpecificKeyboardViewExt
     }
 
     func longPressActions(variableStates: VariableStates) -> LongpressActionType {
-        if QwertyLayoutProvider<Extension>.shiftBehaviorPreference() != .leftbottom || variableStates.boolStates.isShifted || variableStates.boolStates.isCapsLocked {
+        if Extension.SettingProvider.qwertyShiftBehaviorPreference != .leftBottom || variableStates.boolStates.isShifted || variableStates.boolStates.isCapsLocked {
             .none
         } else {
             .init(start: [.setTabBar(.toggle)])
@@ -80,7 +80,7 @@ struct QwertyDynamicChangeKeyModel<Extension: ApplicationSpecificKeyboardViewExt
         if SemiStaticStates.shared.needsInputModeSwitchKey {
             switch tabRole(states: states) {
             case .english:
-                if QwertyLayoutProvider<Extension>.shiftBehaviorPreference() != .leftbottom || states.boolStates.isShifted || states.boolStates.isCapsLocked {
+                if Extension.SettingProvider.qwertyShiftBehaviorPreference != .leftBottom || states.boolStates.isShifted || states.boolStates.isCapsLocked {
                     KeyLabel(.changeKeyboard, width: width, textColor: color)
                 } else {
                     KeyLabel(.image("textformat.123"), width: width, textColor: color)
@@ -93,7 +93,7 @@ struct QwertyDynamicChangeKeyModel<Extension: ApplicationSpecificKeyboardViewExt
             case .hiragana:
                 KeyLabel(.text("#+="), width: width, textColor: color)
             case .english:
-                if QwertyLayoutProvider<Extension>.shiftBehaviorPreference() != .leftbottom || states.boolStates.isShifted || states.boolStates.isCapsLocked {
+                if Extension.SettingProvider.qwertyShiftBehaviorPreference != .leftBottom || states.boolStates.isShifted || states.boolStates.isCapsLocked {
                     KeyLabel(.text("#+="), width: width, textColor: color)
                 } else {
                     KeyLabel(.image("textformat.123"), width: width, textColor: color)

@@ -43,3 +43,21 @@ import Foundation
 
     static func get(_: CustomizableFlickKey) -> KeyFlickSetting.SettingData
 }
+
+enum QwertyShiftBehaviorPreference {
+    case left
+    case leftBottom
+    case off
+}
+
+extension ApplicationSpecificKeyboardViewSettingProvider {
+    static var qwertyShiftBehaviorPreference: QwertyShiftBehaviorPreference {
+        if #available(iOS 18, *) {
+            useShiftKey ? .leftBottom : .off
+        } else if useShiftKey {
+            keepDeprecatedShiftKeyBehavior ? .left : .leftBottom
+        } else {
+            .off
+        }
+    }
+}

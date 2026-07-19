@@ -51,7 +51,8 @@ private enum DefaultQwertyCustards {
         var keys = letterKeys(
             secondRowTrailingKey: inputKey(
                 "ー",
-                variations: ["ー", "。", "、", "！", "？", "・"]
+                variations: ["ー", "。", "、", "！", "？", "・"],
+                direction: .left
             )
         )
         keys[position(0, 2, width: 1.4)] = .system(.qwertyLanguageSwitch)
@@ -76,7 +77,8 @@ private enum DefaultQwertyCustards {
         let secondRowTrailingKey: CustardInterfaceKey? = if shiftKeyPlacement == .bottom {
             inputKey(
                 ".",
-                variations: [".", ",", "!", "?", "'", "\""]
+                variations: [".", ",", "!", "?", "'", "\""],
+                direction: .left
             )
         } else if shiftKeyPlacement == .none {
             .system(.upperLower)
@@ -126,7 +128,12 @@ private enum DefaultQwertyCustards {
         for (index, variations) in numberVariations.enumerated() {
             keys[position(Double(index), 0)] = inputKey(
                 variations[0],
-                variations: variations
+                variations: variations,
+                direction: variationDirection(
+                    index: index,
+                    rightEdge: 2,
+                    leftEdge: 8
+                )
             )
         }
 
@@ -145,7 +152,8 @@ private enum DefaultQwertyCustards {
         for (index, item) in secondRow.enumerated() {
             keys[position(Double(index), 1)] = inputKey(
                 item.0,
-                variations: item.1
+                variations: item.1,
+                direction: index >= 8 ? .left : .center
             )
         }
 
@@ -154,7 +162,7 @@ private enum DefaultQwertyCustards {
             destination: .qwerty_symbols
         )
         let middleKeys = customKeys.keys.isEmpty
-            ? QwertyCustomKeysValue.defaultValue.keys
+            ? legacyNumberMiddleKeys
             : customKeys.keys
         let middleKeyWidth = 7.0 / Double(middleKeys.count)
         for (index, key) in middleKeys.enumerated() {
@@ -202,7 +210,9 @@ private enum DefaultQwertyCustards {
         for (index, item) in firstRow.enumerated() {
             keys[position(Double(index), 0)] = inputKey(
                 item.0,
-                variations: item.1
+                variations: item.1,
+                direction: index == 9 ? .left : .right,
+                showsTapBubble: !item.1.isEmpty
             )
         }
 
@@ -221,7 +231,9 @@ private enum DefaultQwertyCustards {
         for (index, item) in secondRow.enumerated() {
             keys[position(Double(index), 1)] = inputKey(
                 item.0,
-                variations: item.1
+                variations: item.1,
+                direction: index == 9 ? .left : .right,
+                showsTapBubble: !item.1.isEmpty
             )
         }
 
@@ -239,7 +251,8 @@ private enum DefaultQwertyCustards {
         for (item, geometry) in zip(punctuation, punctuationGeometry) {
             keys[position(geometry.x, 2, width: geometry.width)] = inputKey(
                 item.0,
-                variations: item.1
+                variations: item.1,
+                showsTapBubble: !item.1.isEmpty
             )
         }
         keys[position(8.6, 2, width: 1.4)] = deleteKey
@@ -286,14 +299,20 @@ private enum DefaultQwertyCustards {
     ) -> [CustardKeyPositionSpecifier: CustardInterfaceKey] {
         var keys: [CustardKeyPositionSpecifier: CustardInterfaceKey] = [:]
         for (index, letter) in ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"].enumerated() {
-            keys[position(Double(index), 0)] = inputKey(letter)
+            keys[position(Double(index), 0)] = inputKey(
+                letter,
+                direction: .right
+            )
         }
         if let secondRowLeadingKey {
             keys[position(0, 1)] = secondRowLeadingKey
         }
         let secondRowOffset = secondRowLeadingKey == nil ? 0.0 : 1.0
         for (index, letter) in ["a", "s", "d", "f", "g", "h", "j", "k", "l"].enumerated() {
-            keys[position(secondRowOffset + Double(index), 1)] = inputKey(letter)
+            keys[position(secondRowOffset + Double(index), 1)] = inputKey(
+                letter,
+                direction: .right
+            )
         }
         if let secondRowTrailingKey {
             keys[position(9, 1)] = secondRowTrailingKey
@@ -305,7 +324,10 @@ private enum DefaultQwertyCustards {
         to keys: inout [CustardKeyPositionSpecifier: CustardInterfaceKey]
     ) {
         for (index, letter) in ["z", "x", "c", "v", "b", "n", "m"].enumerated() {
-            keys[position(1.5 + Double(index), 2)] = inputKey(letter)
+            keys[position(1.5 + Double(index), 2)] = inputKey(
+                letter,
+                direction: .right
+            )
         }
         keys[position(8.6, 2, width: 1.4)] = deleteKey
     }
@@ -322,7 +344,9 @@ private enum DefaultQwertyCustards {
 
     private static func inputKey(
         _ input: String,
-        variations: [String] = []
+        variations: [String] = [],
+        direction: CustardInterfaceLongpressVariationDirection = .center,
+        showsTapBubble: Bool = true
     ) -> CustardInterfaceKey {
         .custom(
             .init(
@@ -338,7 +362,9 @@ private enum DefaultQwertyCustards {
                             longpress_actions: .none
                         )
                     )
-                }
+                },
+                longpress_variation_direction: direction,
+                shows_tap_bubble: showsTapBubble
             )
         )
     }
@@ -362,7 +388,9 @@ private enum DefaultQwertyCustards {
                             longpress_actions: .none
                         )
                     )
-                }
+                },
+                longpress_variation_direction: .center,
+                shows_tap_bubble: !variations.isEmpty
             )
         )
     }
@@ -376,7 +404,9 @@ private enum DefaultQwertyCustards {
                 design: .init(label: label, color: .special),
                 press_actions: [.moveTab(.system(destination))],
                 longpress_actions: .init(start: [.toggleTabBar]),
-                variations: []
+                variations: [],
+                longpress_variation_direction: .right,
+                shows_tap_bubble: false
             )
         )
     }
@@ -390,10 +420,40 @@ private enum DefaultQwertyCustards {
                 ),
                 press_actions: [.delete(1)],
                 longpress_actions: .init(repeat: [.delete(1)]),
-                variations: []
+                variations: [],
+                longpress_variation_direction: .right,
+                shows_tap_bubble: false
             )
         )
     }
+
+    private static func variationDirection(
+        index: Int,
+        rightEdge: Int,
+        leftEdge: Int
+    ) -> CustardInterfaceLongpressVariationDirection {
+        if index < rightEdge {
+            .right
+        } else if index >= leftEdge {
+            .left
+        } else {
+            .center
+        }
+    }
+
+    private static let legacyNumberMiddleKeys: [QwertyCustomKey] = [
+        .init(
+            name: ".",
+            actions: [.input(".")],
+            longpresses: [".", ",", "!", "?", "'", "\""].map {
+                .init(name: $0, actions: [.input($0)])
+            }
+        ),
+        .init(name: ",", actions: [.input(",")], longpresses: []),
+        .init(name: "?", actions: [.input("?")], longpresses: []),
+        .init(name: "!", actions: [.input("!")], longpresses: []),
+        .init(name: "…", actions: [.input("…")], longpresses: []),
+    ]
 
     private static let punctuationGeometry: [(x: Double, width: Double)] = [
         (1.5, 1.4),
