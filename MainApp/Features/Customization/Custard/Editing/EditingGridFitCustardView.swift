@@ -802,50 +802,24 @@ private struct GridFitKeyPlacementEditor: View {
                         .foregroundStyle(.secondary)
                 }
                 Section("位置") {
-                    decimalField("X座標", text: $xText)
-                    decimalField("Y座標", text: $yText)
+                    decimalStepperField("X座標", text: $xText)
+                    decimalStepperField("Y座標", text: $yText)
                     movementButtons
                     Text("左上をX: 0、Y: 0とするグリッド座標です")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
                 Section("サイズ") {
-                    Stepper(
-                        "横幅: \(widthText)",
-                        onIncrement: {
-                            adjustText(
-                                $widthText,
-                                by: adjustmentStep,
-                                mustRemainPositive: true
-                            )
-                        },
-                        onDecrement: {
-                            adjustText(
-                                $widthText,
-                                by: -adjustmentStep,
-                                mustRemainPositive: true
-                            )
-                        }
+                    decimalStepperField(
+                        "横幅",
+                        text: $widthText,
+                        mustRemainPositive: true
                     )
-                    Stepper(
-                        "縦幅: \(heightText)",
-                        onIncrement: {
-                            adjustText(
-                                $heightText,
-                                by: adjustmentStep,
-                                mustRemainPositive: true
-                            )
-                        },
-                        onDecrement: {
-                            adjustText(
-                                $heightText,
-                                by: -adjustmentStep,
-                                mustRemainPositive: true
-                            )
-                        }
+                    decimalStepperField(
+                        "縦幅",
+                        text: $heightText,
+                        mustRemainPositive: true
                     )
-                    decimalField("横幅を直接入力", text: $widthText)
-                    decimalField("縦幅を直接入力", text: $heightText)
                 }
                 Section {
                     Toggle(
@@ -1044,14 +1018,32 @@ private struct GridFitKeyPlacementEditor: View {
         max(4, unitHeight * CGFloat(frame.height) - 4)
     }
 
-    private func decimalField(
+    private func decimalStepperField(
         _ title: LocalizedStringKey,
-        text: Binding<String>
+        text: Binding<String>,
+        mustRemainPositive: Bool = false
     ) -> some View {
-        LabeledContent(title) {
-            TextField("0", text: text)
-                .keyboardType(.decimalPad)
-                .multilineTextAlignment(.trailing)
+        Stepper {
+            HStack {
+                Text(title)
+                Spacer()
+                TextField("0", text: text)
+                    .frame(minWidth: 64, maxWidth: 100)
+                    .keyboardType(.decimalPad)
+                    .multilineTextAlignment(.trailing)
+            }
+        } onIncrement: {
+            adjustText(
+                text,
+                by: adjustmentStep,
+                mustRemainPositive: mustRemainPositive
+            )
+        } onDecrement: {
+            adjustText(
+                text,
+                by: -adjustmentStep,
+                mustRemainPositive: mustRemainPositive
+            )
         }
     }
 
