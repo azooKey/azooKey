@@ -127,7 +127,12 @@ public struct CustardManager: CustardManagerProtocol {
         let fileName = Self.fileName(identifier)
         let fileURL = Self.fileURL(name: "\(fileName)_edit.json")
         let data = try Data(contentsOf: fileURL)
-        let userMadeCustard = try JSONDecoder().decode(UserMadeCustard.self, from: data)
+        var userMadeCustard = try JSONDecoder().decode(UserMadeCustard.self, from: data)
+        if case .tenkey(var value) = userMadeCustard,
+           let custard = try? self.custard(identifier: identifier) {
+            value.keyStyle = .init(custard.interface.keyStyle)
+            userMadeCustard = .tenkey(value)
+        }
         return userMadeCustard
     }
 

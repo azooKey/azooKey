@@ -69,7 +69,7 @@ public extension CustardInterface {
                     case .tenkeyStyle:
                         UnifiedEnterKeyModel<Extension>(textSize: .large)
                     case .pcStyle:
-                        QwertyAaKeyModel<Extension>()
+                        UnifiedEnterKeyModel<Extension>()
                     }
                 case .upperLower:
                     switch self.keyStyle {

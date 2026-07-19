@@ -42,7 +42,6 @@ struct EditingGridFitCustardView: CancelableEditor {
     let base: UserMadeGridFitCustard
     @StateObject private var variableStates = VariableStates(clipboardHistoryManagerConfig: ClipboardHistoryManagerConfig(), tabManagerConfig: TabManagerConfig(), userDefaults: UserDefaults.standard)
     @State private var editingItem: UserMadeGridFitCustard
-    @State private var isTenkeyStyle: Bool = true
     @Binding private var manager: CustardManager
 
     // MARK: 遷移
@@ -73,7 +72,7 @@ struct EditingGridFitCustardView: CancelableEditor {
                 display_name: editingItem.tabName
             ),
             interface: .init(
-                keyStyle: isTenkeyStyle ? .tenkeyStyle : .pcStyle,
+                keyStyle: editingItem.keyStyle.interfaceStyle,
                 keyLayout: .gridFit(layout),
                 keys: editingItem.keys.reduce(into: [:]) {dict, item in
                     if case let .gridFit(x: x, y: y) = item.key, !editingItem.emptyKeys.contains(item.key) {
@@ -86,7 +85,7 @@ struct EditingGridFitCustardView: CancelableEditor {
 
     private var editingInterface: CustardInterface {
         .init(
-            keyStyle: isTenkeyStyle ? .tenkeyStyle : .pcStyle,
+            keyStyle: editingItem.keyStyle.interfaceStyle,
             keyLayout: .gridFit(layout),
             keys: editingItem.keys.reduce(into: [:]) {dict, item in
                 if case let .gridFit(x: x, y: y) = item.key {
@@ -167,9 +166,9 @@ struct EditingGridFitCustardView: CancelableEditor {
                     Text("そのまま入力").tag(CustardInputStyle.direct)
                     Text("ローマ字かな入力").tag(CustardInputStyle.roman2kana)
                 }
-                Picker("レイアウトスタイル", selection: $isTenkeyStyle) {
-                    Text("フリック").tag(true)
-                    Text("QWERTY").tag(false)
+                Picker("レイアウトスタイル", selection: $editingItem.keyStyle) {
+                    Text("フリック").tag(UserMadeGridFitCustard.KeyStyle.tenkeyStyle)
+                    Text("QWERTY").tag(UserMadeGridFitCustard.KeyStyle.pcStyle)
                 }
                 if self.isNewItem {
                     Toggle("自動的にタブバーに追加", isOn: $editingItem.addTabBarAutomatically)
@@ -372,7 +371,6 @@ struct EditingGridFitCustardView: CancelableEditor {
                     }
                     ForEach(manager.availableCustards, id: \.self) {identifier in
                         if let custard = self.getCustard(identifier: identifier),
-                           case .tenkeyStyle = custard.interface.keyStyle,
                            case .gridFit = custard.interface.keyLayout {
                             custardSelectionView(for: custard)
                         }
@@ -395,6 +393,10 @@ struct EditingGridFitCustardView: CancelableEditor {
             Custard.flickJapanese,
             Custard.flickEnglish,
             Custard.flickNumberSymbols,
+            Custard.qwertyJapanese,
+            Custard.qwertyEnglish,
+            Custard.qwertyNumbers,
+            Custard.qwertySymbols,
         ]
     }
 
@@ -427,7 +429,7 @@ struct EditingGridFitCustardView: CancelableEditor {
     }
 
     private func selectBaseCustard(_ custard: Custard) {
-        self.editingItem = custard.userMadeTenKeyCustard ?? Self.emptyItem
+        self.editingItem = custard.userMadeGridFitCustard ?? Self.emptyItem
         let identifiers = self.manager.availableCustards.compactMap { self.getCustard(identifier: $0)?.identifier }
         if identifiers.contains(self.editingItem.tabName) {
             let d = (1...).first {
