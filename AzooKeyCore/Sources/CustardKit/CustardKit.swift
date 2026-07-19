@@ -229,7 +229,7 @@ public enum CustardKeyPositionSpecifier: Hashable, Sendable {
 /// - gridFitのレイアウトを利用した際のキーの位置指定子に与える値
 /// - values in position specifier when you use grid fit layout
 public struct GridFitPositionSpecifier: Codable, Hashable, Sendable {
-    public init(x: Int, y: Int, width: Int = 1, height: Int = 1) {
+    public init(x: Double, y: Double, width: Double = 1, height: Double = 1) {
         self.x = x
         self.y = y
         self.width = width
@@ -238,14 +238,14 @@ public struct GridFitPositionSpecifier: Codable, Hashable, Sendable {
 
     /// - 横方向の位置(左をゼロとする)
     /// - horizontal position (leading edge is zero)
-    public var x: Int
+    public var x: Double
 
     /// - 縦方向の位置(上をゼロとする)
     /// - vertical positon (top edge is zero)
-    public var y: Int
+    public var y: Double
 
-    public var width: Int
-    public var height: Int
+    public var width: Double
+    public var height: Double
 
     private enum CodingKeys: CodingKey {
         case x, y, width, height
@@ -253,10 +253,10 @@ public struct GridFitPositionSpecifier: Codable, Hashable, Sendable {
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.x = try container.decode(Int.self, forKey: .x)
-        self.y = try container.decode(Int.self, forKey: .y)
-        let width = try container.decode(Int.self, forKey: .width)
-        let height = try container.decode(Int.self, forKey: .height)
+        self.x = try container.decode(Double.self, forKey: .x)
+        self.y = try container.decode(Double.self, forKey: .y)
+        let width = try container.decode(Double.self, forKey: .width)
+        let height = try container.decode(Double.self, forKey: .height)
         (self.width, self.height) = (abs(width), abs(height))
     }
 }
@@ -454,6 +454,15 @@ public enum CustardInterfaceSystemKey: Codable, Equatable, Hashable, Sendable {
     /// - the QWERTY language switch key
     case qwertyLanguageSwitch
 
+    /// - the QWERTY shift key
+    case qwertyShift
+
+    /// - the QWERTY key whose label and destination depend on the current tab
+    case qwertyDynamicChange
+
+    /// - the QWERTY space key that follows the next-candidate setting
+    case qwertySpace
+
     /// - the enter key that changes its label in condition
     case enter
 
@@ -484,6 +493,9 @@ public extension CustardInterfaceSystemKey {
     private enum ValueType: String, Codable {
         case change_keyboard
         case qwerty_language_switch
+        case qwerty_shift
+        case qwerty_dynamic_change
+        case qwerty_space
         case enter
         case upper_lower
         case next_candidate
@@ -498,6 +510,9 @@ public extension CustardInterfaceSystemKey {
         switch self {
         case .changeKeyboard: return .change_keyboard
         case .qwertyLanguageSwitch: return .qwerty_language_switch
+        case .qwertyShift: return .qwerty_shift
+        case .qwertyDynamicChange: return .qwerty_dynamic_change
+        case .qwertySpace: return .qwerty_space
         case .enter: return .enter
         case .upperLower: return .upper_lower
         case .nextCandidate: return .next_candidate
@@ -524,6 +539,12 @@ public extension CustardInterfaceSystemKey {
             self = .changeKeyboard
         case .qwerty_language_switch:
             self = .qwertyLanguageSwitch
+        case .qwerty_shift:
+            self = .qwertyShift
+        case .qwerty_dynamic_change:
+            self = .qwertyDynamicChange
+        case .qwerty_space:
+            self = .qwertySpace
         case .upper_lower:
             self = .upperLower
         case .next_candidate:

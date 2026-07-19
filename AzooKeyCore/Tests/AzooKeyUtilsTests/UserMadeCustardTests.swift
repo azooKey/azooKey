@@ -32,6 +32,62 @@ final class UserMadeCustardTests: XCTestCase {
         XCTAssertEqual(decoded.keyStyle, .pcStyle)
     }
 
+    func test_fractionalGridFitEditingDataRoundTrips() throws {
+        var original = makeGridFitCustard(keyStyle: .pcStyle)
+        original.keys[.gridFit(x: 1.5, y: 2)] = .init(
+            model: .system(.qwertySpace),
+            width: 1.4,
+            height: 0.5
+        )
+
+        let data = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(
+            UserMadeGridFitCustard.self,
+            from: data
+        )
+
+        XCTAssertEqual(decoded.tabName, original.tabName)
+        XCTAssertEqual(decoded.rowCount, original.rowCount)
+        XCTAssertEqual(decoded.columnCount, original.columnCount)
+        XCTAssertEqual(decoded.inputStyle, original.inputStyle)
+        XCTAssertEqual(decoded.language, original.language)
+        XCTAssertEqual(decoded.keyStyle, original.keyStyle)
+        XCTAssertEqual(decoded.emptyKeys, original.emptyKeys)
+        XCTAssertEqual(
+            decoded.keys[.gridFit(x: 1.5, y: 2)]?.model,
+            .system(.qwertySpace)
+        )
+        XCTAssertEqual(
+            decoded.keys[.gridFit(x: 1.5, y: 2)]?.width,
+            1.4
+        )
+        XCTAssertEqual(
+            decoded.keys[.gridFit(x: 1.5, y: 2)]?.height,
+            0.5
+        )
+    }
+
+    func test_legacyIntegerKeySizeDecodes() throws {
+        let data = try XCTUnwrap(
+            """
+            {
+              "type": "system",
+              "key": {"type": "enter"},
+              "width": 1,
+              "height": 2
+            }
+            """.data(using: .utf8)
+        )
+
+        let decoded = try JSONDecoder().decode(
+            UserMadeKeyData.self,
+            from: data
+        )
+
+        XCTAssertEqual(decoded.width, 1)
+        XCTAssertEqual(decoded.height, 2)
+    }
+
     func test_legacyGridFitDataDefaultsToTenkeyStyle() throws {
         let original = UserMadeCustard.tenkey(
             makeGridFitCustard(keyStyle: .pcStyle)
@@ -100,12 +156,11 @@ final class UserMadeCustardTests: XCTestCase {
             )
 
             XCTAssertEqual(editingData.keyStyle, .pcStyle)
-            XCTAssertEqual(editingData.rowCount, "20")
+            XCTAssertEqual(editingData.rowCount, "10")
             XCTAssertEqual(editingData.columnCount, "4")
             XCTAssertFalse(editingData.keys.isEmpty)
-            XCTAssertEqual(
-                editingData.keys.count + editingData.emptyKeys.count,
-                80,
+            XCTAssertNotNil(
+                editingData.keys[.gridFit(x: 1.5, y: 2)],
                 custard.identifier
             )
         }
@@ -114,26 +169,26 @@ final class UserMadeCustardTests: XCTestCase {
     func test_defaultQwertyCustardsUseStandardLanguageKeys() {
         assertLanguageKey(
             in: .qwertyJapanese,
-            at: .init(x: 0, y: 2, width: 3)
+            at: .init(x: 0, y: 2, width: 1.4)
         )
         assertLanguageKey(
             in: .qwertyEnglish,
-            at: .init(x: 0, y: 2, width: 3)
+            at: .init(x: 0, y: 2, width: 1.4)
         )
         for custard in [Custard.qwertyNumbers, .qwertySymbols] {
             assertLanguageKey(
                 in: custard,
-                at: .init(x: 0, y: 3, width: 3)
+                at: .init(x: 0, y: 3, width: 1.4)
             )
         }
     }
 
     func test_defaultQwertyCustardsUseStandardBottomRowGeometry() throws {
         let positions = [
-            GridFitPositionSpecifier(x: 0, y: 3, width: 3),
-            GridFitPositionSpecifier(x: 3, y: 3, width: 3),
-            GridFitPositionSpecifier(x: 6, y: 3, width: 8),
-            GridFitPositionSpecifier(x: 14, y: 3, width: 6),
+            GridFitPositionSpecifier(x: 0, y: 3, width: 1.4),
+            GridFitPositionSpecifier(x: 1.4, y: 3, width: 1.4),
+            GridFitPositionSpecifier(x: 2.8, y: 3, width: 4.4),
+            GridFitPositionSpecifier(x: 7.2, y: 3, width: 2.8),
         ]
 
         for custard in [
@@ -148,7 +203,67 @@ final class UserMadeCustardTests: XCTestCase {
                     "\(custard.identifier): \(position)"
                 )
             }
+            XCTAssertEqual(
+                custard.interface.keys[
+                    .gridFit(.init(x: 1.4, y: 3, width: 1.4))
+                ],
+                .system(.qwertyDynamicChange)
+            )
+            XCTAssertEqual(
+                custard.interface.keys[
+                    .gridFit(.init(x: 2.8, y: 3, width: 4.4))
+                ],
+                .system(.qwertySpace)
+            )
         }
+    }
+
+    func test_defaultQwertySymbolRowsUseEqualKeyWidths() {
+        let positions = [1.5, 2.9, 4.3, 5.7, 7.1].map {
+            GridFitPositionSpecifier(x: $0, y: 2, width: 1.4)
+        }
+
+        for custard in [Custard.qwertyNumbers, .qwertySymbols] {
+            for position in positions {
+                XCTAssertNotNil(
+                    custard.interface.keys[.gridFit(position)],
+                    "\(custard.identifier): \(position)"
+                )
+            }
+        }
+    }
+
+    func test_shiftEnabledEnglishQwertyUsesSystemShiftKey() {
+        let custard = Custard.qwertyEnglish(useShiftKey: true)
+
+        XCTAssertEqual(
+            custard.interface.keys[
+                .gridFit(.init(x: 0, y: 3, width: 1.4))
+            ],
+            .system(.qwertyShift)
+        )
+        XCTAssertNotEqual(
+            custard.interface.keys[.gridFit(.init(x: 9, y: 1))],
+            .system(.upperLower)
+        )
+    }
+
+    func test_deprecatedShiftEnglishQwertyUsesLeftShiftKey() {
+        let custard = Custard.qwertyEnglish(
+            useShiftKey: true,
+            useDeprecatedShiftKeyBehavior: true
+        )
+
+        XCTAssertEqual(
+            custard.interface.keys[.gridFit(.init(x: 0, y: 1))],
+            .system(.qwertyShift)
+        )
+        XCTAssertNotEqual(
+            custard.interface.keys[
+                .gridFit(.init(x: 0, y: 3, width: 1.4))
+            ],
+            .system(.qwertyShift)
+        )
     }
 
     private func assertLanguageKey(

@@ -8,7 +8,7 @@
 
 import Foundation
 public enum KeyPosition: Hashable, Codable, Sendable {
-    case gridFit(x: Int, y: Int)
+    case gridFit(x: Double, y: Double)
     case gridScroll(index: Int)
 
     private enum CodingKeys: CodingKey {
@@ -37,13 +37,19 @@ public enum KeyPosition: Hashable, Codable, Sendable {
         switch type {
         case .gridFit:
             self = .gridFit(
-                x: try container.decode(Int.self, forKey: .x),
-                y: try container.decode(Int.self, forKey: .y)
+                x: try container.decode(Double.self, forKey: .x),
+                y: try container.decode(Double.self, forKey: .y)
             )
         case .gridScroll:
             self = .gridScroll(
                 index: try container.decode(Int.self, forKey: .index)
             )
         }
+    }
+}
+
+public extension KeyPosition {
+    static func gridFit(x: Int, y: Int) -> Self {
+        .gridFit(x: Double(x), y: Double(y))
     }
 }

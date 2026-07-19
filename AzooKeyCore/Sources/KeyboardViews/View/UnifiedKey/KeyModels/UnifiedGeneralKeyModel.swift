@@ -20,6 +20,7 @@ struct UnifiedGeneralKeyModel<Extension: ApplicationSpecificKeyboardViewExtensio
     private let linearDirection: VariationsViewDirection
     private let showsBubbleFlag: Bool
     private let colorRole: ColorRole
+    private let shouldUppercaseForEnglish: Bool
 
     init(
         labelType: KeyLabelType,
@@ -29,7 +30,8 @@ struct UnifiedGeneralKeyModel<Extension: ApplicationSpecificKeyboardViewExtensio
         linearVariations: [QwertyVariationsModel.VariationElement],
         linearDirection: VariationsViewDirection = .center,
         showsTapBubble: Bool,
-        colorRole: ColorRole
+        colorRole: ColorRole,
+        shouldUppercaseForEnglish: Bool = false
     ) {
         self.labelType = labelType
         self.centerPress = pressActions
@@ -39,6 +41,7 @@ struct UnifiedGeneralKeyModel<Extension: ApplicationSpecificKeyboardViewExtensio
         self.linearDirection = linearDirection
         self.showsBubbleFlag = showsTapBubble
         self.colorRole = colorRole
+        self.shouldUppercaseForEnglish = shouldUppercaseForEnglish
     }
 
     func pressActions(variableStates _: VariableStates) -> [ActionType] {
@@ -73,8 +76,14 @@ struct UnifiedGeneralKeyModel<Extension: ApplicationSpecificKeyboardViewExtensio
     (arr: [QwertyVariationsModel.VariationElement], direction: VariationsViewDirection) { (linearVariations, linearDirection)
     }
 
-    func label<ThemeExtension>(width: CGFloat, theme _: ThemeData<ThemeExtension>, states _: VariableStates, color _: Color?) -> KeyLabel<Extension> where ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable {
-        KeyLabel(labelType, width: width)
+    func label<ThemeExtension>(width: CGFloat, theme _: ThemeData<ThemeExtension>, states: VariableStates, color _: Color?) -> KeyLabel<Extension> where ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable {
+        if shouldUppercaseForEnglish,
+           states.boolStates.isCapsLocked || states.boolStates.isShifted,
+           states.keyboardLanguage == .en_US,
+           case let .text(text) = labelType {
+            return KeyLabel(.text(text.uppercased()), width: width)
+        }
+        return KeyLabel(labelType, width: width)
     }
 
     @MainActor

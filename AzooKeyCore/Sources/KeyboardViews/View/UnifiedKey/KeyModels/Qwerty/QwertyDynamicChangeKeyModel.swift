@@ -5,31 +5,63 @@ import SwiftUI
 import enum KanaKanjiConverterModule.KeyboardLanguage
 
 struct QwertyDynamicChangeKeyModel<Extension: ApplicationSpecificKeyboardViewExtension>: UnifiedKeyModelProtocol {
+    private enum TabRole {
+        case hiragana
+        case english
+        case numberOrSymbol
+        case other
+    }
+
+    @MainActor
+    private func tabRole(states: VariableStates) -> TabRole {
+        switch states.tabManager.existentialTab() {
+        case .qwerty_hira:
+            .hiragana
+        case .qwerty_abc:
+            .english
+        case .qwerty_numbers, .qwerty_symbols:
+            .numberOrSymbol
+        case let .custard(custard):
+            switch custard.language {
+            case .ja_JP:
+                .hiragana
+            case .en_US:
+                .english
+            case .none:
+                .numberOrSymbol
+            case .el_GR, .undefined:
+                .other
+            }
+        default:
+            .other
+        }
+    }
+
     func pressActions(variableStates states: VariableStates) -> [ActionType] {
         if SemiStaticStates.shared.needsInputModeSwitchKey {
-            switch states.tabManager.existentialTab() {
-            case .qwerty_abc:
+            switch tabRole(states: states) {
+            case .english:
                 if QwertyLayoutProvider<Extension>.shiftBehaviorPreference() != .leftbottom || states.boolStates.isShifted || states.boolStates.isCapsLocked {
                     [] // system globe
                 } else {
                     [.moveTab(.system(.qwerty_numbers))]
                 }
-            default:
+            case .hiragana, .numberOrSymbol, .other:
                 [] // system globe
             }
         } else {
-            switch states.tabManager.existentialTab() {
-            case .qwerty_hira:
+            switch tabRole(states: states) {
+            case .hiragana:
                 [.moveTab(.system(.qwerty_symbols))]
-            case .qwerty_abc:
+            case .english:
                 if QwertyLayoutProvider<Extension>.shiftBehaviorPreference() != .leftbottom || states.boolStates.isShifted || states.boolStates.isCapsLocked {
                     [.moveTab(.system(.qwerty_symbols))]
                 } else {
                     [.moveTab(.system(.qwerty_numbers))]
                 }
-            case .qwerty_numbers, .qwerty_symbols:
+            case .numberOrSymbol:
                 [.moveTab(.system(.user_english))]
-            default:
+            case .other:
                 [.setCursorBar(.toggle)]
             }
         }
@@ -46,29 +78,29 @@ struct QwertyDynamicChangeKeyModel<Extension: ApplicationSpecificKeyboardViewExt
 
     func label<ThemeExtension>(width: CGFloat, theme _: ThemeData<ThemeExtension>, states: VariableStates, color: Color?) -> KeyLabel<Extension> where ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable {
         if SemiStaticStates.shared.needsInputModeSwitchKey {
-            switch states.tabManager.existentialTab() {
-            case .qwerty_abc:
+            switch tabRole(states: states) {
+            case .english:
                 if QwertyLayoutProvider<Extension>.shiftBehaviorPreference() != .leftbottom || states.boolStates.isShifted || states.boolStates.isCapsLocked {
                     KeyLabel(.changeKeyboard, width: width, textColor: color)
                 } else {
                     KeyLabel(.image("textformat.123"), width: width, textColor: color)
                 }
-            default:
+            case .hiragana, .numberOrSymbol, .other:
                 KeyLabel(.changeKeyboard, width: width, textColor: color)
             }
         } else {
-            switch states.tabManager.existentialTab() {
-            case .qwerty_hira:
+            switch tabRole(states: states) {
+            case .hiragana:
                 KeyLabel(.text("#+="), width: width, textColor: color)
-            case .qwerty_abc:
+            case .english:
                 if QwertyLayoutProvider<Extension>.shiftBehaviorPreference() != .leftbottom || states.boolStates.isShifted || states.boolStates.isCapsLocked {
                     KeyLabel(.text("#+="), width: width, textColor: color)
                 } else {
                     KeyLabel(.image("textformat.123"), width: width, textColor: color)
                 }
-            case .qwerty_numbers, .qwerty_symbols:
+            case .numberOrSymbol:
                 KeyLabel(.text(KeyboardLanguage.en_US.symbol), width: width, textColor: color)
-            default:
+            case .other:
                 KeyLabel(.image("arrowtriangle.left.and.line.vertical.and.arrowtriangle.right"), width: width, textColor: color)
             }
         }

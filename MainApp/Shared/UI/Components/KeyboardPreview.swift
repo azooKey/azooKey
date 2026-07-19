@@ -127,6 +127,9 @@ struct KeyboardPreview: View {
                 resolvedHeight - Design.keyboardScreenBottomPadding
             )
         }
+        if let defaultTab {
+            variableStates.setTabForPreview(defaultTab)
+        }
         variableStates.resultModel.setResults([
             CandidateMock(text: "azooKey"),
             CandidateMock(text: "あずーきー"),

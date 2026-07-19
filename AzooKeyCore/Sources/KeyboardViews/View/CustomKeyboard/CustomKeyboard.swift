@@ -91,6 +91,16 @@ public extension CustardInterface {
                     QwertyLanguageSwitchKeyModel<Extension>(
                         languages: (.ja_JP, .en_US)
                     )
+                case .qwertyShift:
+                    QwertyShiftKeyModel<Extension>()
+                case .qwertyDynamicChange:
+                    QwertyDynamicChangeKeyModel<Extension>()
+                case .qwertySpace:
+                    if Extension.SettingProvider.useNextCandidateKey {
+                        QwertyNextCandidateKeyModel<Extension>()
+                    } else {
+                        QwertySpaceKeyModel<Extension>()
+                    }
                 case .flickKogaki:
                     FlickKogakiKeyModel<Extension>()
                 case .flickKutoten:
@@ -125,6 +135,17 @@ public extension CustardInterface {
                 case .tenkeyStyle: false
                 case .pcStyle: val.longpress_actions.isEmpty
                 }
+                let shouldUppercaseForEnglish: Bool
+                if self.keyStyle == .pcStyle,
+                   case let .text(label) = val.design.label,
+                   label.count == 1,
+                   val.press_actions.count == 1,
+                   case let .input(input) = val.press_actions[0],
+                   label == input {
+                    shouldUppercaseForEnglish = true
+                } else {
+                    shouldUppercaseForEnglish = false
+                }
                 let model = UnifiedGeneralKeyModel<Extension>(
                     labelType: val.design.label.keyLabelType,
                     pressActions: val.press_actions.map { $0.actionType },
@@ -133,7 +154,8 @@ public extension CustardInterface {
                     linearVariations: linear,
                     linearDirection: .center,
                     showsTapBubble: needSuggest,
-                    colorRole: colorRole
+                    colorRole: colorRole,
+                    shouldUppercaseForEnglish: shouldUppercaseForEnglish
                 )
                 models.append((pos, model))
             }
@@ -206,6 +228,36 @@ extension CustardInterfaceKey {
                     keyLabelType: .text("あA"),
                     unpressedKeyColorType: .special,
                     pressActions: [.moveTab(.system(.user_english))]
+                )
+            case .qwertyShift:
+                return SimpleKeyModel(
+                    keyLabelType: .image("shift"),
+                    unpressedKeyColorType: .special,
+                    pressActions: [
+                        .setBoolState(
+                            VariableStates.BoolStates.isShiftedKey,
+                            .toggle
+                        ),
+                    ],
+                    longPressActions: .init(
+                        start: [
+                            .setBoolState(
+                                VariableStates.BoolStates.isCapsLockedKey,
+                                .toggle
+                            ),
+                        ]
+                    )
+                )
+            case .qwertyDynamicChange:
+                return SimpleChangeKeyboardKeyModel()
+            case .qwertySpace:
+                return SimpleKeyModel(
+                    keyLabelType: .text("空白"),
+                    unpressedKeyColorType: .normal,
+                    pressActions: [.input(" ")],
+                    longPressActions: .init(
+                        start: [.setCursorBar(.toggle)]
+                    )
                 )
             case .enter:
                 return SimpleEnterKeyModel()

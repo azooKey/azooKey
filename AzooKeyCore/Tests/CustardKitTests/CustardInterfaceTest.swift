@@ -45,6 +45,44 @@ final class CustardInterfaceTest: XCTestCase {
         }
         do {
             let target = """
+            {
+            "key_layout": {
+                "type": "grid_fit",
+                "row_count": 10,
+                "column_count": 4
+            },
+            "key_style": "pc_style",
+            "keys": [{
+                "specifier_type": "grid_fit",
+                "specifier": {
+                    "x": 1.5,
+                    "y": 2,
+                    "width": 1.4,
+                    "height": 1
+                },
+                "key_type": "system",
+                "key": {
+                    "type": "qwerty_shift"
+                }
+            }]}
+            """
+            XCTAssertEqual(
+                CustardInterface.quickDecode(target: target),
+                .init(
+                    keyStyle: .pcStyle,
+                    keyLayout: .gridFit(
+                        .init(rowCount: 10, columnCount: 4)
+                    ),
+                    keys: [
+                        .gridFit(
+                            .init(x: 1.5, y: 2, width: 1.4)
+                        ): .system(.qwertyShift),
+                    ]
+                )
+            )
+        }
+        do {
+            let target = """
             {"key_layout": {
                 "type": "grid_scroll",
                 "direction": "horizontal",
@@ -80,6 +118,20 @@ final class CustardInterfaceTest: XCTestCase {
     func testEncode() {
         do {
             let target = CustardInterface.init(keyStyle: .pcStyle, keyLayout: .gridScroll(.init(direction: .vertical, rowCount: 3, columnCount: 8)), keys: [.gridScroll(0): .custom(.flickDelete()), .gridScroll(1): .custom(.flickSpace())])
+            XCTAssertEqual(target.quickEncodeDecode(), target)
+        }
+        do {
+            let target = CustardInterface(
+                keyStyle: .pcStyle,
+                keyLayout: .gridFit(
+                    .init(rowCount: 10, columnCount: 4)
+                ),
+                keys: [
+                    .gridFit(
+                        .init(x: 2.8, y: 3, width: 4.4)
+                    ): .custom(.flickSpace()),
+                ]
+            )
             XCTAssertEqual(target.quickEncodeDecode(), target)
         }
     }

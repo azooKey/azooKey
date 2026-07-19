@@ -215,6 +215,9 @@ struct CustardInterfaceKeyEditor: View {
                 .custom(.flickDelete()),
                 .system(.changeKeyboard),
                 .system(.qwertyLanguageSwitch),
+                .system(.qwertyShift),
+                .system(.qwertyDynamicChange),
+                .system(.qwertySpace),
                 .system(.flickKogaki),
                 .system(.flickKutoten),
                 .system(.flickHiraTab),
@@ -235,6 +238,15 @@ struct CustardInterfaceKeyEditor: View {
             Text("QWERTY言語切り替えキー").tag(
                 CustardInterfaceKey.system(.qwertyLanguageSwitch)
             )
+            Text("QWERTYシフトキー").tag(
+                CustardInterfaceKey.system(.qwertyShift)
+            )
+            Text("QWERTY動的切り替えキー").tag(
+                CustardInterfaceKey.system(.qwertyDynamicChange)
+            )
+            Text("QWERTY空白・次候補キー").tag(
+                CustardInterfaceKey.system(.qwertySpace)
+            )
             Text("小書き・濁点化キー").tag(CustardInterfaceKey.system(.flickKogaki))
             Text("大文字・小文字キー").tag(CustardInterfaceKey.system(.upperLower))
             Text("句読点キー").tag(CustardInterfaceKey.system(.flickKutoten))
@@ -246,8 +258,22 @@ struct CustardInterfaceKeyEditor: View {
 
     @ViewBuilder
     private var sizePicker: some View {
-        Stepper("縦幅: \(keyData.height)", value: $keyData.height, in: 1 ... .max)
-        Stepper("横幅: \(keyData.width)", value: $keyData.width, in: 1 ... .max)
+        Stepper(
+            "縦幅: \(formattedSize(keyData.height))",
+            value: $keyData.height,
+            in: 0.1 ... .greatestFiniteMagnitude,
+            step: 0.1
+        )
+        Stepper(
+            "横幅: \(formattedSize(keyData.width))",
+            value: $keyData.width,
+            in: 0.1 ... .greatestFiniteMagnitude,
+            step: 0.1
+        )
+    }
+
+    private func formattedSize(_ value: Double) -> String {
+        value.formatted(.number.precision(.fractionLength(0 ... 2)))
     }
 
     private var systemKeyEditor: some View {

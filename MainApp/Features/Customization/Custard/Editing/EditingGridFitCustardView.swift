@@ -104,20 +104,18 @@ struct EditingGridFitCustardView: CancelableEditor {
         self.isNewItem = editingItem == nil
     }
 
-    private func isCovered(at position: (x: Int, y: Int)) -> Bool {
-        for ox in 0...position.x {
-            for oy in 0...position.y {
-                if ox == position.x && oy == position.y { continue }
-                if let data = editingItem.keys[.gridFit(x: ox, y: oy)], !editingItem.emptyKeys.contains(.gridFit(x: ox, y: oy)) {
-                    let w = data.width
-                    let h = data.height
-                    if (ox ..< ox + w).contains(position.x) && (oy ..< oy + h).contains(position.y) {
-                        return true
-                    }
-                }
+    private func isCovered(at position: (x: Double, y: Double)) -> Bool {
+        editingItem.keys.contains { key, data in
+            guard case let .gridFit(x, y) = key,
+                  key != .gridFit(x: position.x, y: position.y),
+                  !editingItem.emptyKeys.contains(key) else {
+                return false
             }
+            return x < position.x + 1
+                && position.x < x + data.width
+                && y < position.y + 1
+                && position.y < y + data.height
         }
-        return false
     }
 
     private var interfaceSize: CGSize {
@@ -200,8 +198,8 @@ struct EditingGridFitCustardView: CancelableEditor {
                 )
                 let unifiedModels = editingInterface.unifiedKeyModels(extension: AzooKeyKeyboardViewExtension.self)
                 UnifiedKeysView(models: unifiedModels, tabDesign: design) { (view: UnifiedGenericKeyView<AzooKeyKeyboardViewExtension>, pos: UnifiedPositionSpecifier) in
-                    let x = Int(pos.x)
-                    let y = Int(pos.y)
+                    let x = Double(pos.x)
+                    let y = Double(pos.y)
                     if editingItem.emptyKeys.contains(.gridFit(x: x, y: y)) {
                         if !isCovered(at: (x, y)) {
                             Button {
@@ -234,84 +232,26 @@ struct EditingGridFitCustardView: CancelableEditor {
                             }
                             .disabled(self.manager.editorState.copiedKey == nil)
                             Button("下に行を追加", systemImage: "plus") {
-                                editingItem.columnCount = Int(editingItem.columnCount)?.advanced(by: 1).description ?? editingItem.columnCount
-                                for px in 0 ..< Int(layout.rowCount) {
-                                    for py in (y + 1 ..< Int(layout.columnCount)).reversed() {
-                                        editingItem.keys[.gridFit(x: px, y: py + 1)] = editingItem.keys[.gridFit(x: px, y: py)]
-                                    }
-                                }
-                                for px in 0 ..< Int(layout.rowCount) {
-                                    editingItem.keys[.gridFit(x: px, y: y + 1)] = nil
-                                }
-                                editingItem.emptyKeys = editingItem.emptyKeys.mapSet { item in
-                                    switch item {
-                                    case .gridFit(x: let px, y: let py) where y + 1 <= py: return .gridFit(x: px, y: py + 1)
-                                    default: return item
-                                    }
-                                }
+                                insertRow(at: Int(y.rounded(.down)) + 1)
                             }
                             Button("上に行を追加", systemImage: "plus") {
-                                editingItem.columnCount = Int(editingItem.columnCount)?.advanced(by: 1).description ?? editingItem.columnCount
-                                for px in 0 ..< Int(layout.rowCount) {
-                                    for py in (y ..< Int(layout.columnCount)).reversed() {
-                                        editingItem.keys[.gridFit(x: px, y: py + 1)] = editingItem.keys[.gridFit(x: px, y: py)]
-                                    }
-                                }
-                                for px in 0 ..< Int(layout.rowCount) {
-                                    editingItem.keys[.gridFit(x: px, y: y)] = nil
-                                }
-                                editingItem.emptyKeys = editingItem.emptyKeys.mapSet { item in
-                                    switch item {
-                                    case .gridFit(x: let px, y: let py) where y <= py:
-                                        return .gridFit(x: px, y: py + 1)
-                                    default:
-                                        return item
-                                    }
-                                }
+                                insertRow(at: Int(y.rounded(.down)))
                             }
                             Button("右に列を追加", systemImage: "plus") {
-                                editingItem.rowCount = Int(editingItem.rowCount)?.advanced(by: 1).description ?? editingItem.rowCount
-                                for px in (x + 1 ..< Int(layout.rowCount)).reversed() {
-                                    for py in 0 ..< Int(layout.columnCount) {
-                                        editingItem.keys[.gridFit(x: px + 1, y: py)] = editingItem.keys[.gridFit(x: px, y: py)]
-                                    }
-                                }
-                                for py in 0 ..< Int(layout.columnCount) {
-                                    editingItem.keys[.gridFit(x: x + 1, y: py)] = nil
-                                }
-                                editingItem.emptyKeys = editingItem.emptyKeys.mapSet { item in
-                                    switch item {
-                                    case .gridFit(x: let px, y: let py) where x + 1 <= px: return .gridFit(x: px + 1, y: py)
-                                    default: return item
-                                    }
-                                }
+                                insertColumn(at: Int(x.rounded(.down)) + 1)
                             }
                             Button("左に列を追加", systemImage: "plus") {
-                                editingItem.rowCount = Int(editingItem.rowCount)?.advanced(by: 1).description ?? editingItem.rowCount
-                                for px in (x ..< Int(layout.rowCount)).reversed() {
-                                    for py in 0 ..< Int(layout.columnCount) {
-                                        editingItem.keys[.gridFit(x: px + 1, y: py)] = editingItem.keys[.gridFit(x: px, y: py)]
-                                    }
-                                }
-                                for py in 0 ..< Int(layout.columnCount) {
-                                    editingItem.keys[.gridFit(x: x, y: py)] = nil
-                                }
-                                editingItem.emptyKeys = editingItem.emptyKeys.mapSet { item in
-                                    switch item {
-                                    case .gridFit(x: let px, y: let py) where x <= px: return .gridFit(x: px + 1, y: py)
-                                    default: return item
-                                    }
-                                }
+                                insertColumn(at: Int(x.rounded(.down)))
                             }
                             Divider()
                             Button("削除する", systemImage: "trash", role: .destructive) {
                                 editingItem.emptyKeys.insert(.gridFit(x: x, y: y))
                             }
                             Button("この行を削除", systemImage: "trash", role: .destructive) {
-                                removeRow(y: y)
+                                removeRow(y: Int(y.rounded(.down)))
                             }
                             Button("この列を削除", systemImage: "trash", role: .destructive) {
-                                removeColumn(x: x)
+                                removeColumn(x: Int(x.rounded(.down)))
                             }
                         }
                     }
@@ -394,8 +334,19 @@ struct EditingGridFitCustardView: CancelableEditor {
             Custard.flickEnglish,
             Custard.flickNumberSymbols,
             Custard.qwertyJapanese,
-            Custard.qwertyEnglish,
-            Custard.qwertyNumbers,
+            Custard.qwertyEnglish(
+                useShiftKey: UseShiftKey.value,
+                useDeprecatedShiftKeyBehavior: {
+                    if #available(iOS 18, *) {
+                        false
+                    } else {
+                        KeepDeprecatedShiftKeyBehavior.value
+                    }
+                }()
+            ),
+            Custard.qwertyNumbers(
+                customKeys: NumberTabCustomKeysSetting.value
+            ),
             Custard.qwertySymbols,
         ]
     }
@@ -451,50 +402,111 @@ struct EditingGridFitCustardView: CancelableEditor {
         }
     }
 
+    private func insertColumn(at x: Int) {
+        let boundary = Double(x)
+        transformGridPositions { positionX, positionY in
+            .gridFit(
+                x: positionX >= boundary ? positionX + 1 : positionX,
+                y: positionY
+            )
+        }
+        editingItem.rowCount =
+            Int(editingItem.rowCount)?.advanced(by: 1).description
+            ?? editingItem.rowCount
+    }
+
+    private func insertRow(at y: Int) {
+        let boundary = Double(y)
+        transformGridPositions { positionX, positionY in
+            .gridFit(
+                x: positionX,
+                y: positionY >= boundary ? positionY + 1 : positionY
+            )
+        }
+        editingItem.columnCount =
+            Int(editingItem.columnCount)?.advanced(by: 1).description
+            ?? editingItem.columnCount
+    }
+
     private func removeColumn(x: Int) {
-        for px in x + 1 ..< Int(layout.rowCount) {
-            for py in 0 ..< Int(layout.columnCount) {
-                editingItem.keys[.gridFit(x: px - 1, y: py)] = editingItem.keys[.gridFit(x: px, y: py)]
-            }
+        guard layout.rowCount > 1 else {
+            return
         }
-        editingItem.rowCount = Int(editingItem.rowCount)?.advanced(by: -1).description ?? editingItem.rowCount
-        editingItem.emptyKeys = editingItem.emptyKeys.compactMapSet { item in
-            switch item {
-            case .gridFit(x: let px, y: _) where px == x:
+        let lowerBound = Double(x)
+        let upperBound = lowerBound + 1
+        transformGridPositions { positionX, positionY in
+            if lowerBound <= positionX, positionX < upperBound {
                 return nil
-            case .gridFit(x: let px, y: let py) where x + 1 <= px:
-                return .gridFit(x: px - 1, y: py)
-            default:
-                return item
             }
+            return .gridFit(
+                x: positionX >= upperBound ? positionX - 1 : positionX,
+                y: positionY
+            )
         }
+        editingItem.rowCount =
+            Int(editingItem.rowCount)?.advanced(by: -1).description
+            ?? editingItem.rowCount
     }
 
     private func removeRow(y: Int) {
-        for px in 0 ..< Int(layout.rowCount) {
-            for py in y + 1 ..< Int(layout.columnCount) {
-                editingItem.keys[.gridFit(x: px, y: py - 1)] = editingItem.keys[.gridFit(x: px, y: py)]
-            }
+        guard layout.columnCount > 1 else {
+            return
         }
-        editingItem.columnCount = Int(editingItem.columnCount)?.advanced(by: -1).description ?? editingItem.columnCount
-        editingItem.emptyKeys = editingItem.emptyKeys.compactMapSet { item in
-            switch item {
-            case .gridFit(x: _, y: let py) where y == py:
+        let lowerBound = Double(y)
+        let upperBound = lowerBound + 1
+        transformGridPositions { positionX, positionY in
+            if lowerBound <= positionY, positionY < upperBound {
                 return nil
-            case .gridFit(x: let px, y: let py) where y + 1 <= py:
-                return .gridFit(x: px, y: py - 1)
-            default:
-                return item
+            }
+            return .gridFit(
+                x: positionX,
+                y: positionY >= upperBound ? positionY - 1 : positionY
+            )
+        }
+        editingItem.columnCount =
+            Int(editingItem.columnCount)?.advanced(by: -1).description
+            ?? editingItem.columnCount
+    }
+
+    private func transformGridPositions(
+        _ transform: (Double, Double) -> KeyPosition?
+    ) {
+        editingItem.keys = editingItem.keys.reduce(into: [:]) { result, item in
+            switch item.key {
+            case let .gridFit(x, y):
+                if let position = transform(x, y) {
+                    result[position] = item.value
+                }
+            case .gridScroll:
+                result[item.key] = item.value
             }
         }
+        editingItem.emptyKeys = Set(
+            editingItem.emptyKeys.compactMap { position in
+                switch position {
+                case let .gridFit(x, y):
+                    transform(x, y)
+                case .gridScroll:
+                    position
+                }
+            }
+        )
     }
 
     private func updateModel() {
         let layout = layout
         (0..<layout.rowCount).forEach {x in
             (0..<layout.columnCount).forEach {y in
-                if !editingItem.keys.keys.contains(.gridFit(x: x, y: y)) {
-                    editingItem.keys[.gridFit(x: x, y: y)] = .init(model: .custom(.empty), width: 1, height: 1)
+                let position = KeyPosition.gridFit(
+                    x: Double(x),
+                    y: Double(y)
+                )
+                if !editingItem.keys.keys.contains(position) {
+                    editingItem.keys[position] = .init(
+                        model: .custom(.empty),
+                        width: 1,
+                        height: 1
+                    )
                 }
             }
         }
@@ -502,7 +514,10 @@ struct EditingGridFitCustardView: CancelableEditor {
             guard case let .gridFit(x: x, y: y) = key else {
                 continue
             }
-            if x < 0 || layout.rowCount <= x || y < 0 || layout.columnCount <= y {
+            if x < 0
+                || Double(layout.rowCount) <= x
+                || y < 0
+                || Double(layout.columnCount) <= y {
                 if editingItem.keys[key] == Self.emptyKey {
                     editingItem.keys[key] = nil
                 }

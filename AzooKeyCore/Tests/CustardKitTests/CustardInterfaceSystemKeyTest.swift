@@ -5,6 +5,9 @@ final class CustardInterfaceSystemKeyTest: XCTestCase {
     func testDecode() {
         XCTAssertEqual(CustardInterfaceSystemKey.quickDecode(target: #"{"type": "change_keyboard"}"#), .changeKeyboard)
         XCTAssertEqual(CustardInterfaceSystemKey.quickDecode(target: #"{"type": "qwerty_language_switch"}"#), .qwertyLanguageSwitch)
+        XCTAssertEqual(CustardInterfaceSystemKey.quickDecode(target: #"{"type": "qwerty_shift"}"#), .qwertyShift)
+        XCTAssertEqual(CustardInterfaceSystemKey.quickDecode(target: #"{"type": "qwerty_dynamic_change"}"#), .qwertyDynamicChange)
+        XCTAssertEqual(CustardInterfaceSystemKey.quickDecode(target: #"{"type": "qwerty_space"}"#), .qwertySpace)
         XCTAssertEqual(CustardInterfaceSystemKey.quickDecode(target: #"{"type": "flick_kogaki"}"#), .flickKogaki)
         XCTAssertEqual(CustardInterfaceSystemKey.quickDecode(target: #"{"type": "flick_kutoten"}"#), .flickKutoten)
         XCTAssertEqual(CustardInterfaceSystemKey.quickDecode(target: #"{"type": "flick_hira_tab"}"#), .flickHiraTab)
@@ -18,6 +21,9 @@ final class CustardInterfaceSystemKeyTest: XCTestCase {
     func testEncode() {
         XCTAssertEqual(CustardInterfaceSystemKey.changeKeyboard.quickEncodeDecode(), .changeKeyboard)
         XCTAssertEqual(CustardInterfaceSystemKey.qwertyLanguageSwitch.quickEncodeDecode(), .qwertyLanguageSwitch)
+        XCTAssertEqual(CustardInterfaceSystemKey.qwertyShift.quickEncodeDecode(), .qwertyShift)
+        XCTAssertEqual(CustardInterfaceSystemKey.qwertyDynamicChange.quickEncodeDecode(), .qwertyDynamicChange)
+        XCTAssertEqual(CustardInterfaceSystemKey.qwertySpace.quickEncodeDecode(), .qwertySpace)
         XCTAssertEqual(CustardInterfaceSystemKey.flickKogaki.quickEncodeDecode(), .flickKogaki)
         XCTAssertEqual(CustardInterfaceSystemKey.flickKutoten.quickEncodeDecode(), .flickKutoten)
         XCTAssertEqual(CustardInterfaceSystemKey.flickHiraTab.quickEncodeDecode(), .flickHiraTab)

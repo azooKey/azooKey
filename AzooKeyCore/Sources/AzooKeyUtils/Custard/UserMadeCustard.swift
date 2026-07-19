@@ -260,10 +260,27 @@ public extension Custard {
                 width: value.width,
                 height: value.height
             )
-            for x in value.x ..< value.x + value.width {
-                for y in value.y ..< value.y + value.height
-                where x != value.x || y != value.y {
-                    emptyKeys.insert(.gridFit(x: x, y: y))
+        }
+        for x in 0 ..< layout.rowCount {
+            for y in 0 ..< layout.columnCount {
+                let cellPosition = KeyPosition.gridFit(
+                    x: Double(x),
+                    y: Double(y)
+                )
+                guard keys[cellPosition] == nil else {
+                    continue
+                }
+                let cellIsCovered = keys.contains { position, data in
+                    guard case let .gridFit(keyX, keyY) = position else {
+                        return false
+                    }
+                    return keyX < Double(x + 1)
+                        && Double(x) < keyX + data.width
+                        && keyY < Double(y + 1)
+                        && Double(y) < keyY + data.height
+                }
+                if cellIsCovered {
+                    emptyKeys.insert(cellPosition)
                 }
             }
         }
@@ -284,7 +301,7 @@ public extension Custard {
 public struct UserMadeKeyData: Codable, Hashable, Sendable, Identifiable {
     /// - warning: Do not assume `id` is held between execution; this value is re-generated for each `init`
     public let id = UUID()
-    public init(model: CustardInterfaceKey, width: Int, height: Int) {
+    public init(model: CustardInterfaceKey, width: Double, height: Double) {
         self.model = model
         self.width = width
         self.height = height
@@ -299,8 +316,8 @@ public struct UserMadeKeyData: Codable, Hashable, Sendable, Identifiable {
     }
 
     public var model: CustardInterfaceKey
-    public var width: Int
-    public var height: Int
+    public var width: Double
+    public var height: Double
 
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
@@ -318,8 +335,8 @@ public struct UserMadeKeyData: Codable, Hashable, Sendable, Identifiable {
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.width = try container.decode(Int.self, forKey: .width)
-        self.height = try container.decode(Int.self, forKey: .height)
+        self.width = try container.decode(Double.self, forKey: .width)
+        self.height = try container.decode(Double.self, forKey: .height)
         let type = try container.decode(ModelType.self, forKey: .type)
         switch type {
         case .system:
