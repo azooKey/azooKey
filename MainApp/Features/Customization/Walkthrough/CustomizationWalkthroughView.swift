@@ -1,11 +1,3 @@
-//
-//  CustomizeTabWalkthrough.swift
-//  MainApp
-//
-//  Created by ensan on 2021/03/08.
-//  Copyright © 2021 ensan. All rights reserved.
-//
-
 import Foundation
 import SwiftUI
 
