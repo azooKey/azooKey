@@ -10,6 +10,7 @@ import SwiftUI
 
 struct TipsNewsSection: View {
     @AppStorage("read_terms_of_use_update_2025_05_31") private var readTermsOfUseUpdate_2025_05_31 = false
+    @AppStorage("read_article_iOS17_service_termination") private var readArticle_iOS17_service_termination = false
     @EnvironmentObject private var keyboardConfiguration: KeyboardConfigurationState
 
     @MainActor
@@ -20,6 +21,19 @@ struct TipsNewsSection: View {
     @MainActor
     private var needFlickDakutenKeyNews: Bool {
         keyboardConfiguration.japaneseLayout != .qwerty
+    }
+
+    private var iOS17TerminationNewsLabel: some View {
+        Label(
+            title: {
+                Text("iOS 17のサポートを終了します")
+            },
+            icon: {
+                Image(systemName: "exclamationmark.circle.fill")
+                    .foregroundStyle(.red)
+                    .font(.caption)
+            }
+        )
     }
 
     var body: some View {
@@ -38,6 +52,20 @@ struct TipsNewsSection: View {
                                 .font(.caption)
                         }
                     )
+                }
+            }
+        }
+        if #unavailable(iOS 18) {
+            Section("お知らせ") {
+                NavigationLink {
+                    IOS17TerminationNews(readThisMessage: $readArticle_iOS17_service_termination)
+                } label: {
+                    if readArticle_iOS17_service_termination {
+                        iOS17TerminationNewsLabel
+                            .labelStyle(.titleOnly)
+                    } else {
+                        iOS17TerminationNewsLabel
+                    }
                 }
             }
         }
