@@ -12,6 +12,7 @@ Package.resolved
 .swiftpm
 *.DS_Store
 __MACOSX/
+/build/app-store/
 
 # Xcode settings
 # Created by https://www.toptal.com/developers/gitignore/api/xcode
