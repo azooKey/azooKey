@@ -321,10 +321,10 @@
 			);
 			fileSystemSynchronizedGroups = (
 				55252D7C2DBCC53800F0C8CA /* EmojiDictionary */,
+				559E90562CAC29E400E016FA /* Preview Content */,
 				55A000012F00000100000001 /* App */,
 				55A000012F00000100000002 /* Features */,
 				55A000012F00000100000003 /* Shared */,
-				559E90562CAC29E400E016FA /* Preview Content */,
 			);
 			name = azooKey;
 			packageProductDependencies = (
@@ -760,7 +760,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.2;
+				MARKETING_VERSION = 3.1;
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = DevEn3.azooKey;
 				PRODUCT_NAME = azooKey;
@@ -795,7 +795,7 @@
 					"@executable_path/Frameworks",
 				);
 				LLVM_LTO = YES_THIN;
-				MARKETING_VERSION = 3.0.2;
+				MARKETING_VERSION = 3.1;
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = DevEn3.azooKey;
 				PRODUCT_NAME = azooKey;
@@ -919,7 +919,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.0.2;
+				MARKETING_VERSION = 3.1;
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = DevEn3.azooKey.keyboard;
 				PRODUCT_NAME = Keyboard;
@@ -953,7 +953,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LLVM_LTO = YES_THIN;
-				MARKETING_VERSION = 3.0.2;
+				MARKETING_VERSION = 3.1;
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = DevEn3.azooKey.keyboard;
 				PRODUCT_NAME = Keyboard;
