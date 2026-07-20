@@ -394,6 +394,7 @@ public extension CustardInterface {
     }
 
     func encode(to encoder: any Encoder) throws {
+        try validate()
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(keyStyle, forKey: .key_style)
         try container.encode(keyLayout, forKey: .key_layout)
@@ -409,6 +410,7 @@ public extension CustardInterface {
         self.keys = elements.reduce(into: [:]) {dictionary, element in
             dictionary[element.specifier] = element.key
         }
+        try validate()
     }
 }
 
@@ -484,6 +486,55 @@ public enum CustardInterfaceSystemKey: Codable, Equatable, Hashable, Sendable {
     case flickAbcTab
     /// - flick number and symbols tab
     case flickStar123Tab
+}
+
+public enum CustardInterfaceValidationError: Error, Equatable, Sendable {
+    case qwertySystemKeyRequiresPCStyleGridFit
+}
+
+public extension CustardInterface {
+    var supportsQwertySystemKeys: Bool {
+        guard keyStyle == .pcStyle,
+              case .gridFit = keyLayout else {
+            return false
+        }
+        return true
+    }
+
+    func validate() throws {
+        guard keys.values.contains(where: \.isQwertySystemKey) else {
+            return
+        }
+        guard supportsQwertySystemKeys else {
+            throw CustardInterfaceValidationError
+                .qwertySystemKeyRequiresPCStyleGridFit
+        }
+    }
+}
+
+public extension CustardInterfaceKey {
+    var isQwertySystemKey: Bool {
+        guard case let .system(key) = self else {
+            return false
+        }
+        switch key {
+        case .qwertyLanguageSwitch,
+             .qwertyShift,
+             .qwertyDynamicChange,
+             .qwertySpace:
+            return true
+        case .changeKeyboard,
+             .enter,
+             .upperLower,
+             .nextCandidate,
+             .flickKogaki,
+             .flickKutoten,
+             .flickHiraTab,
+             .flickAbcTab,
+             .flickStar123Tab:
+            return false
+        }
+    }
 }
 
 public extension CustardInterfaceSystemKey {

@@ -343,7 +343,9 @@ struct EditingGridFitCustardView: CancelableEditor {
                                 initialEditSegment:
                                     editingItem.keyStyle == .pcStyle
                                     ? .longpress
-                                    : .flick
+                                    : .flick,
+                                supportsQwertySystemKeys:
+                                    editingItem.keyStyle == .pcStyle
                             ) {
                                 showPlacementEditor(
                                     for: .gridFit(x: x, y: y)
@@ -752,22 +754,26 @@ private struct GridFitCustardKeyEditor: View {
     @State private var opensPlacementEditorOnDismiss = false
 
     private let initialEditSegment: CustardKeyEditSegment
+    private let supportsQwertySystemKeys: Bool
     private let onEditPlacement: () -> Void
 
     init(
         keyData: Binding<UserMadeKeyData>,
         initialEditSegment: CustardKeyEditSegment,
+        supportsQwertySystemKeys: Bool,
         onEditPlacement: @escaping () -> Void
     ) {
         self._keyData = keyData
         self.initialEditSegment = initialEditSegment
+        self.supportsQwertySystemKeys = supportsQwertySystemKeys
         self.onEditPlacement = onEditPlacement
     }
 
     var body: some View {
         CustardInterfaceKeyEditor(
             data: $keyData,
-            initialEditSegment: initialEditSegment
+            initialEditSegment: initialEditSegment,
+            supportsQwertySystemKeys: supportsQwertySystemKeys
         ) {
             opensPlacementEditorOnDismiss = true
             dismiss()

@@ -17,11 +17,13 @@ struct CustardInterfaceKeyEditor: View {
     @State private var usesFineSizeAdjustment = false
     private let target: Target
     private let onEditPlacement: (() -> Void)?
+    private let supportsQwertySystemKeys: Bool
 
     init(
         data: Binding<UserMadeKeyData>,
         target: Target = .flick,
         initialEditSegment: CustardKeyEditSegment = .flick,
+        supportsQwertySystemKeys: Bool = false,
         onEditPlacement: (() -> Void)? = nil
     ) {
         self._keyData = data
@@ -33,6 +35,7 @@ struct CustardInterfaceKeyEditor: View {
         )
         self.target = target
         self.onEditPlacement = onEditPlacement
+        self.supportsQwertySystemKeys = supportsQwertySystemKeys
     }
 
     private var screenWidth: CGFloat {
@@ -250,18 +253,20 @@ struct CustardInterfaceKeyEditor: View {
             Text("空白キー").tag(CustardInterfaceKey.custom(.flickSpace()))
             Text("次候補キー").tag(CustardInterfaceKey.system(.nextCandidate))
             Text("地球儀キー").tag(CustardInterfaceKey.system(.changeKeyboard))
-            Text("QWERTY言語切り替えキー").tag(
-                CustardInterfaceKey.system(.qwertyLanguageSwitch)
-            )
-            Text("QWERTYシフトキー").tag(
-                CustardInterfaceKey.system(.qwertyShift)
-            )
-            Text("QWERTY動的切り替えキー").tag(
-                CustardInterfaceKey.system(.qwertyDynamicChange)
-            )
-            Text("QWERTY空白・次候補キー").tag(
-                CustardInterfaceKey.system(.qwertySpace)
-            )
+            if supportsQwertySystemKeys {
+                Text("QWERTY言語切り替えキー").tag(
+                    CustardInterfaceKey.system(.qwertyLanguageSwitch)
+                )
+                Text("QWERTYシフトキー").tag(
+                    CustardInterfaceKey.system(.qwertyShift)
+                )
+                Text("QWERTY動的切り替えキー").tag(
+                    CustardInterfaceKey.system(.qwertyDynamicChange)
+                )
+                Text("QWERTY空白・次候補キー").tag(
+                    CustardInterfaceKey.system(.qwertySpace)
+                )
+            }
             Text("小書き・濁点化キー").tag(CustardInterfaceKey.system(.flickKogaki))
             Text("大文字・小文字キー").tag(CustardInterfaceKey.system(.upperLower))
             Text("句読点キー").tag(CustardInterfaceKey.system(.flickKutoten))
