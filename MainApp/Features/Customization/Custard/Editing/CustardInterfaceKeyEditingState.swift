@@ -59,9 +59,13 @@ final class CustardInterfaceKeyEditingState: ObservableObject {
     @Published var longpressIDs: [UUID] = []
     @Published var longpressLabelSelections: [UUID: CustardKeyLabelSelection] = [:]
     @Published var labelTypes = CustardKeyLabelTypeMap()
-    @Published var editSegment: CustardKeyEditSegment = .flick
+    @Published var editSegment: CustardKeyEditSegment
 
-    init(model: CustardInterfaceKey) {
+    init(
+        model: CustardInterfaceKey,
+        initialEditSegment: CustardKeyEditSegment = .flick
+    ) {
+        self.editSegment = initialEditSegment
         guard case let .custom(key) = model else {
             return
         }

@@ -43,6 +43,14 @@ public final class VariableStates: ObservableObject {
         }
     }
 
+    @MainActor
+    public func setTabForPreview(_ tab: KeyboardTab.ExistentialTab) {
+        self.tabManager.moveTab(
+            to: .existential(tab),
+            variableStates: self
+        )
+    }
+
     public struct BoolStates: CustardExpressionEvaluatorContext {
         public func getValue(for key: String) -> ExpressionValue? {
             if let boolValue = self[key] {

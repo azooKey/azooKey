@@ -14,14 +14,28 @@ struct CustardInterfaceKeyEditor: View {
 
     @Binding private var keyData: UserMadeKeyData
     @StateObject private var state: CustardInterfaceKeyEditingState
+    @State private var usesFineSizeAdjustment = false
     private let target: Target
+    private let onEditPlacement: (() -> Void)?
+    private let supportsQwertySystemKeys: Bool
 
-    init(data: Binding<UserMadeKeyData>, target: Target = .flick) {
+    init(
+        data: Binding<UserMadeKeyData>,
+        target: Target = .flick,
+        initialEditSegment: CustardKeyEditSegment = .flick,
+        supportsQwertySystemKeys: Bool = false,
+        onEditPlacement: (() -> Void)? = nil
+    ) {
         self._keyData = data
         self._state = StateObject(
-            wrappedValue: CustardInterfaceKeyEditingState(model: data.wrappedValue.model)
+            wrappedValue: CustardInterfaceKeyEditingState(
+                model: data.wrappedValue.model,
+                initialEditSegment: initialEditSegment
+            )
         )
         self.target = target
+        self.onEditPlacement = onEditPlacement
+        self.supportsQwertySystemKeys = supportsQwertySystemKeys
     }
 
     private var screenWidth: CGFloat {
@@ -54,6 +68,10 @@ struct CustardInterfaceKeyEditor: View {
                         let count = keyData.model[.custom].longpressKeys().count
                         if (0..<count).contains(state.selectedLongpressIndex) {
                             longpressKeyEditor(index: state.selectedLongpressIndex)
+                        } else if onEditPlacement != nil {
+                            Form {
+                                placementEditorSection
+                            }
                         } else {
                             Spacer()
                         }
@@ -214,6 +232,10 @@ struct CustardInterfaceKeyEditor: View {
                 .custom(.flickSpace()),
                 .custom(.flickDelete()),
                 .system(.changeKeyboard),
+                .system(.qwertyLanguageSwitch),
+                .system(.qwertyShift),
+                .system(.qwertyDynamicChange),
+                .system(.qwertySpace),
                 .system(.flickKogaki),
                 .system(.flickKutoten),
                 .system(.flickHiraTab),
@@ -231,6 +253,20 @@ struct CustardInterfaceKeyEditor: View {
             Text("空白キー").tag(CustardInterfaceKey.custom(.flickSpace()))
             Text("次候補キー").tag(CustardInterfaceKey.system(.nextCandidate))
             Text("地球儀キー").tag(CustardInterfaceKey.system(.changeKeyboard))
+            if supportsQwertySystemKeys {
+                Text("QWERTY言語切り替えキー").tag(
+                    CustardInterfaceKey.system(.qwertyLanguageSwitch)
+                )
+                Text("QWERTYシフトキー").tag(
+                    CustardInterfaceKey.system(.qwertyShift)
+                )
+                Text("QWERTY動的切り替えキー").tag(
+                    CustardInterfaceKey.system(.qwertyDynamicChange)
+                )
+                Text("QWERTY空白・次候補キー").tag(
+                    CustardInterfaceKey.system(.qwertySpace)
+                )
+            }
             Text("小書き・濁点化キー").tag(CustardInterfaceKey.system(.flickKogaki))
             Text("大文字・小文字キー").tag(CustardInterfaceKey.system(.upperLower))
             Text("句読点キー").tag(CustardInterfaceKey.system(.flickKutoten))
@@ -242,12 +278,32 @@ struct CustardInterfaceKeyEditor: View {
 
     @ViewBuilder
     private var sizePicker: some View {
-        Stepper("縦幅: \(keyData.height)", value: $keyData.height, in: 1 ... .max)
-        Stepper("横幅: \(keyData.width)", value: $keyData.width, in: 1 ... .max)
+        Stepper(
+            "縦幅: \(formattedSize(keyData.height))",
+            value: $keyData.height,
+            in: 0.1 ... .greatestFiniteMagnitude,
+            step: sizeAdjustmentStep
+        )
+        Stepper(
+            "横幅: \(formattedSize(keyData.width))",
+            value: $keyData.width,
+            in: 0.1 ... .greatestFiniteMagnitude,
+            step: sizeAdjustmentStep
+        )
+        Toggle("0.1刻みで微調整", isOn: $usesFineSizeAdjustment)
+    }
+
+    private var sizeAdjustmentStep: Double {
+        usesFineSizeAdjustment ? 0.1 : 1
+    }
+
+    private func formattedSize(_ value: Double) -> String {
+        value.formatted(.number.precision(.fractionLength(0 ... 2)))
     }
 
     private var systemKeyEditor: some View {
         Form {
+            placementEditorSection
             Section {
                 keyPicker
             }
@@ -267,6 +323,7 @@ struct CustardInterfaceKeyEditor: View {
 
     private func customKeyEditor(position: FlickKeyPosition) -> some View {
         Form {
+            placementEditorSection
             inputSection(position: position)
             CustardKeyLabelEditorSection(
                 selection: labelSelection(position: position),
@@ -482,6 +539,7 @@ struct CustardInterfaceKeyEditor: View {
         let id = state.longpressIDs.indices.contains(index) ? state.longpressIDs[index] : nil
 
         return Form {
+            placementEditorSection
             Section {
                 let actions = variation.wrappedValue[.pressAction]
                 if CustardInterfaceKeyEditingService.isInputActionEditable(actions) {
@@ -541,6 +599,31 @@ struct CustardInterfaceKeyEditor: View {
                     )
                 }
                 .foregroundStyle(.red)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var placementEditorSection: some View {
+        if let onEditPlacement {
+            Section("配置") {
+                Button {
+                    onEditPlacement()
+                } label: {
+                    HStack {
+                        Label(
+                            "位置とサイズ",
+                            systemImage:
+                                "arrow.up.left.and.arrow.down.right"
+                        )
+                        Spacer()
+                        Image(systemName: "chevron.forward")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.tertiary)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
             }
         }
     }

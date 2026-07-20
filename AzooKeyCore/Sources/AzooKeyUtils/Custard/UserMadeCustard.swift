@@ -161,7 +161,40 @@ public struct UserMadeGridScrollCustard: Codable, Sendable {
 }
 
 public struct UserMadeGridFitCustard: Codable, Sendable, Equatable {
-    public init(tabName: String, rowCount: String, columnCount: String, inputStyle: CustardInputStyle, language: CustardLanguage, keys: [KeyPosition: UserMadeKeyData], emptyKeys: Set<KeyPosition> = [], addTabBarAutomatically: Bool) {
+    public enum KeyStyle: String, Codable, Sendable, Hashable {
+        case tenkeyStyle = "tenkey_style"
+        case pcStyle = "pc_style"
+
+        public init(_ value: CustardInterfaceStyle) {
+            switch value {
+            case .tenkeyStyle:
+                self = .tenkeyStyle
+            case .pcStyle:
+                self = .pcStyle
+            }
+        }
+
+        public var interfaceStyle: CustardInterfaceStyle {
+            switch self {
+            case .tenkeyStyle:
+                .tenkeyStyle
+            case .pcStyle:
+                .pcStyle
+            }
+        }
+    }
+
+    public init(
+        tabName: String,
+        rowCount: String,
+        columnCount: String,
+        inputStyle: CustardInputStyle,
+        language: CustardLanguage,
+        keys: [KeyPosition: UserMadeKeyData],
+        emptyKeys: Set<KeyPosition> = [],
+        keyStyle: KeyStyle = .tenkeyStyle,
+        addTabBarAutomatically: Bool
+    ) {
         self.tabName = tabName
         self.rowCount = rowCount
         self.columnCount = columnCount
@@ -169,6 +202,7 @@ public struct UserMadeGridFitCustard: Codable, Sendable, Equatable {
         self.language = language
         self.keys = keys
         self.emptyKeys = emptyKeys
+        self.keyStyle = keyStyle
         self.addTabBarAutomatically = addTabBarAutomatically
     }
 
@@ -179,13 +213,70 @@ public struct UserMadeGridFitCustard: Codable, Sendable, Equatable {
     public var language: CustardLanguage
     public var keys: [KeyPosition: UserMadeKeyData]
     public var emptyKeys: Set<KeyPosition> = []
+    public var keyStyle: KeyStyle
     public var addTabBarAutomatically: Bool
+
+    private enum CodingKeys: CodingKey {
+        case tabName
+        case rowCount
+        case columnCount
+        case inputStyle
+        case language
+        case keys
+        case emptyKeys
+        case keyStyle
+        case addTabBarAutomatically
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.tabName = try container.decode(String.self, forKey: .tabName)
+        self.rowCount = try container.decode(String.self, forKey: .rowCount)
+        self.columnCount = try container.decode(String.self, forKey: .columnCount)
+        self.inputStyle = try container.decode(CustardInputStyle.self, forKey: .inputStyle)
+        self.language = try container.decode(CustardLanguage.self, forKey: .language)
+        self.keys = try container.decode([KeyPosition: UserMadeKeyData].self, forKey: .keys)
+        self.emptyKeys = try container.decodeIfPresent(Set<KeyPosition>.self, forKey: .emptyKeys) ?? []
+        self.keyStyle = try container.decodeIfPresent(KeyStyle.self, forKey: .keyStyle) ?? .tenkeyStyle
+        self.addTabBarAutomatically = try container.decode(Bool.self, forKey: .addTabBarAutomatically)
+    }
+}
+
+public extension Custard {
+    var userMadeGridFitCustard: UserMadeGridFitCustard? {
+        guard case let .gridFit(layout) = self.interface.keyLayout else {
+            return nil
+        }
+        var keys: [KeyPosition: UserMadeKeyData] = [:]
+        for (position, key) in self.interface.keys {
+            guard case let .gridFit(value) = position,
+                  value.width > 0,
+                  value.height > 0 else {
+                continue
+            }
+            keys[.gridFit(x: value.x, y: value.y)] = .init(
+                model: key,
+                width: value.width,
+                height: value.height
+            )
+        }
+        return UserMadeGridFitCustard(
+            tabName: self.identifier,
+            rowCount: layout.rowCount.description,
+            columnCount: layout.columnCount.description,
+            inputStyle: self.input_style,
+            language: self.language,
+            keys: keys,
+            keyStyle: .init(self.interface.keyStyle),
+            addTabBarAutomatically: true
+        )
+    }
 }
 
 public struct UserMadeKeyData: Codable, Hashable, Sendable, Identifiable {
     /// - warning: Do not assume `id` is held between execution; this value is re-generated for each `init`
     public let id = UUID()
-    public init(model: CustardInterfaceKey, width: Int, height: Int) {
+    public init(model: CustardInterfaceKey, width: Double, height: Double) {
         self.model = model
         self.width = width
         self.height = height
@@ -200,8 +291,8 @@ public struct UserMadeKeyData: Codable, Hashable, Sendable, Identifiable {
     }
 
     public var model: CustardInterfaceKey
-    public var width: Int
-    public var height: Int
+    public var width: Double
+    public var height: Double
 
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
@@ -219,8 +310,8 @@ public struct UserMadeKeyData: Codable, Hashable, Sendable, Identifiable {
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.width = try container.decode(Int.self, forKey: .width)
-        self.height = try container.decode(Int.self, forKey: .height)
+        self.width = try container.decode(Double.self, forKey: .width)
+        self.height = try container.decode(Double.self, forKey: .height)
         let type = try container.decode(ModelType.self, forKey: .type)
         switch type {
         case .system:

@@ -24,11 +24,12 @@ final class UserDictionaryMigrationCoordinatorTests: XCTestCase {
         .init(ruby: "てんぷれ", word: word, isVerb: false, isPersonName: false, isPlaceName: false, id: id, isTemplateMode: false, formatLiteral: nil)
     }
 
+    @MainActor
     func test_backup_created_once_and_not_overwritten() {
         let store = FakeStore()
         let flagKey = "flag"
         let backupKey = "backup"
-        let rawV1 = "v1".data(using: .utf8)
+        let rawV1 = Data("v1".utf8)
         let templates: [TemplateData] = []
         let entries: [UserDictionaryEntryCore] = []
 
@@ -40,7 +41,7 @@ final class UserDictionaryMigrationCoordinatorTests: XCTestCase {
 
         // Reset only flag, change raw to v2
         store.set(false, forKey: flagKey)
-        let rawV2 = "v2".data(using: .utf8)
+        let rawV2 = Data("v2".utf8)
         let r2 = UserDictionaryMigrationCoordinator.runIfNeeded(store: store, flagKey: flagKey, backupKey: backupKey, currentRawData: rawV2, currentEntries: entries, templates: templates)
         XCTAssertFalse(r2.didMigrate)
         // backup must remain v1

@@ -1,6 +1,6 @@
 import enum CustardKit.FlickDirection
 
-extension FlickDirection: @retroactive CustomStringConvertible {
+extension FlickDirection: CustomStringConvertible {
     public var description: String {
         switch self {
         case .left:

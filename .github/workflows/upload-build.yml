@@ -30,7 +30,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/Library/Developer/Xcode/DerivedData
-          key: ${{ runner.os }}-derived-data-${{ hashFiles('**/project.pbxproj') }}
+          key: ${{ runner.os }}-derived-data-${{ hashFiles('**/project.pbxproj', '**/Package.swift') }}
           restore-keys: |
             ${{ runner.os }}-derived-data-
 
