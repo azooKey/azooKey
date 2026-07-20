@@ -103,8 +103,8 @@ final class InputManager {
     private static let dictionaryResourceURL = Bundle.main.bundleURL.appendingPathComponent("Dictionary", isDirectory: true)
     private static let memoryDirectoryURL = (try? FileManager.default.url(for: .libraryDirectory, in: .userDomainMask, appropriateFor: nil, create: false)) ?? sharedContainerURL
     private static let sharedContainerURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: SharedStore.appGroupKey)!
-    private static let zenzSmallWeightURL = Bundle.main.bundleURL.appendingPathComponent("zenz-v3.1-small-gguf/ggml-model-Q5_K_M.gguf", isDirectory: false)
-    private static let zenzXsmallWeightURL = Bundle.main.bundleURL.appendingPathComponent("zenz-v3.1-xsmall-gguf/ggml-model-Q5_K_M.gguf", isDirectory: false)
+    private static let zenzSmallWeightURL = Bundle.main.bundleURL.appendingPathComponent("zenz-v3.2-small-gguf/ggml-model-Q5_K_M.gguf", isDirectory: false)
+    private static let zenzXsmallWeightURL = Bundle.main.bundleURL.appendingPathComponent("zenz-v3.2-xsmall-gguf/ggml-model-Q5_K_M.gguf", isDirectory: false)
 
     @MainActor private func getConvertRequestOptions(inputStylePreference: InputStyle? = nil) -> ConvertRequestOptions {
         let requireJapanesePrediction: Bool

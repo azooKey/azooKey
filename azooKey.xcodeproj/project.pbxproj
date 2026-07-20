@@ -38,8 +38,8 @@
 		55950E542AF8E09400ACACAB /* KeyboardExtensionUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 55950E532AF8E09400ACACAB /* KeyboardExtensionUtils */; };
 		55EA62DF2BD4FD4F0056B5BA /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55EA62DE2BD4FCF20056B5BA /* PrivacyInfo.xcprivacy */; };
 		55EE424B2B8091B400C75B3D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55EE424A2B8091B400C75B3D /* PrivacyInfo.xcprivacy */; };
-		55FBA8982E68851700DA8EC0 /* zenz-v3.1-xsmall-gguf in Resources */ = {isa = PBXBuildFile; fileRef = 55FBA8962E6884A000DA8EC0 /* zenz-v3.1-xsmall-gguf */; };
-		55FBA8992E68851B00DA8EC0 /* zenz-v3.1-small-gguf in Resources */ = {isa = PBXBuildFile; fileRef = 55FBA8972E6884A300DA8EC0 /* zenz-v3.1-small-gguf */; };
+		55FBA8982E68851700DA8EC0 /* zenz-v3.2-xsmall-gguf in Resources */ = {isa = PBXBuildFile; fileRef = 55FBA8962E6884A000DA8EC0 /* zenz-v3.2-xsmall-gguf */; };
+		55FBA8992E68851B00DA8EC0 /* zenz-v3.2-small-gguf in Resources */ = {isa = PBXBuildFile; fileRef = 55FBA8972E6884A300DA8EC0 /* zenz-v3.2-small-gguf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -122,8 +122,8 @@
 		55EA62DE2BD4FCF20056B5BA /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		55EE424A2B8091B400C75B3D /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		55FA896B2D870FED001BF3B8 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
-		55FBA8962E6884A000DA8EC0 /* zenz-v3.1-xsmall-gguf */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "zenz-v3.1-xsmall-gguf"; sourceTree = SOURCE_ROOT; };
-		55FBA8972E6884A300DA8EC0 /* zenz-v3.1-small-gguf */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "zenz-v3.1-small-gguf"; sourceTree = SOURCE_ROOT; };
+		55FBA8962E6884A000DA8EC0 /* zenz-v3.2-xsmall-gguf */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "zenz-v3.2-xsmall-gguf"; sourceTree = SOURCE_ROOT; };
+		55FBA8972E6884A300DA8EC0 /* zenz-v3.2-small-gguf */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "zenz-v3.2-small-gguf"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -262,8 +262,8 @@
 				1AC0315F25120B3B004CA505 /* Keyboard.entitlements */,
 				1A3DC1FD2500D488002CAA93 /* Info.plist */,
 				55EA62DE2BD4FCF20056B5BA /* PrivacyInfo.xcprivacy */,
-				55FBA8972E6884A300DA8EC0 /* zenz-v3.1-small-gguf */,
-				55FBA8962E6884A000DA8EC0 /* zenz-v3.1-xsmall-gguf */,
+				55FBA8972E6884A300DA8EC0 /* zenz-v3.2-small-gguf */,
+				55FBA8962E6884A000DA8EC0 /* zenz-v3.2-xsmall-gguf */,
 				1A09112B2A20B13C00ABFC72 /* Dictionary */,
 				559E8F3E2CAC294600E016FA /* Display */,
 			);
@@ -498,8 +498,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				55EA62DF2BD4FD4F0056B5BA /* PrivacyInfo.xcprivacy in Resources */,
-				55FBA8992E68851B00DA8EC0 /* zenz-v3.1-small-gguf in Resources */,
-				55FBA8982E68851700DA8EC0 /* zenz-v3.1-xsmall-gguf in Resources */,
+				55FBA8992E68851B00DA8EC0 /* zenz-v3.2-small-gguf in Resources */,
+				55FBA8982E68851700DA8EC0 /* zenz-v3.2-xsmall-gguf in Resources */,
 				1A09112C2A20B13C00ABFC72 /* Dictionary in Resources */,
 				1AC03159251103EF004CA505 /* Designs.xcassets in Resources */,
 				557D9E022ABF320F0028F3A0 /* Localizable.xcstrings in Resources */,
