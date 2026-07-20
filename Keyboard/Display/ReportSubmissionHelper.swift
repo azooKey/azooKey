@@ -171,14 +171,14 @@ struct ReportSubmissionHelper {
 
     @MainActor
     private static func resolveJapaneseLayout(variableStates: VariableStates) -> String {
-        switch variableStates.tabManager.existentialTab() {
-        case .flick_hira:
+        switch variableStates.tabManager.resolvedTab() {
+        case .standard(.flick_japanese):
             return "flick"
-        case .qwerty_hira:
+        case .standard(.qwerty_japanese):
             return "qwerty"
         case .custard:
             return "custurd"
-        default:
+        case .standard, .clipboardHistory, .emoji:
             return "other"
         }
     }

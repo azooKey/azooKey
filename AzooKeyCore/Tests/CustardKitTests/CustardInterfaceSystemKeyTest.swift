@@ -1,9 +1,10 @@
-import XCTest
 @testable import CustardKit
+import XCTest
 
 final class CustardInterfaceSystemKeyTest: XCTestCase {
     func testDecode() {
         XCTAssertEqual(CustardInterfaceSystemKey.quickDecode(target: #"{"type": "change_keyboard"}"#), .changeKeyboard)
+        XCTAssertEqual(CustardInterfaceSystemKey.quickDecode(target: #"{"type": "flick_space"}"#), .flickSpace)
         XCTAssertEqual(CustardInterfaceSystemKey.quickDecode(target: #"{"type": "qwerty_language_switch"}"#), .qwertyLanguageSwitch)
         XCTAssertEqual(CustardInterfaceSystemKey.quickDecode(target: #"{"type": "qwerty_shift"}"#), .qwertyShift)
         XCTAssertEqual(CustardInterfaceSystemKey.quickDecode(target: #"{"type": "qwerty_dynamic_change"}"#), .qwertyDynamicChange)
@@ -20,6 +21,7 @@ final class CustardInterfaceSystemKeyTest: XCTestCase {
 
     func testEncode() {
         XCTAssertEqual(CustardInterfaceSystemKey.changeKeyboard.quickEncodeDecode(), .changeKeyboard)
+        XCTAssertEqual(CustardInterfaceSystemKey.flickSpace.quickEncodeDecode(), .flickSpace)
         XCTAssertEqual(CustardInterfaceSystemKey.qwertyLanguageSwitch.quickEncodeDecode(), .qwertyLanguageSwitch)
         XCTAssertEqual(CustardInterfaceSystemKey.qwertyShift.quickEncodeDecode(), .qwertyShift)
         XCTAssertEqual(CustardInterfaceSystemKey.qwertyDynamicChange.quickEncodeDecode(), .qwertyDynamicChange)

@@ -19,9 +19,9 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
     @Environment(\.showMessage) private var showMessage
     @EnvironmentObject private var variableStates: VariableStates
 
-    private let defaultTab: KeyboardTab.ExistentialTab?
+    private let defaultTab: ResolvedTab?
 
-    public init(defaultTab: KeyboardTab.ExistentialTab? = nil) {
+    public init(defaultTab: ResolvedTab? = nil) {
         self.defaultTab = defaultTab
     }
 
@@ -139,7 +139,10 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
                             // バーのタッチ判定領域はpaddingより前まで
                             .contentShape(Rectangle())
                             .padding(.vertical, 6)
-                        keyboardView(tab: defaultTab ?? variableStates.tabManager.existentialTab())
+                        keyboardView(
+                            tab: defaultTab
+                                ?? variableStates.tabManager.resolvedTab()
+                        )
                             .zIndex(1)
                     }
                 }
@@ -181,68 +184,24 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
         .frame(height: totalBackgroundHeight)
     }
 
-    private var standardEnglishQwertyCustard: Custard {
-        switch Extension.SettingProvider.qwertyShiftBehaviorPreference {
-        case .left:
-            .qwertyEnglish(
-                useShiftKey: true,
-                useDeprecatedShiftKeyBehavior: true
-            )
-        case .leftBottom:
-            .qwertyEnglish(
-                useShiftKey: true,
-                useDeprecatedShiftKeyBehavior: false
-            )
-        case .off:
-            .qwertyEnglish(
-                useShiftKey: false,
-                useDeprecatedShiftKeyBehavior: false
-            )
-        }
-    }
-
     @MainActor @ViewBuilder
-    func keyboardView(tab: KeyboardTab.ExistentialTab) -> some View {
+    func keyboardView(tab: ResolvedTab) -> some View {
         switch tab {
-        case .flick_hira:
-            CustomKeyboardView<Extension>(custard: settingAppliedFlickCustard(.flickJapanese))
-        case .flick_abc:
-            CustomKeyboardView<Extension>(custard: settingAppliedFlickCustard(.flickEnglish))
-        case .flick_numbersymbols:
-            CustomKeyboardView<Extension>(custard: settingAppliedFlickCustard(.flickNumberSymbols))
-        case .qwerty_hira:
-            CustomKeyboardView<Extension>(custard: .qwertyJapanese)
-        case .qwerty_abc:
+        case let .standard(tab):
             CustomKeyboardView<Extension>(
-                custard: standardEnglishQwertyCustard
-            )
-        case .qwerty_numbers:
-            CustomKeyboardView<Extension>(
-                custard: .qwertyNumbers(
-                    customKeys: Extension.SettingProvider.numberTabCustomKeysSetting
+                custard: StandardKeyboardCatalog.custard(
+                    for: tab,
+                    configuration:
+                        Extension.SettingProvider
+                            .standardKeyboardConfiguration
                 )
             )
-        case .qwerty_symbols:
-            CustomKeyboardView<Extension>(custard: .qwertySymbols)
         case let .custard(custard):
             CustomKeyboardView<Extension>(custard: custard)
-        case let .special(tab):
-            switch tab {
-            case .clipboard_history_tab:
-                ClipboardHistoryTab<Extension>()
-            case .emoji:
-                EmojiTab<Extension>()
-            }
+        case .clipboardHistory:
+            ClipboardHistoryTab<Extension>()
+        case .emoji:
+            EmojiTab<Extension>()
         }
-    }
-
-    private func settingAppliedFlickCustard(_ custard: Custard) -> Custard {
-        var custard = custard
-        if Extension.SettingProvider.useNextCandidateKey {
-            var interface = custard.interface
-            interface.keys[.gridFit(.init(x: 4, y: 1))] = .system(.nextCandidate)
-            custard.interface = interface
-        }
-        return custard
     }
 }

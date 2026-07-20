@@ -97,7 +97,7 @@ struct KeyboardPreview: View {
 
     @Environment(\.scenePhase) private var scenePhase
     private let sizing: KeyboardPreviewSizing
-    private let defaultTab: KeyboardTab.ExistentialTab?
+    private let defaultTab: ResolvedTab?
     @State private var availableWidth: CGFloat
     @State private var measuredDisplayWidth: CGFloat = 0
     @StateObject private var variableStates: VariableStates
@@ -105,7 +105,7 @@ struct KeyboardPreview: View {
     init(
         theme: AzooKeyTheme? = nil,
         sizing: KeyboardPreviewSizing = .fitToExtension,
-        defaultTab: KeyboardTab.ExistentialTab? = nil
+        defaultTab: ResolvedTab? = nil
     ) {
         self.theme = theme ?? AzooKeySpecificTheme.default
         self.sizing = sizing

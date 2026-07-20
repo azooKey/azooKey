@@ -74,16 +74,16 @@ struct LanguageLayoutSettingView<SettingKey: LanguageLayoutKeyboardSetting>: Vie
         }
     }
 
-    private var tab: KeyboardTab.ExistentialTab {
+    private var tab: ResolvedTab {
         switch (selection, language) {
         case (.flick, .japanese):
-            return .flick_hira
+            return .standard(.flick_japanese)
         case (.flick, .english):
-            return .flick_abc
+            return .standard(.flick_english)
         case (.qwerty, .japanese):
-            return .qwerty_hira
+            return .standard(.qwerty_japanese)
         case (.qwerty, .english):
-            return .qwerty_abc
+            return .standard(.qwerty_english)
         case let (.custard(identifier), _):
             if let custard = try? custardManager.custard(identifier: identifier) {
                 return .custard(custard)

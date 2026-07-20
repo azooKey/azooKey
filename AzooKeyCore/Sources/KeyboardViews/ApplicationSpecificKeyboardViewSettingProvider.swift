@@ -44,7 +44,7 @@ import Foundation
     static func get(_: CustomizableFlickKey) -> KeyFlickSetting.SettingData
 }
 
-enum QwertyShiftBehaviorPreference {
+enum QwertyShiftBehaviorPreference: Equatable {
     case left
     case leftBottom
     case off
@@ -59,5 +59,18 @@ extension ApplicationSpecificKeyboardViewSettingProvider {
         } else {
             .off
         }
+    }
+}
+
+public extension ApplicationSpecificKeyboardViewSettingProvider {
+    static var standardKeyboardConfiguration:
+        StandardKeyboardCatalog.Configuration {
+        .init(
+            useEnglishQwertyShiftKey:
+                qwertyShiftBehaviorPreference != .off,
+            useDeprecatedEnglishQwertyShiftKeyBehavior:
+                qwertyShiftBehaviorPreference == .left,
+            numberTabCustomKeys: numberTabCustomKeysSetting
+        )
     }
 }

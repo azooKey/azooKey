@@ -51,6 +51,62 @@ public extension CustardInterface {
             )
         }
 
+        func customKeyModel(_ key: CustardInterfaceCustomKey) -> any UnifiedKeyModelProtocol<Extension> {
+            var flickMap: [FlickDirection: UnifiedVariation] = [:]
+            var linear: [QwertyVariationsModel.VariationElement] = []
+            key.variations.forEach { variation in
+                switch variation.type {
+                case let .flickVariation(direction):
+                    let value = UnifiedVariation(label: variation.key.design.label.keyLabelType, pressActions: variation.key.press_actions.map { $0.actionType }, longPressActions: variation.key.longpress_actions.longpressActionType)
+                    flickMap[direction] = value
+                case .longpressVariation:
+                    linear.append(.init(label: variation.key.design.label.keyLabelType, actions: variation.key.press_actions.map { $0.actionType }))
+                }
+            }
+            let colorRole: UnifiedGeneralKeyModel<Extension>.ColorRole = switch key.design.color {
+            case .normal: .normal
+            case .special: .special
+            case .selected: .selected
+            case .unimportant: .unimportant
+            }
+            let defaultNeedSuggest = switch self.keyStyle {
+            case .tenkeyStyle:
+                false
+            case .pcStyle:
+                key.longpress_actions.isEmpty
+            }
+            let linearDirection: VariationsViewDirection = switch key.longpress_variation_direction {
+            case .center, .none:
+                .center
+            case .right:
+                .right
+            case .left:
+                .left
+            }
+            let shouldUppercaseForEnglish: Bool
+            if self.keyStyle == .pcStyle,
+               case let .text(label) = key.design.label,
+               label.count == 1,
+               key.press_actions.count == 1,
+               case let .input(input) = key.press_actions[0],
+               label == input {
+                shouldUppercaseForEnglish = true
+            } else {
+                shouldUppercaseForEnglish = false
+            }
+            return UnifiedGeneralKeyModel<Extension>(
+                labelType: key.design.label.keyLabelType,
+                pressActions: key.press_actions.map { $0.actionType },
+                longPressActions: key.longpress_actions.longpressActionType,
+                flick: flickMap,
+                linearVariations: linear,
+                linearDirection: linearDirection,
+                showsTapBubble: key.shows_tap_bubble ?? defaultNeedSuggest,
+                colorRole: colorRole,
+                shouldUppercaseForEnglish: shouldUppercaseForEnglish
+            )
+        }
+
         return self.keys.reduce(into: []) { models, value in
             guard case let .gridFit(data) = value.key else {
                 return
@@ -64,6 +120,12 @@ public extension CustardInterface {
             switch value.value {
             case let .system(sys):
                 let model: any UnifiedKeyModelProtocol<Extension> = switch sys {
+                case .flickSpace:
+                    if Extension.SettingProvider.useNextCandidateKey {
+                        FlickNextCandidateKeyModel<Extension>()
+                    } else {
+                        customKeyModel(.flickSpace())
+                    }
                 case .enter:
                     switch self.keyStyle {
                     case .tenkeyStyle:
@@ -113,62 +175,8 @@ public extension CustardInterface {
                     flickTabKeyModel(Extension.SettingProvider.symbolsTabFlickCustomKey.compiled())
                 }
                 models.append((pos, model))
-            case let .custom(val):
-                var flickMap: [FlickDirection: UnifiedVariation] = [:]
-                var linear: [QwertyVariationsModel.VariationElement] = []
-                val.variations.forEach { variation in
-                    switch variation.type {
-                    case let .flickVariation(direction):
-                        let v = UnifiedVariation(label: variation.key.design.label.keyLabelType, pressActions: variation.key.press_actions.map { $0.actionType }, longPressActions: variation.key.longpress_actions.longpressActionType)
-                        flickMap[direction] = v
-                    case .longpressVariation:
-                        linear.append(.init(label: variation.key.design.label.keyLabelType, actions: variation.key.press_actions.map { $0.actionType }))
-                    }
-                }
-                let colorRole: UnifiedGeneralKeyModel<Extension>.ColorRole = switch val.design.color {
-                case .normal: .normal
-                case .special: .special
-                case .selected: .selected
-                case .unimportant: .unimportant
-                }
-                let defaultNeedSuggest = switch self.keyStyle {
-                case .tenkeyStyle:
-                    false
-                case .pcStyle:
-                    val.longpress_actions.isEmpty
-                }
-                let needSuggest = val.shows_tap_bubble ?? defaultNeedSuggest
-                let linearDirection: VariationsViewDirection = switch val.longpress_variation_direction {
-                case .center, .none:
-                    .center
-                case .right:
-                    .right
-                case .left:
-                    .left
-                }
-                let shouldUppercaseForEnglish: Bool
-                if self.keyStyle == .pcStyle,
-                   case let .text(label) = val.design.label,
-                   label.count == 1,
-                   val.press_actions.count == 1,
-                   case let .input(input) = val.press_actions[0],
-                   label == input {
-                    shouldUppercaseForEnglish = true
-                } else {
-                    shouldUppercaseForEnglish = false
-                }
-                let model = UnifiedGeneralKeyModel<Extension>(
-                    labelType: val.design.label.keyLabelType,
-                    pressActions: val.press_actions.map { $0.actionType },
-                    longPressActions: val.longpress_actions.longpressActionType,
-                    flick: flickMap,
-                    linearVariations: linear,
-                    linearDirection: linearDirection,
-                    showsTapBubble: needSuggest,
-                    colorRole: colorRole,
-                    shouldUppercaseForEnglish: shouldUppercaseForEnglish
-                )
-                models.append((pos, model))
+            case let .custom(key):
+                models.append((pos, customKeyModel(key)))
             }
         }
     }
@@ -234,6 +242,8 @@ extension CustardInterfaceKey {
             switch value {
             case .changeKeyboard:
                 return SimpleChangeKeyboardKeyModel()
+            case .flickSpace:
+                return CustardInterfaceKey.custom(.flickSpace()).simpleKeyModel(extension: Extension.self)
             case .qwertyLanguageSwitch:
                 return SimpleKeyModel(
                     keyLabelType: .text("あA"),

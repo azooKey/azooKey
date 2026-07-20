@@ -17,13 +17,15 @@ struct CustardInterfaceKeyEditor: View {
     @State private var usesFineSizeAdjustment = false
     private let target: Target
     private let onEditPlacement: (() -> Void)?
-    private let supportsQwertySystemKeys: Bool
+    private let keyStyle: CustardInterfaceStyle
+    private let isGridFit: Bool
 
     init(
         data: Binding<UserMadeKeyData>,
         target: Target = .flick,
         initialEditSegment: CustardKeyEditSegment = .flick,
-        supportsQwertySystemKeys: Bool = false,
+        keyStyle: CustardInterfaceStyle,
+        isGridFit: Bool,
         onEditPlacement: (() -> Void)? = nil
     ) {
         self._keyData = data
@@ -35,7 +37,8 @@ struct CustardInterfaceKeyEditor: View {
         )
         self.target = target
         self.onEditPlacement = onEditPlacement
-        self.supportsQwertySystemKeys = supportsQwertySystemKeys
+        self.keyStyle = keyStyle
+        self.isGridFit = isGridFit
     }
 
     private var screenWidth: CGFloat {
@@ -232,6 +235,7 @@ struct CustardInterfaceKeyEditor: View {
                 .custom(.flickSpace()),
                 .custom(.flickDelete()),
                 .system(.changeKeyboard),
+                .system(.flickSpace),
                 .system(.qwertyLanguageSwitch),
                 .system(.qwertyShift),
                 .system(.qwertyDynamicChange),
@@ -250,10 +254,19 @@ struct CustardInterfaceKeyEditor: View {
             }
             Text("改行キー").tag(CustardInterfaceKey.system(.enter))
             Text("削除キー").tag(CustardInterfaceKey.custom(.flickDelete()))
-            Text("空白キー").tag(CustardInterfaceKey.custom(.flickSpace()))
+            if supports(.flickSpace),
+               keyData.model != .custom(.flickSpace()) {
+                Text("空白キー").tag(
+                    CustardInterfaceKey.system(.flickSpace)
+                )
+            } else {
+                Text("空白キー").tag(
+                    CustardInterfaceKey.custom(.flickSpace())
+                )
+            }
             Text("次候補キー").tag(CustardInterfaceKey.system(.nextCandidate))
             Text("地球儀キー").tag(CustardInterfaceKey.system(.changeKeyboard))
-            if supportsQwertySystemKeys {
+            if supports(.qwertyLanguageSwitch) {
                 Text("QWERTY言語切り替えキー").tag(
                     CustardInterfaceKey.system(.qwertyLanguageSwitch)
                 )
@@ -274,6 +287,11 @@ struct CustardInterfaceKeyEditor: View {
             Text("英語タブキー").tag(CustardInterfaceKey.system(.flickAbcTab))
             Text("記号タブキー").tag(CustardInterfaceKey.system(.flickStar123Tab))
         }
+    }
+
+    private func supports(_ key: CustardInterfaceSystemKey) -> Bool {
+        key.capability == .any
+            || key.capability == .gridFit(keyStyle) && isGridFit
     }
 
     @ViewBuilder

@@ -98,7 +98,8 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
         // 左右の文字列
         let (left, center, right) = self.inputManager.getSurroundingText()
         // MARK: Replacementの更新をする
-        let target = variableStates.tabManager.existentialTab().replacementTarget
+        let target = variableStates.tabManager.resolvedTab()
+            .replacementTarget
         if !target.isEmpty {
             self.inputManager.updateTextReplacementCandidates(left: left, center: center, right: right, target: target)
         }
@@ -166,7 +167,8 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
                    self.inputManager.completeAndStartNewComposition(candidate: candidate, with: input, simpleInsert: simpleInsert, inputStyle: variableStates.inputStyle) {
                     self.registerActions(candidate.actions.map(\.action), variableStates: variableStates)
                     let (left, center, right) = self.inputManager.getSurroundingText()
-                    let target = variableStates.tabManager.existentialTab().replacementTarget
+                    let target = variableStates.tabManager.resolvedTab()
+                        .replacementTarget
                     if !target.isEmpty {
                         self.inputManager.updateTextReplacementCandidates(left: left, center: center, right: right, target: target)
                     }
@@ -346,8 +348,9 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
             // MARK: 言語を更新する
             self.inputManager.setKeyboardLanguage(variableStates.keyboardLanguage)
             // MARK: Replacementの更新をする
-            if !variableStates.tabManager.existentialTab().replacementTarget.isEmpty {
-                self.inputManager.updateTextReplacementCandidates(left: left, center: center, right: right, target: variableStates.tabManager.existentialTab().replacementTarget)
+            if !variableStates.tabManager.resolvedTab()
+                .replacementTarget.isEmpty {
+                self.inputManager.updateTextReplacementCandidates(left: left, center: center, right: right, target: variableStates.tabManager.resolvedTab().replacementTarget)
             }
         }
     }
@@ -613,8 +616,9 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
             // エンターキーの状態の更新
             variableStates.setEnterKeyState(self.inputManager.getEnterKeyState())
             // Replacementの更新
-            if !variableStates.tabManager.existentialTab().replacementTarget.isEmpty {
-                self.inputManager.updateTextReplacementCandidates(left: a_left, center: a_center, right: a_right, target: variableStates.tabManager.existentialTab().replacementTarget)
+            if !variableStates.tabManager.resolvedTab()
+                .replacementTarget.isEmpty {
+                self.inputManager.updateTextReplacementCandidates(left: a_left, center: a_center, right: a_right, target: variableStates.tabManager.resolvedTab().replacementTarget)
             }
         }
         // 前のデータが保存されていない場合は操作しない

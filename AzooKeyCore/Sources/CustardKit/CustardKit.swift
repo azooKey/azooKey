@@ -454,6 +454,9 @@ public enum CustardInterfaceSystemKey: Codable, Equatable, Hashable, Sendable {
     /// - the globe key
     case changeKeyboard
 
+    /// - the flick space key that follows the next-candidate setting
+    case flickSpace
+
     /// - the QWERTY language switch key
     case qwertyLanguageSwitch
 
@@ -488,41 +491,67 @@ public enum CustardInterfaceSystemKey: Codable, Equatable, Hashable, Sendable {
     case flickStar123Tab
 }
 
+public enum CustardInterfaceSystemKeyCapability: Equatable, Sendable {
+    case any
+    case gridFit(CustardInterfaceStyle)
+
+    public func supports(
+        keyStyle: CustardInterfaceStyle,
+        keyLayout: CustardInterfaceLayout
+    ) -> Bool {
+        switch self {
+        case .any:
+            true
+        case let .gridFit(requiredStyle):
+            requiredStyle == keyStyle && {
+                if case .gridFit = keyLayout {
+                    return true
+                }
+                return false
+            }()
+        }
+    }
+}
+
 public enum CustardInterfaceValidationError: Error, Equatable, Sendable {
-    case qwertySystemKeyRequiresPCStyleGridFit
+    case unsupportedSystemKey(
+        CustardInterfaceSystemKey,
+        CustardInterfaceSystemKeyCapability
+    )
 }
 
 public extension CustardInterface {
-    var supportsQwertySystemKeys: Bool {
-        guard keyStyle == .pcStyle,
-              case .gridFit = keyLayout else {
-            return false
-        }
-        return true
+    func supports(_ key: CustardInterfaceSystemKey) -> Bool {
+        key.capability.supports(
+            keyStyle: keyStyle,
+            keyLayout: keyLayout
+        )
     }
 
     func validate() throws {
-        guard keys.values.contains(where: \.isQwertySystemKey) else {
-            return
-        }
-        guard supportsQwertySystemKeys else {
-            throw CustardInterfaceValidationError
-                .qwertySystemKeyRequiresPCStyleGridFit
+        for key in keys.values {
+            guard case let .system(systemKey) = key,
+                  !supports(systemKey) else {
+                continue
+            }
+            throw CustardInterfaceValidationError.unsupportedSystemKey(
+                systemKey,
+                systemKey.capability
+            )
         }
     }
 }
 
-public extension CustardInterfaceKey {
-    var isQwertySystemKey: Bool {
-        guard case let .system(key) = self else {
-            return false
-        }
-        switch key {
+public extension CustardInterfaceSystemKey {
+    var capability: CustardInterfaceSystemKeyCapability {
+        switch self {
         case .qwertyLanguageSwitch,
              .qwertyShift,
              .qwertyDynamicChange,
              .qwertySpace:
-            return true
+            .gridFit(.pcStyle)
+        case .flickSpace:
+            .gridFit(.tenkeyStyle)
         case .changeKeyboard,
              .enter,
              .upperLower,
@@ -532,7 +561,7 @@ public extension CustardInterfaceKey {
              .flickHiraTab,
              .flickAbcTab,
              .flickStar123Tab:
-            return false
+            .any
         }
     }
 }
@@ -544,6 +573,7 @@ public extension CustardInterfaceSystemKey {
 
     private enum ValueType: String, Codable {
         case change_keyboard
+        case flick_space
         case qwerty_language_switch
         case qwerty_shift
         case qwerty_dynamic_change
@@ -561,6 +591,7 @@ public extension CustardInterfaceSystemKey {
     private var valueType: ValueType {
         switch self {
         case .changeKeyboard: return .change_keyboard
+        case .flickSpace: return .flick_space
         case .qwertyLanguageSwitch: return .qwerty_language_switch
         case .qwertyShift: return .qwerty_shift
         case .qwertyDynamicChange: return .qwerty_dynamic_change
@@ -589,6 +620,8 @@ public extension CustardInterfaceSystemKey {
             self = .enter
         case .change_keyboard:
             self = .changeKeyboard
+        case .flick_space:
+            self = .flickSpace
         case .qwerty_language_switch:
             self = .qwertyLanguageSwitch
         case .qwerty_shift:

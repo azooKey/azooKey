@@ -46,3 +46,10 @@ jobs:
         xcodebuild test \
           -scheme CustardKitTests \
           -destination 'platform=macOS'
+
+    - name: Run KeyboardViews tests
+      working-directory: AzooKeyCore
+      run: |
+        xcodebuild test \
+          -scheme KeyboardViewsTests \
+          -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=latest'

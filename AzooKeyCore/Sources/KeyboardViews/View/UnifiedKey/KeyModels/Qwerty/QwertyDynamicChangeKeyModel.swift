@@ -14,12 +14,14 @@ struct QwertyDynamicChangeKeyModel<Extension: ApplicationSpecificKeyboardViewExt
 
     @MainActor
     private func tabRole(states: VariableStates) -> TabRole {
-        switch states.tabManager.existentialTab() {
-        case .qwerty_hira:
+        switch states.tabManager.resolvedTab() {
+        case .standard(.flick_japanese), .standard(.qwerty_japanese):
             .hiragana
-        case .qwerty_abc:
+        case .standard(.flick_english), .standard(.qwerty_english):
             .english
-        case .qwerty_numbers, .qwerty_symbols:
+        case .standard(.flick_numbersymbols),
+             .standard(.qwerty_numbers),
+             .standard(.qwerty_symbols):
             .numberOrSymbol
         case let .custard(custard):
             switch custard.language {
@@ -32,7 +34,7 @@ struct QwertyDynamicChangeKeyModel<Extension: ApplicationSpecificKeyboardViewExt
             case .el_GR, .undefined:
                 .other
             }
-        default:
+        case .standard, .clipboardHistory, .emoji:
             .other
         }
     }

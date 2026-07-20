@@ -186,12 +186,12 @@ struct ThemeEditView: CancelableEditor {
                         .foregroundStyle(.red)
                     }
                 }
-                let tab: KeyboardTab.ExistentialTab = {
+                let tab: ResolvedTab = {
                     switch keyboardConfiguration.japaneseLayout {
                     case .flick:
-                        return .flick_hira
+                        return .standard(.flick_japanese)
                     case .qwerty:
-                        return .qwerty_hira
+                        return .standard(.qwerty_japanese)
                     case let .custard(identifier):
                         return .custard((try? CustardManager.load().custard(identifier: identifier)) ?? .errorMessage)
                     }

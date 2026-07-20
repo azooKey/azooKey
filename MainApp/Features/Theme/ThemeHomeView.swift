@@ -134,12 +134,12 @@ struct ThemeHomeView: View {
             }
     }
 
-    private var tab: KeyboardTab.ExistentialTab {
+    private var tab: ResolvedTab {
         switch keyboardConfiguration.japaneseLayout {
         case .flick:
-            return .flick_hira
+            return .standard(.flick_japanese)
         case .qwerty:
-            return .qwerty_hira
+            return .standard(.qwerty_japanese)
         case let .custard(identifier):
             return .custard((try? CustardManager.load().custard(identifier: identifier)) ?? .errorMessage)
         }

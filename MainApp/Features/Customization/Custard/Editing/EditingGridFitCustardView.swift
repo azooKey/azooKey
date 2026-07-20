@@ -344,8 +344,8 @@ struct EditingGridFitCustardView: CancelableEditor {
                                     editingItem.keyStyle == .pcStyle
                                     ? .longpress
                                     : .flick,
-                                supportsQwertySystemKeys:
-                                    editingItem.keyStyle == .pcStyle
+                                keyStyle:
+                                    editingItem.keyStyle.interfaceStyle
                             ) {
                                 showPlacementEditor(
                                     for: .gridFit(x: x, y: y)
@@ -492,26 +492,10 @@ struct EditingGridFitCustardView: CancelableEditor {
     }
 
     private var baseCustards: [Custard] {
-        [
-            Custard.flickJapanese,
-            Custard.flickEnglish,
-            Custard.flickNumberSymbols,
-            Custard.qwertyJapanese,
-            Custard.qwertyEnglish(
-                useShiftKey: UseShiftKey.value,
-                useDeprecatedShiftKeyBehavior: {
-                    if #available(iOS 18, *) {
-                        false
-                    } else {
-                        KeepDeprecatedShiftKeyBehavior.value
-                    }
-                }()
-            ),
-            Custard.qwertyNumbers(
-                customKeys: NumberTabCustomKeysSetting.value
-            ),
-            Custard.qwertySymbols,
-        ]
+        StandardKeyboardCatalog.templates(
+            configuration:
+                AzooKeySettingProvider.standardKeyboardConfiguration
+        )
     }
 
     private func custardSelectionView(for custard: Custard) -> some View {
@@ -754,18 +738,18 @@ private struct GridFitCustardKeyEditor: View {
     @State private var opensPlacementEditorOnDismiss = false
 
     private let initialEditSegment: CustardKeyEditSegment
-    private let supportsQwertySystemKeys: Bool
+    private let keyStyle: CustardInterfaceStyle
     private let onEditPlacement: () -> Void
 
     init(
         keyData: Binding<UserMadeKeyData>,
         initialEditSegment: CustardKeyEditSegment,
-        supportsQwertySystemKeys: Bool,
+        keyStyle: CustardInterfaceStyle,
         onEditPlacement: @escaping () -> Void
     ) {
         self._keyData = keyData
         self.initialEditSegment = initialEditSegment
-        self.supportsQwertySystemKeys = supportsQwertySystemKeys
+        self.keyStyle = keyStyle
         self.onEditPlacement = onEditPlacement
     }
 
@@ -773,7 +757,8 @@ private struct GridFitCustardKeyEditor: View {
         CustardInterfaceKeyEditor(
             data: $keyData,
             initialEditSegment: initialEditSegment,
-            supportsQwertySystemKeys: supportsQwertySystemKeys
+            keyStyle: keyStyle,
+            isGridFit: true
         ) {
             opensPlacementEditorOnDismiss = true
             dismiss()

@@ -69,7 +69,7 @@ public extension Custard {
 
                 // 5列目 (システムキー列)
                 .gridFit(.init(x: 4, y: 0)): .custom(.flickDelete()),
-                .gridFit(.init(x: 4, y: 1)): .custom(.flickSpace()),
+                .gridFit(.init(x: 4, y: 1)): .system(.flickSpace),
                 .gridFit(.init(x: 4, y: 2, width: 1, height: 2)): .system(.enter),
             ]
         )

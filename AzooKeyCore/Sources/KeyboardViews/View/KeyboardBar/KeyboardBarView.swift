@@ -58,7 +58,7 @@ struct KeyboardBarView<Extension: ApplicationSpecificKeyboardViewExtension>: Vie
             TabBarView<Extension>(data: tabBarData)
         case .none:
             switch variableStates.tabManager.tab {
-            case let .existential(.special(tab)) where tab == .emoji:
+            case .resolved(.emoji):
                 EmojiTabResultBar<Extension>()
             default:
                 ResultBar<Extension>(isResultViewExpanded: $isResultViewExpanded)

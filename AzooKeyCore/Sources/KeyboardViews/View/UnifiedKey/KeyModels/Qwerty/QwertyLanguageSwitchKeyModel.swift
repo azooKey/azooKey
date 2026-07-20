@@ -7,7 +7,7 @@ struct QwertyLanguageSwitchKeyModel<Extension: ApplicationSpecificKeyboardViewEx
     let languages: (KeyboardLanguage, KeyboardLanguage)
 
     @MainActor func currentTabLanguage(variableStates: VariableStates) -> KeyboardLanguage? {
-        variableStates.tabManager.existentialTab().language
+        variableStates.tabManager.resolvedTab().language
     }
 
     func pressActions(variableStates: VariableStates) -> [ActionType] {

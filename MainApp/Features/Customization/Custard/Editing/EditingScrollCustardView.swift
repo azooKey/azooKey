@@ -202,7 +202,9 @@ struct EditingScrollCustardView: CancelableEditor {
                         NavigationLink {
                             CustardInterfaceKeyEditor(
                                 data: $editingItem.keys[itemIndex],
-                                target: .simple
+                                target: .simple,
+                                keyStyle: .tenkeyStyle,
+                                isGridFit: false
                             )
                         } label: {
                             view.disabled(true)

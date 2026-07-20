@@ -44,9 +44,9 @@ public final class VariableStates: ObservableObject {
     }
 
     @MainActor
-    public func setTabForPreview(_ tab: KeyboardTab.ExistentialTab) {
+    public func setTabForPreview(_ tab: ResolvedTab) {
         self.tabManager.moveTab(
-            to: .existential(tab),
+            to: .resolved(tab),
             variableStates: self
         )
     }
@@ -281,17 +281,17 @@ public final class VariableStates: ObservableObject {
         case .numbersAndPunctuation:
             return
         case .URL:
-            self.setTab(.user_dependent(.english), temporary: true)
+            self.setTab(.userDependent(.english), temporary: true)
         case .numberPad:
-            self.setTab(.existential(.custard(.numberPad)), temporary: true)
+            self.setTab(.resolved(.custard(.numberPad)), temporary: true)
         case .phonePad:
-            self.setTab(.existential(.custard(.phonePad)), temporary: true)
+            self.setTab(.resolved(.custard(.phonePad)), temporary: true)
         case .namePhonePad:
             return
         case .emailAddress:
-            self.setTab(.user_dependent(.english), temporary: true)
+            self.setTab(.userDependent(.english), temporary: true)
         case .decimalPad:
-            self.setTab(.existential(.custard(.decimalPad)), temporary: true)
+            self.setTab(.resolved(.custard(.decimalPad)), temporary: true)
         case .twitter:
             return
         case .webSearch:

@@ -185,7 +185,10 @@ final class CustardInterfaceTest: XCTestCase {
             XCTAssertThrowsError(try invalidScroll.validate()) { error in
                 XCTAssertEqual(
                     error as? CustardInterfaceValidationError,
-                    .qwertySystemKeyRequiresPCStyleGridFit
+                    .unsupportedSystemKey(
+                        key,
+                        .gridFit(.pcStyle)
+                    )
                 )
             }
             XCTAssertThrowsError(try JSONEncoder().encode(invalidScroll))
@@ -200,6 +203,61 @@ final class CustardInterfaceTest: XCTestCase {
             ]
         )
         XCTAssertThrowsError(try invalidTenkey.validate())
+    }
+
+    func testFlickSpaceRequiresTenkeyStyleGridFit() throws {
+        let valid = CustardInterface(
+            keyStyle: .tenkeyStyle,
+            keyLayout: .gridFit(.init(rowCount: 5, columnCount: 4)),
+            keys: [
+                .gridFit(.init(x: 4, y: 1)): .system(.flickSpace),
+            ]
+        )
+        XCTAssertNoThrow(try valid.validate())
+
+        let invalidStyle = CustardInterface(
+            keyStyle: .pcStyle,
+            keyLayout: .gridFit(.init(rowCount: 10, columnCount: 4)),
+            keys: [
+                .gridFit(.init(x: 0, y: 0)): .system(.flickSpace),
+            ]
+        )
+        XCTAssertThrowsError(try invalidStyle.validate()) { error in
+            XCTAssertEqual(
+                error as? CustardInterfaceValidationError,
+                .unsupportedSystemKey(
+                    .flickSpace,
+                    .gridFit(.tenkeyStyle)
+                )
+            )
+        }
+
+        let invalidLayout = CustardInterface(
+            keyStyle: .tenkeyStyle,
+            keyLayout: .gridScroll(
+                .init(
+                    direction: .vertical,
+                    rowCount: 4,
+                    columnCount: 8
+                )
+            ),
+            keys: [
+                .gridScroll(0): .system(.flickSpace),
+            ]
+        )
+        XCTAssertThrowsError(try invalidLayout.validate())
+    }
+
+    func testLegacyCustomFlickSpaceStillDecodes() {
+        let target = CustardInterface(
+            keyStyle: .tenkeyStyle,
+            keyLayout: .gridFit(.init(rowCount: 5, columnCount: 4)),
+            keys: [
+                .gridFit(.init(x: 4, y: 1)): .custom(.flickSpace()),
+            ]
+        )
+
+        XCTAssertEqual(target.quickEncodeDecode(), target)
     }
 
     func testDecodeRejectsQwertySystemKeyInGridScroll() {
