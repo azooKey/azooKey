@@ -21,11 +21,15 @@ struct CustardInterfaceKeyEditor: View {
     init(
         data: Binding<UserMadeKeyData>,
         target: Target = .flick,
+        initialEditSegment: CustardKeyEditSegment = .flick,
         onEditPlacement: (() -> Void)? = nil
     ) {
         self._keyData = data
         self._state = StateObject(
-            wrappedValue: CustardInterfaceKeyEditingState(model: data.wrappedValue.model)
+            wrappedValue: CustardInterfaceKeyEditingState(
+                model: data.wrappedValue.model,
+                initialEditSegment: initialEditSegment
+            )
         )
         self.target = target
         self.onEditPlacement = onEditPlacement
@@ -61,6 +65,10 @@ struct CustardInterfaceKeyEditor: View {
                         let count = keyData.model[.custom].longpressKeys().count
                         if (0..<count).contains(state.selectedLongpressIndex) {
                             longpressKeyEditor(index: state.selectedLongpressIndex)
+                        } else if onEditPlacement != nil {
+                            Form {
+                                placementEditorSection
+                            }
                         } else {
                             Spacer()
                         }
