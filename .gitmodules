@@ -4,9 +4,9 @@
 [submodule "azooKey_emoji_dictionary_storage"]
 	path = azooKey_emoji_dictionary_storage
 	url = https://github.com/azooKey/azooKey_emoji_dictionary_storage
-[submodule "zenz-v3.1-small-gguf"]
-	path = zenz-v3.1-small-gguf
-	url = https://huggingface.co/Miwa-Keita/zenz-v3.1-small-gguf
-[submodule "zenz-v3.1-xsmall-gguf"]
-	path = zenz-v3.1-xsmall-gguf
-	url = https://huggingface.co/Miwa-Keita/zenz-v3.1-xsmall-gguf
+[submodule "zenz-v3.2-small-gguf"]
+	path = zenz-v3.2-small-gguf
+	url = https://huggingface.co/Miwa-Keita/zenz-v3.2-small-gguf
+[submodule "zenz-v3.2-xsmall-gguf"]
+	path = zenz-v3.2-xsmall-gguf
+	url = https://huggingface.co/Miwa-Keita/zenz-v3.2-xsmall-gguf
