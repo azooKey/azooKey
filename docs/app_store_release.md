@@ -16,7 +16,7 @@
 リポジトリのルートで、次のように実行します。
 
 ```bash
-BUILD_NUMBER=42 scripts/app-store-release.sh
+scripts/app-store-release.sh --build-number 42
 ```
 
 以下が順番に実行されます。
@@ -25,15 +25,9 @@ BUILD_NUMBER=42 scripts/app-store-release.sh
 2. App Store配布用に自動署名
 3. dSYMを含めてApp Store Connectへアップロード
 
-Archive、ExportOptions、ログは `build/app-store/<日時>-<プロセスID>/` に保存されます。このディレクトリはGitの管理対象外です。
+Archive、ExportOptions、ログは `build/app-store/<日時>-<プロセスID>/` に保存されます。このディレクトリはGitの管理対象外です。Archiveを作成する実行モードでは、ビルド番号の明示指定が必須です。
 
-プロジェクトに設定されたビルド番号をそのまま使う場合は、引数なしでも実行できます。
-
-```bash
-scripts/app-store-release.sh
-```
-
-同じマーケティングバージョンへアップロードするビルド番号は、過去に使用した番号と重複しない値にしてください。`--build-number` を使っても、プロジェクトファイル自体は変更されません。
+ビルド番号を手動指定する場合は、過去に使用した番号と重複しない値にしてください。`--build-number` を使っても、プロジェクトファイル自体は変更されません。
 
 ```bash
 scripts/app-store-release.sh --build-number 42
@@ -45,6 +39,14 @@ scripts/app-store-release.sh --build-number 42
 scripts/app-store-release.sh \
   --marketing-version 3.1 \
   --build-number 42
+```
+
+既存Archiveを再アップロードするだけの場合はビルド番号を作り直せないため、必要ならXcodeのアップロード時管理を使います。
+
+```bash
+scripts/app-store-release.sh \
+  --upload-only build/app-store/20260720-120000-12345/azooKey.xcarchive \
+  --manage-build-number
 ```
 
 ## Archiveとアップロードを分ける
@@ -83,7 +85,7 @@ export ASC_KEY_PATH="$HOME/.appstoreconnect/private_keys/AuthKey_XXXXXXXXXX.p8"
 export ASC_KEY_ID="XXXXXXXXXX"
 export ASC_ISSUER_ID="00000000-0000-0000-0000-000000000000"
 
-BUILD_NUMBER=42 scripts/app-store-release.sh
+scripts/app-store-release.sh --build-number 42
 ```
 
 `.p8` 秘密鍵はGitへ追加しないでください。
@@ -92,7 +94,7 @@ BUILD_NUMBER=42 scripts/app-store-release.sh
 
 | 変数 | 既定値 | 用途 |
 | --- | --- | --- |
-| `BUILD_NUMBER` | プロジェクト設定 | ビルド番号 |
+| `BUILD_NUMBER` | なし | ビルド番号（Archive作成時は必須） |
 | `MARKETING_VERSION` | プロジェクト設定 | マーケティングバージョン |
 | `APP_STORE_PROJECT` | `azooKey.xcodeproj` | Xcodeプロジェクト |
 | `APP_STORE_SCHEME` | `MainApp` | 共有スキーム |
