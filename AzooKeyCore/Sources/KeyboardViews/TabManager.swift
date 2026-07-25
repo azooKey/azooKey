@@ -8,9 +8,9 @@
 
 import CustardKit
 import Foundation
-import SwiftUI
 import enum KanaKanjiConverterModule.InputStyle
 import enum KanaKanjiConverterModule.KeyboardLanguage
+import SwiftUI
 
 extension TabData {
     func tab(config: any TabManagerConfiguration) -> KeyboardTab {

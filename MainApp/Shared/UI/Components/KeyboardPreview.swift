@@ -74,7 +74,7 @@ enum KeyboardPreviewSizing: Equatable {
                 context: context,
                 upsideComponent: nil
             ) * CGFloat(AzooKeySettingProvider.keyboardHeight)
-                + Design.keyboardScreenBottomPadding
+            + Design.keyboardScreenBottomPadding
         )
     }
 

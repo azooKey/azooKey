@@ -1,5 +1,5 @@
-import XCTest
 @testable import CustardKit
+import XCTest
 
 /// Test class for encoding of `CodableActionData`
 /// Make sure that decoding of `CodablaActionData` is successfuly working
@@ -21,7 +21,7 @@ final class EncodeCodableActionTest: XCTestCase {
             "天": "地",
             "海": "山",
             "正": "負",
-            "嬉": "悲"
+            "嬉": "悲",
         ])
         XCTAssertEqual(target.quickEncodeDecode(), target)
     }

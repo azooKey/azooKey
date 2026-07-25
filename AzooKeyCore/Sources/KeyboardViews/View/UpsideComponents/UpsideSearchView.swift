@@ -6,8 +6,8 @@
 //  Copyright © 2023 ensan. All rights reserved.
 //
 
-import SwiftUI
 import enum KanaKanjiConverterModule.ConverterBehaviorSemantics
+import SwiftUI
 
 @MainActor
 struct UpsideSearchView<Extension: ApplicationSpecificKeyboardViewExtension>: View {

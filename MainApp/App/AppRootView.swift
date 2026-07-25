@@ -10,27 +10,27 @@ struct AppRootView: View {
     var body: some View {
         ZStack {
             AppTabView()
-            .onAppear {
-                onboarding.presentInterruptedTutorialIfNeeded()
-            }
-            .task {
-                await AppLaunchTasks.performMaintenance()
-            }
-            .fullScreenCover(isPresented: $onboarding.isPresented, content: {
-                EnableAzooKeyView(resumeProgress: onboarding.resumeProgress)
-            })
-            .onChange(of: router.selectedTab) { _, selectedTab in
-                if selectedTab == .customization {
-                    customizationWalkthrough.presentIfNeeded()
+                .onAppear {
+                    onboarding.presentInterruptedTutorialIfNeeded()
                 }
-            }
-            .onOpenURL(perform: router.open)
-            .sheet(isPresented: $customizationWalkthrough.isPresented, onDismiss: {
-                customizationWalkthrough.markDone()
-            }, content: {
-                CustomizationWalkthroughView()
-                    .background(Color.background)
-            })
+                .task {
+                    await AppLaunchTasks.performMaintenance()
+                }
+                .fullScreenCover(isPresented: $onboarding.isPresented, content: {
+                    EnableAzooKeyView(resumeProgress: onboarding.resumeProgress)
+                })
+                .onChange(of: router.selectedTab) { _, selectedTab in
+                    if selectedTab == .customization {
+                        customizationWalkthrough.presentIfNeeded()
+                    }
+                }
+                .onOpenURL(perform: router.open)
+                .sheet(isPresented: $customizationWalkthrough.isPresented, onDismiss: {
+                    customizationWalkthrough.markDone()
+                }, content: {
+                    CustomizationWalkthroughView()
+                        .background(Color.background)
+                })
             AppDataUpdateOverlay()
             if router.importedFileURL != nil {
                 URLImportCustardView(

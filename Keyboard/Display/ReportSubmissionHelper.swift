@@ -1,13 +1,13 @@
 import AzooKeyUtils
 import Foundation
+import struct KanaKanjiConverterModule.Candidate
+import enum KanaKanjiConverterModule.ComposingCount
+import struct KanaKanjiConverterModule.ComposingText
+import enum KanaKanjiConverterModule.InputPiece
+import enum KanaKanjiConverterModule.InputStyle
 import KeyboardViews
 import SwiftUtils
 import UIKit
-import enum KanaKanjiConverterModule.InputPiece
-import enum KanaKanjiConverterModule.InputStyle
-import struct KanaKanjiConverterModule.Candidate
-import struct KanaKanjiConverterModule.ComposingText
-import enum KanaKanjiConverterModule.ComposingCount
 
 struct ReportSubmissionHelper {
     @MainActor

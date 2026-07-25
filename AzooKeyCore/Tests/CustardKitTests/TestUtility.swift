@@ -20,7 +20,7 @@ extension Encodable where Self: Decodable {
     }
 
     public func quickEncodeDecode() -> Self? {
-        return Self.quickDecode(target: self.quickEncode())
+        Self.quickDecode(target: self.quickEncode())
     }
 
     @_disfavoredOverload
@@ -39,7 +39,7 @@ extension Encodable where Self: Decodable {
 
     @_disfavoredOverload
     public func quickEncodeDecode() throws -> Self {
-        return try Self.quickDecode(target: self.quickEncode())
+        try Self.quickDecode(target: self.quickEncode())
     }
 }
 

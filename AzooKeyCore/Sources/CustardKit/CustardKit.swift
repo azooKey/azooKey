@@ -507,7 +507,7 @@ public extension CustardInterface {
         }
         guard supportsQwertySystemKeys else {
             throw CustardInterfaceValidationError
-                .qwertySystemKeyRequiresPCStyleGridFit
+            .qwertySystemKeyRequiresPCStyleGridFit
         }
     }
 }

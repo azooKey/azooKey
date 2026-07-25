@@ -8,11 +8,11 @@
 
 import AzooKeyUtils
 import Foundation
+import struct KanaKanjiConverterModule.Candidate
+import struct KanaKanjiConverterModule.DateTemplateLiteral
+import struct KanaKanjiConverterModule.TemplateData
 import KeyboardViews
 import SwiftUI
-import struct KanaKanjiConverterModule.Candidate
-import struct KanaKanjiConverterModule.TemplateData
-import struct KanaKanjiConverterModule.DateTemplateLiteral
 
 import SwiftUIUtils
 import SwiftUtils

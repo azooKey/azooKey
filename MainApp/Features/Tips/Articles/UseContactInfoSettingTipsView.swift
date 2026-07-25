@@ -6,8 +6,8 @@
 //  Copyright © 2023 DevEn3. All rights reserved.
 //
 
-import SwiftUI
 import class KeyboardViews.SemiStaticStates
+import SwiftUI
 
 struct UseContactInfoSettingTipsView: View {
     var body: some View {

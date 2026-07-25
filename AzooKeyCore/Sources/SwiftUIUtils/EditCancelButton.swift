@@ -15,12 +15,12 @@ public struct EditConfirmButton: View {
         }
     }
 
-    public init(_ type: ConfirmationType = .save, action: @escaping () -> ()) {
+    public init(_ type: ConfirmationType = .save, action: @escaping () -> Void) {
         self.confirmationType = type
         self.action = action
     }
     private var confirmationType: ConfirmationType
-    private var action: () -> ()
+    private var action: () -> Void
 
     public var body: some View {
         if #available(iOS 26, macOS 26, *) {
@@ -37,13 +37,13 @@ public struct EditConfirmButton: View {
 }
 
 public struct EditCancelButton: View {
-    public init(confirmationRequired: Bool = true, action: (() -> ())? = nil) {
+    public init(confirmationRequired: Bool = true, action: (() -> Void)? = nil) {
         self.confirmationRequired = confirmationRequired
         self.action = action
     }
 
     private let confirmationRequired: Bool
-    private var action: (() -> ())?
+    private var action: (() -> Void)?
 
     @State private var showCancellationAlert: Bool = false
     @Environment(\.dismiss) private var dismiss

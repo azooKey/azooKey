@@ -11,8 +11,8 @@ import CustardKit
 import Foundation
 import KeyboardViews
 import SwiftUI
-import SwiftUtils
 import SwiftUIUtils
+import SwiftUtils
 
 struct EditingTabBarItem: Identifiable, Equatable {
     let id = UUID()

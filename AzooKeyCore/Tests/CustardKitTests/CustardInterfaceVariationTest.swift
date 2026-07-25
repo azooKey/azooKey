@@ -1,5 +1,5 @@
-import XCTest
 @testable import CustardKit
+import XCTest
 
 final class CustardInterfaceVariationTest: XCTestCase {
     func testDecode() {
@@ -40,11 +40,11 @@ final class CustardInterfaceVariationTest: XCTestCase {
 
     func testEncode() {
         do {
-            let target = CustardInterfaceVariation.init(type: .flickVariation(.bottom), key: .init(design: .init(label: .text("facebook")), press_actions: [], longpress_actions: .none))
+            let target = CustardInterfaceVariation(type: .flickVariation(.bottom), key: .init(design: .init(label: .text("facebook")), press_actions: [], longpress_actions: .none))
             XCTAssertEqual(target.quickEncodeDecode(), target)
         }
         do {
-            let target = CustardInterfaceVariation.init(type: .longpressVariation, key: .init(design: .init(label: .systemImage("twitter")), press_actions: [], longpress_actions: .none))
+            let target = CustardInterfaceVariation(type: .longpressVariation, key: .init(design: .init(label: .systemImage("twitter")), press_actions: [], longpress_actions: .none))
             XCTAssertEqual(target.quickEncodeDecode(), target)
         }
     }

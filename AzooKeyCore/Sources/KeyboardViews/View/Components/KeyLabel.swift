@@ -6,9 +6,9 @@
 //  Copyright © 2020 ensan. All rights reserved.
 //
 
+import struct CustardKit.CustardKeyDirectionalLabel
 import Foundation
 import SwiftUI
-import struct CustardKit.CustardKeyDirectionalLabel
 
 public enum KeyLabelType: Sendable, Equatable {
     case text(String)
@@ -27,7 +27,7 @@ public struct DirectionalKeyLabel: View {
         self.font = font
         self.subFont = subFont
     }
-    
+
     let main: String
     let directions: CustardKeyDirectionalLabel
     let font: Font
@@ -119,7 +119,7 @@ public struct KeyLabel<Extension: ApplicationSpecificKeyboardViewExtension>: Vie
                 directions.top,
                 directions.left,
                 directions.right,
-                directions.bottom
+                directions.bottom,
             ]
             .compactMap { $0 }
             .filter { !$0.isEmpty }

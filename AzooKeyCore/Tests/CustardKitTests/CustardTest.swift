@@ -1,5 +1,5 @@
-import XCTest
 @testable import CustardKit
+import XCTest
 
 final class CustardTest: XCTestCase {
     func testDecode() {
@@ -87,7 +87,7 @@ final class CustardTest: XCTestCase {
                         longpress_actions: .init(repeat: [.delete(1)]),
                         variations: []
                     )
-                )
+                ),
             ]
 
             var cuneiforms_keys = keys

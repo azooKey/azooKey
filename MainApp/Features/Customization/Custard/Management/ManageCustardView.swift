@@ -224,7 +224,6 @@ struct ManageCustardView: View {
         }
     }
 
-
     private var newTabToolBarItem: ToolbarItem<(), some View> {
         ToolbarItem(placement: .topBarTrailing) {
             Menu {

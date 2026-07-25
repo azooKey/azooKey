@@ -6,9 +6,9 @@
 //  Copyright © 2020 ensan. All rights reserved.
 //
 
+import struct KeyboardViews.AzooKeyIcon
 import SwiftUI
 import SwiftUIUtils
-import struct KeyboardViews.AzooKeyIcon
 
 struct EnableAzooKeyViewHeader: View {
     private let text: LocalizedStringKey

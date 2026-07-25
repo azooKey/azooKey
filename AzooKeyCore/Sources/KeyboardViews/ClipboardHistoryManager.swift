@@ -6,9 +6,9 @@
 //  Copyright © 2023 ensan. All rights reserved.
 //
 
-import class UIKit.UIPasteboard
 import Foundation
 import SwiftUtils
+import class UIKit.UIPasteboard
 
 struct ClipboardHistoryItem: Equatable, Comparable, Hashable, Codable, Identifiable {
     var content: Content

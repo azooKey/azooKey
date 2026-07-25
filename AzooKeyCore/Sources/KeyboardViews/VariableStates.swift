@@ -8,12 +8,12 @@
 
 import CustardKit
 import Foundation
+import enum KanaKanjiConverterModule.InputStyle
+import enum KanaKanjiConverterModule.KeyboardLanguage
 import SwiftUI
 import SwiftUIUtils
 import SwiftUtils
 import UIKit
-import enum KanaKanjiConverterModule.InputStyle
-import enum KanaKanjiConverterModule.KeyboardLanguage
 
 /// 実行中変更され、かつViewがvariationSpace(variableStates: VariableStates)変更を検知できるべき値。
 public final class VariableStates: ObservableObject {

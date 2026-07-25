@@ -157,28 +157,28 @@ struct ThemeHomeView: View {
                             sizing: .fitToExtension,
                             defaultTab: tab
                         )
-                            .disabled(true)
-                            .overlay {
-                                if manager.selectedIndex == index || manager.selectedIndexInDarkMode == index {
-                                    Color.black.opacity(0.3)
-                                }
+                        .disabled(true)
+                        .overlay {
+                            if manager.selectedIndex == index || manager.selectedIndexInDarkMode == index {
+                                Color.black.opacity(0.3)
                             }
-                            .background {
-                                Rectangle()
-                                    .foregroundStyle(.systemGray4)
+                        }
+                        .background {
+                            Rectangle()
+                                .foregroundStyle(.systemGray4)
+                        }
+                        .onTapGesture {
+                            if manager.selectedIndex != index && manager.selectedIndexInDarkMode != index {
+                                self.manager.select(at: index)
                             }
-                            .onTapGesture {
-                                if manager.selectedIndex != index && manager.selectedIndexInDarkMode != index {
-                                    self.manager.select(at: index)
-                                }
+                        }
+                        .overlay(alignment: .bottom) {
+                            if let title = manager.themeTitle(at: index) {
+                                Label(title, systemImage: "photo")
+                                    .labelStyle(LiquidLabelStyle())
+                                    .labelStyle(.titleOnly)
                             }
-                            .overlay(alignment: .bottom) {
-                                if let title = manager.themeTitle(at: index) {
-                                    Label(title, systemImage: "photo")
-                                        .labelStyle(LiquidLabelStyle())
-                                        .labelStyle(.titleOnly)
-                                }
-                            }
+                        }
                         if manager.selectedIndex == manager.selectedIndexInDarkMode,
                            manager.selectedIndex == index {
                             circle(width: 80, systemName: "checkmark", color: .blue)

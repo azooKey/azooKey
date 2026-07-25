@@ -41,10 +41,10 @@ public enum SharedStore {
         guard let value = userDefaults.dictionary(
             forKey: resolvedKeyboardSizeKey(orientation: orientation)
         ),
-              let width = value["width"] as? NSNumber,
-              let height = value["height"] as? NSNumber,
-              width.doubleValue > 0,
-              height.doubleValue > 0 else {
+        let width = value["width"] as? NSNumber,
+        let height = value["height"] as? NSNumber,
+        width.doubleValue > 0,
+        height.doubleValue > 0 else {
             return nil
         }
         return CGSize(width: width.doubleValue, height: height.doubleValue)
