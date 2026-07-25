@@ -97,6 +97,7 @@ private struct UserDictionaryDataListView: View {
                             .contextMenu {
                                 Button(role: .destructive) {
                                     variables.items.removeAll(where: {$0.id == data.id})
+                                    variables.save()
                                 } label: {
                                     Label("削除", systemImage: "trash")
                                 }
