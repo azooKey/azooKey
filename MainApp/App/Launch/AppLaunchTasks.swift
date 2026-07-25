@@ -16,6 +16,12 @@ enum AppLaunchTasks {
         if let initialVersion = SharedStore.initialAppVersion, initialVersion > .azooKey_v2_2_2 {
             KeepDeprecatedShiftKeyBehavior.value = false
         }
+
+        if let initialVersion = SharedStore.initialAppVersion,
+           initialVersion >= .azooKey_v3_1,
+           UseShiftKey.get() == nil {
+            UseShiftKey.value = true
+        }
     }
 
     @MainActor
