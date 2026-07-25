@@ -129,6 +129,16 @@
         }
       }
     },
+    "「%@」を直接入力" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Input '%@' directly"
+          }
+        }
+      }
+    },
     "「%@」を繰り返し入力" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -867,6 +877,26 @@
         }
       }
     },
+    "0" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0"
+          }
+        }
+      }
+    },
+    "0.1刻みで微調整" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fine-tune in 0.1 increments"
+          }
+        }
+      }
+    },
     "1. 設定 → ユーザ辞書 → azooKeyユーザ辞書 を開く" : {
       "localizations" : {
         "en" : {
@@ -1395,6 +1425,26 @@
         }
       }
     },
+    "iOS 17のサポートを終了します" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support for iOS 17 is ending"
+          }
+        }
+      }
+    },
+    "iOS 18を最新の状態にアップデートすることで、引き続き最新バージョンのazooKeyをご利用いただけます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update iOS 18 to the latest version to continue using the latest version of azooKey."
+          }
+        }
+      }
+    },
     "iPhone 15 Proより上位の端末では「中」「高」程度のエフォートでも快適に利用できます。" : {
       "localizations" : {
         "en" : {
@@ -1497,6 +1547,16 @@
         }
       }
     },
+    "QWERTY" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QWERTY"
+          }
+        }
+      }
+    },
     "QwertyキーボードでAaキーの代わりにシフトキーを利用します。" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1504,6 +1564,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Use shift key instead of Aa key in qwerty keyboards."
+          }
+        }
+      }
+    },
+    "QWERTYシフトキー" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QWERTY Shift Key"
+          }
+        }
+      }
+    },
+    "QWERTY動的切り替えキー" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QWERTY Dynamic Switch Key"
+          }
+        }
+      }
+    },
+    "QWERTY空白・次候補キー" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QWERTY Space / Next Candidate Key"
+          }
+        }
+      }
+    },
+    "QWERTY言語切り替えキー" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QWERTY Language Switch Key"
           }
         }
       }
@@ -1675,6 +1775,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        }
+      }
+    },
+    "X座標" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "X Coordinate"
+          }
+        }
+      }
+    },
+    "Y座標" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Y Coordinate"
           }
         }
       }
@@ -1931,18 +2051,12 @@
         }
       }
     },
-    "おすすめ" : {
+    "おすすめから読み込む" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Suggestion"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
+            "value" : "Load from Recommendations"
           }
         }
       }
@@ -2017,6 +2131,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        }
+      }
+    },
+    "お知らせ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "News"
           }
         }
       }
@@ -2273,6 +2397,16 @@
         }
       }
     },
+    "カスタムタブの作成" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create Custom Tab"
+          }
+        }
+      }
+    },
     "カスタムタブの情報" : {
       "localizations" : {
         "en" : {
@@ -2333,6 +2467,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        }
+      }
+    },
+    "カスタムタブファイルのURLを入力してください。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter the URL of the custom tab file."
           }
         }
       }
@@ -2618,6 +2762,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        }
+      }
+    },
+    "キーの配置" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Key Placement"
           }
         }
       }
@@ -2955,6 +3109,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        }
+      }
+    },
+    "キーを追加" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Key"
           }
         }
       }
@@ -3379,6 +3543,16 @@
         }
       }
     },
+    "このバリエーションを削除" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete This Variation"
+          }
+        }
+      }
+    },
     "この列を削除" : {
       "localizations" : {
         "en" : {
@@ -3623,6 +3797,16 @@
         }
       }
     },
+    "サイズ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size"
+          }
+        }
+      }
+    },
     "サイズの調整モードがオンになります。左右の白い部分をドラッグし、好みのサイズに調整してください。" : {
       "localizations" : {
         "en" : {
@@ -3677,22 +3861,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sub"
-          }
-        }
-      }
-    },
-    "サブのラベル" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sub label"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
           }
         }
       }
@@ -3834,22 +4002,6 @@
         }
       }
     },
-    "スクロール式のカスタムタブを作る" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Make scroll style custom tabs"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "スクロール方向" : {
       "localizations" : {
         "en" : {
@@ -3888,6 +4040,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Section"
+          }
+        }
+      }
+    },
+    "ぜひiOSをアップデートしてazooKeyをご利用ください。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please update iOS to continue using azooKey."
           }
         }
       }
@@ -4640,6 +4802,16 @@
         }
       }
     },
+    "バージョン3.2以降のazooKeyではiOS 17のサポートを終了する予定です。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "azooKey 3.2 and later will no longer support iOS 17."
+          }
+        }
+      }
+    },
     "バグの報告や機能のリクエストをしたい" : {
       "localizations" : {
         "en" : {
@@ -4652,6 +4824,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        }
+      }
+    },
+    "バリエーションはキーを長押しすると選択できます" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Press and hold the key to select a variation."
           }
         }
       }
@@ -4849,6 +5031,16 @@
         }
       }
     },
+    "フリック" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flick"
+          }
+        }
+      }
+    },
     "フリックのキーボードでは削除%@キーを左にフリックすると、文頭まで削除することができます。" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4989,22 +5181,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "You can now select ‘base’ tab for custom flick tabs."
-          }
-        }
-      }
-    },
-    "フリック式のカスタムタブを作成することができます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can make tenkey style custom tabs."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
           }
         }
       }
@@ -5339,28 +5515,22 @@
         }
       }
     },
+    "メインと4方向" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Center and Four Directions"
+          }
+        }
+      }
+    },
     "メインとサブ" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Main and sub"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "メインのラベル" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Main label"
           }
         },
         "ja" : {
@@ -5693,6 +5863,16 @@
         }
       }
     },
+    "レイアウトスタイル" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Layout Style"
+          }
+        }
+      }
+    },
     "レポートに左右の文脈を自動で含めます。左右それぞれ10文字程度まででカットされるので、すべての文章が送信されることはありません。都度、確認画面で含めないよう変更することもできます。" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5774,6 +5954,26 @@
         }
       }
     },
+    "を入力" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Input"
+          }
+        }
+      }
+    },
+    "を直接入力" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Input Directly"
+          }
+        }
+      }
+    },
     "一度端末を再起動していただくとデータが更新され、キーボードが使えるようになることがあります。" : {
       "localizations" : {
         "en" : {
@@ -5836,6 +6036,16 @@
         }
       }
     },
+    "上" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Up"
+          }
+        }
+      }
+    },
     "上から順に実行されます" : {
       "localizations" : {
         "en" : {
@@ -5868,6 +6078,26 @@
         }
       }
     },
+    "上に表示される文字を設定します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set the character displayed above."
+          }
+        }
+      }
+    },
+    "上へ移動" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Up"
+          }
+        }
+      }
+    },
     "上書き" : {
       "localizations" : {
         "en" : {
@@ -5880,6 +6110,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        }
+      }
+    },
+    "下" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Down"
           }
         }
       }
@@ -5912,6 +6152,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        }
+      }
+    },
+    "下に表示される文字を設定します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set the character displayed below."
+          }
+        }
+      }
+    },
+    "下へ移動" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Down"
           }
         }
       }
@@ -5954,6 +6214,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Medium"
+          }
+        }
+      }
+    },
+    "中心に表示される文字を設定します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set the character displayed in the center."
           }
         }
       }
@@ -6030,6 +6300,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        }
+      }
+    },
+    "位置" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Position"
+          }
+        }
+      }
+    },
+    "位置とサイズ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Position and Size"
           }
         }
       }
@@ -6256,22 +6546,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Not necessarily equal to input letter."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "入力する文字" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Letters to input"
           }
         },
         "ja" : {
@@ -6721,22 +6995,6 @@
         }
       }
     },
-    "削除する文字数" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Count to delete"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "削除と順番" : {
       "localizations" : {
         "en" : {
@@ -6997,6 +7255,16 @@
         }
       }
     },
+    "右" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right"
+          }
+        }
+      }
+    },
     "右に列を追加" : {
       "localizations" : {
         "en" : {
@@ -7009,6 +7277,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        }
+      }
+    },
+    "右に表示される文字を設定します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set the character displayed on the right."
+          }
+        }
+      }
+    },
+    "右へ移動" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Right"
           }
         }
       }
@@ -7608,6 +7896,26 @@
         }
       }
     },
+    "定型文タブの作成" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create Phrases Tab"
+          }
+        }
+      }
+    },
+    "定型文タブを作る" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create Phrases Tab"
+          }
+        }
+      }
+    },
     "小さく表示される文字を設定します。" : {
       "localizations" : {
         "en" : {
@@ -7686,6 +7994,16 @@
         }
       }
     },
+    "左" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left"
+          }
+        }
+      }
+    },
     "左に列を追加" : {
       "localizations" : {
         "en" : {
@@ -7698,6 +8016,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        }
+      }
+    },
+    "左に表示される文字を設定します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set the character displayed on the left."
+          }
+        }
+      }
+    },
+    "左へ移動" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Left"
+          }
+        }
+      }
+    },
+    "左上をX: 0、Y: 0とするグリッド座標です" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grid coordinates with X: 0, Y: 0 at the top-left."
           }
         }
       }
@@ -8103,6 +8451,16 @@
         }
       }
     },
+    "文字の直接入力" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Direct Text Input"
+          }
+        }
+      }
+    },
     "文字を拡大するには、まず拡大したい文字を入力した上で変換候補を長押しします。" : {
       "localizations" : {
         "en" : {
@@ -8163,6 +8521,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        }
+      }
+    },
+    "文字削除" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Text"
+          }
+        }
+      }
+    },
+    "文字移動" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Cursor"
           }
         }
       }
@@ -8975,12 +9353,22 @@
         }
       }
     },
-    "横: %lld" : {
+    "横幅" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Width: %lld"
+            "value" : "Width"
+          }
+        }
+      }
+    },
+    "横幅: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Width: %@"
           }
         }
       }
@@ -9462,22 +9850,6 @@
         }
       }
     },
-    "登録したい文字や単語を順番に書いていくだけでスクロール式のカスタムタブを作成することができます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can make scroll style custom tabs only by listing up the words and sentences."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "登録する文字" : {
       "localizations" : {
         "en" : {
@@ -9510,6 +9882,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        }
+      }
+    },
+    "直接入力" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Direct Input"
           }
         }
       }
@@ -9659,22 +10041,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Move/Add"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "移動する文字数" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Count of movement"
           }
         },
         "ja" : {
@@ -9909,6 +10275,16 @@
         }
       }
     },
+    "編集モード" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Mode"
+          }
+        }
+      }
+    },
     "編集を中止します。変更はすべて失われます。" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -9947,12 +10323,22 @@
         }
       }
     },
-    "縦: %lld" : {
+    "縦幅" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Height: %lld"
+            "value" : "Height"
+          }
+        }
+      }
+    },
+    "縦幅: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Height: %@"
           }
         }
       }
@@ -10857,38 +11243,6 @@
         }
       }
     },
-    "負の値を指定すると右側の文字を削除します" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Negative number means delete forward"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "負の値を指定すると左にカーソルが動きます" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Negative number means moving backward"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "軽く" : {
       "localizations" : {
         "en" : {
@@ -11095,6 +11449,36 @@
         }
       }
     },
+    "配置" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Placement"
+          }
+        }
+      }
+    },
+    "配置プレビュー" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Placement Preview"
+          }
+        }
+      }
+    },
+    "配置を変更" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change Placement"
+          }
+        }
+      }
+    },
     "長押し" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -11166,6 +11550,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Longpress Duration"
+          }
+        }
+      }
+    },
+    "長押しバリエーション" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Long-Press Variations"
+          }
+        }
+      }
+    },
+    "長押しバリエーションが設定されている場合長押しアクションは動作しません" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Long-press actions do not work when long-press variations are configured."
           }
         }
       }
