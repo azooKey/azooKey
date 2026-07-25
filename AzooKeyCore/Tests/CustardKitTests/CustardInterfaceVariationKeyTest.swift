@@ -1,5 +1,5 @@
-import XCTest
 @testable import CustardKit
+import XCTest
 
 final class CustardInterfaceVariationKeyTest: XCTestCase {
     func testDecode() {
@@ -29,11 +29,11 @@ final class CustardInterfaceVariationKeyTest: XCTestCase {
 
     func testEncode() {
         do {
-            let target = CustardInterfaceVariationKey.init(design: .init(label: .systemImage("que")), press_actions: [.dismissKeyboard, .complete, .replaceDefault(.default)], longpress_actions: .none)
+            let target = CustardInterfaceVariationKey(design: .init(label: .systemImage("que")), press_actions: [.dismissKeyboard, .complete, .replaceDefault(.default)], longpress_actions: .none)
             XCTAssertEqual(target.quickEncodeDecode(), target)
         }
         do {
-            let target = CustardInterfaceVariationKey.init(design: .init(label: .text("∫")), press_actions: [.input("√")], longpress_actions: .init(start: [.input("≈")]))
+            let target = CustardInterfaceVariationKey(design: .init(label: .text("∫")), press_actions: [.input("√")], longpress_actions: .init(start: [.input("≈")]))
             XCTAssertEqual(target.quickEncodeDecode(), target)
         }
     }

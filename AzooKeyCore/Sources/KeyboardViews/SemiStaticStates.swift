@@ -6,9 +6,9 @@
 //  Copyright © 2022 ensan. All rights reserved.
 //
 
+import class CoreHaptics.CHHapticEngine
 import Foundation
 import SwiftUI
-import class CoreHaptics.CHHapticEngine
 
 /// 実行しないと値が確定しないが、実行されれば全く変更されない値。収容アプリでも共有できる形にすること。
 public final class SemiStaticStates: @unchecked Sendable {

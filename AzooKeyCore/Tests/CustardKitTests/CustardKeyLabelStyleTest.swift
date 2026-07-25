@@ -1,5 +1,5 @@
-import XCTest
 @testable import CustardKit
+import XCTest
 
 final class CustardKeyLabelStyleTest: XCTestCase {
     func testDecode() {

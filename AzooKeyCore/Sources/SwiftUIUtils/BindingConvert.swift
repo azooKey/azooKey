@@ -28,7 +28,7 @@ public extension Binding where Value: Sendable {
     }
 }
 
-public extension Binding where Value == Optional<String> {
+public extension Binding where Value == String? {
     @MainActor
     func wrapped(default: String = "") -> Binding<String> {
         .init(

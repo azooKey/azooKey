@@ -9,8 +9,8 @@
 import AzooKeyUtils
 import Foundation
 import KanaKanjiConverterModule
-import KeyboardViews
 import enum KeyboardExtensionUtils.AnyTextDocumentProxy
+import KeyboardViews
 import SwiftUI
 import SwiftUtils
 

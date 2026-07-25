@@ -1,5 +1,5 @@
-import XCTest
 @testable import CustardKit
+import XCTest
 
 final class CodableLongpressActionTest: XCTestCase {
     func testDecodeLongpressAction() {
@@ -40,13 +40,13 @@ final class CodableLongpressActionTest: XCTestCase {
     }
 
     func testEncodeLongpressAction() {
-        let target = CodableLongpressActionData.init(start: [.complete, .dismissKeyboard, .moveCursor(-1)], repeat: [.moveCursor(-1)])
+        let target = CodableLongpressActionData(start: [.complete, .dismissKeyboard, .moveCursor(-1)], repeat: [.moveCursor(-1)])
         XCTAssertEqual(target.quickEncodeDecode(), target)
     }
 
     func testStaticValue() {
         let target = CodableLongpressActionData.none
-        XCTAssertEqual(target, CodableLongpressActionData.init(start: [], repeat: []))
+        XCTAssertEqual(target, CodableLongpressActionData(start: [], repeat: []))
     }
 
 }

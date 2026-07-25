@@ -1,5 +1,5 @@
-import XCTest
 @testable import CustardKit
+import XCTest
 
 final class CustardKeyDesignTest: XCTestCase {
     func testDecode() {
@@ -25,11 +25,11 @@ final class CustardKeyDesignTest: XCTestCase {
 
     func testEncode() {
         do {
-            let target = CustardKeyDesign.init(label: .systemImage("uchuhi"), color: .normal)
+            let target = CustardKeyDesign(label: .systemImage("uchuhi"), color: .normal)
             XCTAssertEqual(target.quickEncodeDecode(), target)
         }
         do {
-            let target = CustardKeyDesign.init(label: .text("緑和"), color: .special)
+            let target = CustardKeyDesign(label: .text("緑和"), color: .special)
             XCTAssertEqual(target.quickEncodeDecode(), target)
         }
     }

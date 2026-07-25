@@ -22,15 +22,15 @@ public extension Custard {
                 // 2列目
                 .gridFit(.init(x: 1, y: 0)): .custom(
                     .flickSimpleInputs(center: "1", subs: ["☆", "♪", "→"])
-                    .mainAndSubLabel()
+                        .mainAndSubLabel()
                 ),
                 .gridFit(.init(x: 1, y: 1)): .custom(
                     .flickSimpleInputs(center: "4", subs: ["○", "＊", "・"])
-                    .mainAndSubLabel()
+                        .mainAndSubLabel()
                 ),
                 .gridFit(.init(x: 1, y: 2)): .custom(
                     .flickSimpleInputs(center: "7", subs: ["「", "」", ":"])
-                    .mainAndSubLabel()
+                        .mainAndSubLabel()
                 ),
                 .gridFit(.init(x: 1, y: 3)): .custom(
                     .flickSimpleInputs(center: "(", subs: [")", "[", "]"], centerLabel: "()[]")
@@ -39,33 +39,33 @@ public extension Custard {
                 // 3列目
                 .gridFit(.init(x: 2, y: 0)): .custom(
                     .flickSimpleInputs(center: "2", subs: ["¥", "$", "€"])
-                    .mainAndSubLabel()
+                        .mainAndSubLabel()
                 ),
                 .gridFit(.init(x: 2, y: 1)): .custom(
                     .flickSimpleInputs(center: "5", subs: ["+", "×", "÷"])
-                    .mainAndSubLabel()
+                        .mainAndSubLabel()
                 ),
                 .gridFit(.init(x: 2, y: 2)): .custom(
                     .flickSimpleInputs(center: "8", subs: ["〒", "々", "〆"])
-                    .mainAndSubLabel()
+                        .mainAndSubLabel()
                 ),
                 .gridFit(.init(x: 2, y: 3)): .custom(
                     .flickSimpleInputs(center: "0", subs: ["〜", "…"])
-                    .mainAndSubLabel()
+                        .mainAndSubLabel()
                 ),
 
                 // 4列目
                 .gridFit(.init(x: 3, y: 0)): .custom(
                     .flickSimpleInputs(center: "3", subs: ["%", "°", "#"])
-                    .mainAndSubLabel()
+                        .mainAndSubLabel()
                 ),
                 .gridFit(.init(x: 3, y: 1)): .custom(
                     .flickSimpleInputs(center: "6", subs: ["<", "=", ">"])
-                    .mainAndSubLabel()
+                        .mainAndSubLabel()
                 ),
                 .gridFit(.init(x: 3, y: 2)): .custom(
                     .flickSimpleInputs(center: "9", subs: ["^", "|", "\\"])
-                    .mainAndSubLabel()
+                        .mainAndSubLabel()
                 ),
                 .gridFit(.init(x: 3, y: 3)): .custom(
                     .flickSimpleInputs(center: ".", subs: [",", "-", "/"], centerLabel: ".,-/")

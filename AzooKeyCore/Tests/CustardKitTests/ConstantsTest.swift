@@ -1,5 +1,5 @@
-import XCTest
 @testable import CustardKit
+import XCTest
 
 final class ConstantsTest: XCTestCase {
     func testCustardVersion() {

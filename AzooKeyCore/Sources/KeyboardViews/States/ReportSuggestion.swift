@@ -1,6 +1,6 @@
 import Foundation
-import struct KanaKanjiConverterModule.ComposingText
 import enum KanaKanjiConverterModule.ComposingCount
+import struct KanaKanjiConverterModule.ComposingText
 
 public struct CandidateSummary: Equatable {
     public let displayText: String

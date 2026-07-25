@@ -107,8 +107,8 @@ struct LanguageLayoutSettingView<SettingKey: LanguageLayoutKeyboardSetting>: Vie
                         sizing: .fitToExtension,
                         defaultTab: tab
                     )
-                        .allowsHitTesting(false)
-                        .disabled(true)
+                    .allowsHitTesting(false)
+                    .disabled(true)
                 }
             } else {
                 VStack {
@@ -118,8 +118,8 @@ struct LanguageLayoutSettingView<SettingKey: LanguageLayoutKeyboardSetting>: Vie
                             sizing: .fitToExtension,
                             defaultTab: tab
                         )
-                            .allowsHitTesting(false)
-                            .disabled(true)
+                        .allowsHitTesting(false)
+                        .disabled(true)
                     }
                     Picker(selection: $selection, label: Text(labelText)) {
                         ForEach(0 ..< types.count, id: \.self) { i in

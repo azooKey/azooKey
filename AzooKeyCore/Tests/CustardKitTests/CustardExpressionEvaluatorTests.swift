@@ -1,5 +1,5 @@
-import XCTest
 @testable import CustardKit
+import XCTest
 
 final class CustardExpressionEvaluatorTests: XCTestCase {
     func testTokenizer() throws {
@@ -84,7 +84,7 @@ final class CustardExpressionEvaluatorTests: XCTestCase {
     struct EvaluatorContext: CustardExpressionEvaluatorContext {
         var initialValues: [String: ExpressionValue]
         func getValue(for key: String) -> ExpressionValue? {
-            return initialValues[key]
+            initialValues[key]
         }
     }
 

@@ -6,9 +6,9 @@
 //  Copyright © 2023 ensan. All rights reserved.
 //
 
+import enum AzooKeyUtils.SharedStore
 import Foundation
 import class UIKit.UITextInputMode
-import enum AzooKeyUtils.SharedStore
 
 extension SharedStore {
     @MainActor static func checkKeyboardActivation() -> Bool {

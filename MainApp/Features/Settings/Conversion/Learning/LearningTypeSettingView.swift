@@ -7,8 +7,8 @@
 //
 
 import AzooKeyUtils
-import SwiftUI
 import enum KanaKanjiConverterModule.LearningType
+import SwiftUI
 
 struct LearningTypeSettingView: View {
     @State private var setting: SettingUpdater<LearningTypeSetting>

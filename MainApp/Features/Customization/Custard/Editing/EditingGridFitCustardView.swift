@@ -219,7 +219,7 @@ struct EditingGridFitCustardView: CancelableEditor {
         let keyData: UserMadeKeyData
         if let originalPosition,
            let originalData = editingItem.keys.removeValue(
-               forKey: originalPosition
+            forKey: originalPosition
            ) {
             editingItem.emptyKeys.remove(originalPosition)
             keyData = originalData
@@ -680,7 +680,7 @@ struct EditingGridFitCustardView: CancelableEditor {
                 )
                 guard !editingItem.keys.keys.contains(position),
                       !frames.contains(where: {
-                          gridFramesIntersect($0, frame)
+                        gridFramesIntersect($0, frame)
                       }) else {
                     return
                 }
@@ -934,40 +934,40 @@ private struct GridFitKeyPlacementEditor: View {
                     .fill(Color.secondarySystemBackground)
                 ForEach(Array(occupied.enumerated()), id: \.offset) { _, frame in
                     RoundedRectangle(cornerRadius: 5)
-                    .fill(Color.secondary.opacity(0.35))
-                    .frame(
-                        width: previewKeyWidth(
-                            frame,
-                            unitWidth: unitWidth
-                        ),
-                        height: previewKeyHeight(
-                            frame,
-                            unitHeight: unitHeight
+                        .fill(Color.secondary.opacity(0.35))
+                        .frame(
+                            width: previewKeyWidth(
+                                frame,
+                                unitWidth: unitWidth
+                            ),
+                            height: previewKeyHeight(
+                                frame,
+                                unitHeight: unitHeight
+                            )
                         )
-                    )
-                    .offset(
-                        x: unitWidth * CGFloat(frame.x) + 2,
-                        y: unitHeight * CGFloat(frame.y) + 2
-                    )
+                        .offset(
+                            x: unitWidth * CGFloat(frame.x) + 2,
+                            y: unitHeight * CGFloat(frame.y) + 2
+                        )
                 }
                 if let placement {
                     let frame = placement.frame
                     RoundedRectangle(cornerRadius: 5)
-                    .fill(Color.accentColor.opacity(0.75))
-                    .frame(
-                        width: previewKeyWidth(
-                            frame,
-                            unitWidth: unitWidth
-                        ),
-                        height: previewKeyHeight(
-                            frame,
-                            unitHeight: unitHeight
+                        .fill(Color.accentColor.opacity(0.75))
+                        .frame(
+                            width: previewKeyWidth(
+                                frame,
+                                unitWidth: unitWidth
+                            ),
+                            height: previewKeyHeight(
+                                frame,
+                                unitHeight: unitHeight
+                            )
                         )
-                    )
-                    .offset(
-                        x: unitWidth * CGFloat(frame.x) + 2,
-                        y: unitHeight * CGFloat(frame.y) + 2
-                    )
+                        .offset(
+                            x: unitWidth * CGFloat(frame.x) + 2,
+                            y: unitHeight * CGFloat(frame.y) + 2
+                        )
                 }
             }
             .clipped()

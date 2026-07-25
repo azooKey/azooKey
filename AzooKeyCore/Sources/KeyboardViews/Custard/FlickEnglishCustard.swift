@@ -25,26 +25,26 @@ public extension Custard {
                 ),
                 .gridFit(.init(x: 1, y: 1)): .custom(
                     .flickSimpleInputs(center: "G", subs: ["H", "I"], centerLabel: "GHI")
-                    .lowercasedInput()
+                        .lowercasedInput()
                 ),
                 .gridFit(.init(x: 1, y: 2)): .custom(
                     .flickSimpleInputs(center: "P", subs: ["Q", "R", "S"], centerLabel: "PQRS")
-                    .lowercasedInput()
+                        .lowercasedInput()
                 ),
                 .gridFit(.init(x: 1, y: 3)): .system(.upperLower),   // a/A (大文字・小文字切替)
 
                 // 3列目
-                    .gridFit(.init(x: 2, y: 0)): .custom(
-                        .flickSimpleInputs(center: "A", subs: ["B", "C"], centerLabel: "ABC")
+                .gridFit(.init(x: 2, y: 0)): .custom(
+                    .flickSimpleInputs(center: "A", subs: ["B", "C"], centerLabel: "ABC")
                         .lowercasedInput()
-                    ),
+                ),
                 .gridFit(.init(x: 2, y: 1)): .custom(
                     .flickSimpleInputs(center: "J", subs: ["K", "L"], centerLabel: "JKL")
-                    .lowercasedInput()
+                        .lowercasedInput()
                 ),
                 .gridFit(.init(x: 2, y: 2)): .custom(
                     .flickSimpleInputs(center: "T", subs: ["U", "V"], centerLabel: "TUV")
-                    .lowercasedInput()
+                        .lowercasedInput()
                 ),
                 .gridFit(.init(x: 2, y: 3)): .custom(
                     .flickSimpleInputs(center: "'", subs: ["\"", "(", ")"], centerLabel: "'\"()")
@@ -53,15 +53,15 @@ public extension Custard {
                 // 4列目
                 .gridFit(.init(x: 3, y: 0)): .custom(
                     .flickSimpleInputs(center: "D", subs: ["E", "F"], centerLabel: "DEF")
-                    .lowercasedInput()
+                        .lowercasedInput()
                 ),
                 .gridFit(.init(x: 3, y: 1)): .custom(
                     .flickSimpleInputs(center: "M", subs: ["N", "O"], centerLabel: "MNO")
-                    .lowercasedInput()
+                        .lowercasedInput()
                 ),
                 .gridFit(.init(x: 3, y: 2)): .custom(
                     .flickSimpleInputs(center: "W", subs: ["X", "Y", "Z"], centerLabel: "WXYZ")
-                    .lowercasedInput()
+                        .lowercasedInput()
                 ),
                 .gridFit(.init(x: 3, y: 3)): .custom(
                     .flickSimpleInputs(center: ".", subs: [",", "?", "!"], centerLabel: ".,?!")

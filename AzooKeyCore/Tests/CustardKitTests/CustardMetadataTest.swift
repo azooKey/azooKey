@@ -1,5 +1,5 @@
-import XCTest
 @testable import CustardKit
+import XCTest
 
 final class CustardMetadataTest: XCTestCase {
     func testDecode() {
@@ -16,11 +16,11 @@ final class CustardMetadataTest: XCTestCase {
 
     func testEncode() {
         do {
-            let target = CustardMetadata.init(custard_version: .v1_0, display_name: "unknown")
+            let target = CustardMetadata(custard_version: .v1_0, display_name: "unknown")
             XCTAssertEqual(target.quickEncodeDecode(), target)
         }
         do {
-            let target = CustardMetadata.init(custard_version: .v1_0, display_name: "unhappy")
+            let target = CustardMetadata(custard_version: .v1_0, display_name: "unhappy")
             XCTAssertEqual(target.quickEncodeDecode(), target)
         }
     }

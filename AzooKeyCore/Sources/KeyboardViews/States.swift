@@ -6,8 +6,8 @@
 //  Copyright © 2021 ensan. All rights reserved.
 //
 
-import enum UIKit.UIReturnKeyType
 import enum KanaKanjiConverterModule.KeyboardLanguage
+import enum UIKit.UIReturnKeyType
 
 extension KeyboardLanguage {
     var shortSymbol: String {
