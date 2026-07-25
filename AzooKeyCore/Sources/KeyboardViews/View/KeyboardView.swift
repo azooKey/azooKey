@@ -57,7 +57,15 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
     }
 
     private var totalBackgroundHeight: CGFloat {
-        resolvedInterfaceHeight + Design.keyboardScreenBottomPadding + componentOverlayHeight
+        let bodyHeight = if variableStates.boolStates.isTextMagnifying {
+            max(
+                resolvedInterfaceHeight,
+                Design.keyboardHeight(context: variableStates.layoutContext)
+            )
+        } else {
+            resolvedInterfaceHeight
+        }
+        return bodyHeight + Design.keyboardScreenBottomPadding + componentOverlayHeight
     }
 
     @ViewBuilder

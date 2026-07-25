@@ -50,13 +50,11 @@ struct LargeTextView: View {
                 ) * 0.15
             )
         }
-        .background(Color.background)
         .frame(
-            height: Design.keyboardScreenHeight(
-                context: variableStates.layoutContext,
-                upsideComponent: variableStates.upsideComponent
-            ),
+            maxWidth: .infinity,
+            maxHeight: .infinity,
             alignment: .bottom
         )
+        .background(Color.background)
     }
 }

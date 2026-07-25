@@ -150,9 +150,15 @@ final class KeyboardViewController: UIInputViewController {
                 KeyboardViewController.variableStates.$maximumHeight,
                 KeyboardViewController.variableStates.$upsideComponent
             )
+            .combineLatest(
+                KeyboardViewController.variableStates.$boolStates
+                    .map { $0["isTextMagnifying"] ?? false }
+                    .removeDuplicates()
+            )
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] interfaceSize, state, maxH, upsideComponent in
+            .sink { [weak self] values, isTextMagnifying in
                 guard let self = self else { return }
+                let (interfaceSize, state, maxH, upsideComponent) = values
                 // In resizing mode use the dynamic maxH; otherwise default to interfaceSize.height
                 // 1. upsideComponentの高さを計算する（存在しない場合は0）
                 let upsideComponentHeight = upsideComponent.map { component in
@@ -162,7 +168,17 @@ final class KeyboardViewController: UIInputViewController {
                     )
                 } ?? 0
 
-                let bodyHeight = (state == .resizing) ? maxH : interfaceSize.height
+                let currentBodyHeight = (state == .resizing) ? maxH : interfaceSize.height
+                let bodyHeight = if isTextMagnifying {
+                    max(
+                        currentBodyHeight,
+                        Design.keyboardHeight(
+                            context: KeyboardViewController.variableStates.layoutContext
+                        )
+                    )
+                } else {
+                    currentBodyHeight
+                }
 
                 // 3. 全体の高さを「本体の高さ + upsideComponentの高さ」として計算する
                 let totalHeight = bodyHeight + upsideComponentHeight + Design.keyboardScreenBottomPadding
