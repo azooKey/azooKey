@@ -68,6 +68,7 @@ public struct AppVersion: Codable, Equatable, Comparable, Hashable, LosslessStri
     }
 }
 public extension AppVersion {
+    static let azooKey_v3_1 = AppVersion("3.1")!
     static let azooKey_v3_0_3 = AppVersion("3.0.3")!
     static let azooKey_v3_0_2 = AppVersion("3.0.2")!
     static let azooKey_v3_0_1 = AppVersion("3.0.1")!
