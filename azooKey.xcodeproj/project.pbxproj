@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1A09112C2A20B13C00ABFC72 /* Dictionary in Resources */ = {isa = PBXBuildFile; fileRef = 1A09112B2A20B13C00ABFC72 /* Dictionary */; };
-		1A09112E2A20B14C00ABFC72 /* Dictionary in Resources */ = {isa = PBXBuildFile; fileRef = 1A09112B2A20B13C00ABFC72 /* Dictionary */; };
 		1A2E58542951EC87004F959B /* (null) in Sources */ = {isa = PBXBuildFile; };
 		1A2E58592951EC87004F959B /* (null) in Sources */ = {isa = PBXBuildFile; };
 		1A2E585A2951EC87004F959B /* (null) in Sources */ = {isa = PBXBuildFile; };
@@ -22,7 +20,7 @@
 		1A7F37882A6A1A90009AC382 /* KeyboardViews in Frameworks */ = {isa = PBXBuildFile; productRef = 1A7F37872A6A1A90009AC382 /* KeyboardViews */; };
 		1A7F378A2A6A1A99009AC382 /* KeyboardViews in Frameworks */ = {isa = PBXBuildFile; productRef = 1A7F37892A6A1A99009AC382 /* KeyboardViews */; };
 		1A7F547126A96A5F0032E91E /* AzooKeyIcon-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 1AE191FB25D7E3B40044EE4B /* AzooKeyIcon-Regular.otf */; };
-		1ABDFC352A18C60A00CED3A3 /* KanaKanjiConverterModule in Frameworks */ = {isa = PBXBuildFile; productRef = 1ABDFC342A18C60A00CED3A3 /* KanaKanjiConverterModule */; };
+		1ABDFC352A18C60A00CED3A3 /* KanaKanjiConverterModuleWithDefaultDictionary in Frameworks */ = {isa = PBXBuildFile; productRef = 1ABDFC342A18C60A00CED3A3 /* KanaKanjiConverterModuleWithDefaultDictionary */; };
 		1AC03159251103EF004CA505 /* Designs.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1AC03158251103EF004CA505 /* Designs.xcassets */; };
 		1ACEEFF72566786A00899DA2 /* kaomoji_dict.tsv in Resources */ = {isa = PBXBuildFile; fileRef = 1ACEEFF62566786A00899DA2 /* kaomoji_dict.tsv */; };
 		1AD96FB82A22F9C800FD4EA4 /* SwiftUIUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 1AD96FB72A22F9C800FD4EA4 /* SwiftUIUtils */; };
@@ -36,6 +34,7 @@
 		557D9E012ABF320F0028F3A0 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 557D9E002ABF320F0028F3A0 /* Localizable.xcstrings */; };
 		557D9E022ABF320F0028F3A0 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 557D9E002ABF320F0028F3A0 /* Localizable.xcstrings */; };
 		55950E542AF8E09400ACACAB /* KeyboardExtensionUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 55950E532AF8E09400ACACAB /* KeyboardExtensionUtils */; };
+		55B0A1012F22310000D1C700 /* KanaKanjiConverterModuleWithDefaultDictionary in Frameworks */ = {isa = PBXBuildFile; productRef = 55B0A1002F22310000D1C700 /* KanaKanjiConverterModuleWithDefaultDictionary */; };
 		55EA62DF2BD4FD4F0056B5BA /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55EA62DE2BD4FCF20056B5BA /* PrivacyInfo.xcprivacy */; };
 		55EE424B2B8091B400C75B3D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55EE424A2B8091B400C75B3D /* PrivacyInfo.xcprivacy */; };
 		55FBA8982E68851700DA8EC0 /* zenz-v3.2-xsmall-gguf in Resources */ = {isa = PBXBuildFile; fileRef = 55FBA8962E6884A000DA8EC0 /* zenz-v3.2-xsmall-gguf */; };
@@ -101,7 +100,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		1A09112B2A20B13C00ABFC72 /* Dictionary */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Dictionary; path = ../azooKey_dictionary_storage/Dictionary; sourceTree = "<group>"; };
 		1A3DC1C22500D44A002CAA93 /* azooKey.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = azooKey.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A3DC1CB2500D44E002CAA93 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1A3DC1D32500D44E002CAA93 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -116,7 +114,7 @@
 		1ACEEFF62566786A00899DA2 /* kaomoji_dict.tsv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = kaomoji_dict.tsv; sourceTree = "<group>"; };
 		1AE191FB25D7E3B40044EE4B /* AzooKeyIcon-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AzooKeyIcon-Regular.otf"; sourceTree = "<group>"; };
 		1AF3060029FE6C2800B4DAC3 /* AzooKeyCore */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = AzooKeyCore; sourceTree = "<group>"; };
-		1AF6A55825FE0DA70037D5ED /* charID.chid */ = {isa = PBXFileReference; lastKnownFileType = file; name = charID.chid; path = ../../azooKey_dictionary_storage/Dictionary/louds/charID.chid; sourceTree = "<group>"; };
+		1AF6A55825FE0DA70037D5ED /* charID.chid */ = {isa = PBXFileReference; lastKnownFileType = file; path = charID.chid; sourceTree = "<group>"; };
 		557D9DFE2ABF2B9D0028F3A0 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		557D9E002ABF320F0028F3A0 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		55EA62DE2BD4FCF20056B5BA /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -187,7 +185,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1ABDFC352A18C60A00CED3A3 /* KanaKanjiConverterModule in Frameworks */,
+				1ABDFC352A18C60A00CED3A3 /* KanaKanjiConverterModuleWithDefaultDictionary in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -207,6 +205,7 @@
 				1AD96FB82A22F9C800FD4EA4 /* SwiftUIUtils in Frameworks */,
 				1AED0A612A6D22CB005B87E5 /* AzooKeyUtils in Frameworks */,
 				55950E542AF8E09400ACACAB /* KeyboardExtensionUtils in Frameworks */,
+				55B0A1012F22310000D1C700 /* KanaKanjiConverterModuleWithDefaultDictionary in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,7 +263,6 @@
 				55EA62DE2BD4FCF20056B5BA /* PrivacyInfo.xcprivacy */,
 				55FBA8972E6884A300DA8EC0 /* zenz-v3.2-small-gguf */,
 				55FBA8962E6884A000DA8EC0 /* zenz-v3.2-xsmall-gguf */,
-				1A09112B2A20B13C00ABFC72 /* Dictionary */,
 				559E8F3E2CAC294600E016FA /* Display */,
 			);
 			path = Keyboard;
@@ -357,7 +355,7 @@
 			);
 			name = azooKeyTests;
 			packageProductDependencies = (
-				1ABDFC342A18C60A00CED3A3 /* KanaKanjiConverterModule */,
+				1ABDFC342A18C60A00CED3A3 /* KanaKanjiConverterModuleWithDefaultDictionary */,
 			);
 			productName = azooKeyTests;
 			productReference = 1A3DC1D82500D44E002CAA93 /* azooKeyTests.xctest */;
@@ -405,6 +403,7 @@
 				1A7F37892A6A1A99009AC382 /* KeyboardViews */,
 				1AED0A602A6D22CB005B87E5 /* AzooKeyUtils */,
 				55950E532AF8E09400ACACAB /* KeyboardExtensionUtils */,
+				55B0A1002F22310000D1C700 /* KanaKanjiConverterModuleWithDefaultDictionary */,
 			);
 			productName = Keyboard;
 			productReference = 1A3DC1F92500D488002CAA93 /* Keyboard.appex */;
@@ -482,7 +481,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1A09112E2A20B14C00ABFC72 /* Dictionary in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -500,7 +498,6 @@
 				55EA62DF2BD4FD4F0056B5BA /* PrivacyInfo.xcprivacy in Resources */,
 				55FBA8992E68851B00DA8EC0 /* zenz-v3.2-small-gguf in Resources */,
 				55FBA8982E68851700DA8EC0 /* zenz-v3.2-xsmall-gguf in Resources */,
-				1A09112C2A20B13C00ABFC72 /* Dictionary in Resources */,
 				1AC03159251103EF004CA505 /* Designs.xcassets in Resources */,
 				557D9E022ABF320F0028F3A0 /* Localizable.xcstrings in Resources */,
 				1A7F547126A96A5F0032E91E /* AzooKeyIcon-Regular.otf in Resources */,
@@ -1040,9 +1037,9 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = KeyboardViews;
 		};
-		1ABDFC342A18C60A00CED3A3 /* KanaKanjiConverterModule */ = {
+		1ABDFC342A18C60A00CED3A3 /* KanaKanjiConverterModuleWithDefaultDictionary */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = KanaKanjiConverterModule;
+			productName = KanaKanjiConverterModuleWithDefaultDictionary;
 		};
 		1AD96FB72A22F9C800FD4EA4 /* SwiftUIUtils */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -1063,6 +1060,10 @@
 		55950E532AF8E09400ACACAB /* KeyboardExtensionUtils */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = KeyboardExtensionUtils;
+		};
+		55B0A1002F22310000D1C700 /* KanaKanjiConverterModuleWithDefaultDictionary */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = KanaKanjiConverterModuleWithDefaultDictionary;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

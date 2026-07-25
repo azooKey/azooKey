@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import KanaKanjiConverterModule
+import KanaKanjiConverterModuleWithDefaultDictionary
 import XCTest
 
 @MainActor final class ConverterTests: XCTestCase {
@@ -20,34 +20,33 @@ import XCTest
     func requestOptions() -> ConvertRequestOptions {
         ConvertRequestOptions(
             N_best: 5,
-            requireJapanesePrediction: true,
-            requireEnglishPrediction: false,
+            requireJapanesePrediction: .autoMix,
+            requireEnglishPrediction: .disabled,
             keyboardLanguage: .ja_JP,
-            typographyLetterCandidate: false,
-            unicodeCandidate: true,
             englishCandidateInRoman2KanaInput: true,
             fullWidthRomanCandidate: false,
             halfWidthKanaCandidate: false,
             learningType: .nothing,
             maxMemoryCount: 0,
             shouldResetMemory: false,
-            dictionaryResourceURL: Bundle(for: type(of: self)).bundleURL.appendingPathComponent("Dictionary", isDirectory: true),
             memoryDirectoryURL: URL(fileURLWithPath: ""),
             sharedContainerURL: URL(fileURLWithPath: ""),
+            textReplacer: .empty,
+            specialCandidateProviders: nil,
             metadata: .init(appVersionString: "Tests")
         )
     }
 
     func testFullConversion() throws {
         do {
-            let converter = KanaKanjiConverter()
+            let converter = KanaKanjiConverter.withDefaultDictionary()
             var c = ComposingText()
             c.insertAtCursorPosition("あずーきーはしんじだいのきーぼーどあぷりです", inputStyle: .direct)
             let results = converter.requestCandidates(c, options: requestOptions())
             XCTAssertEqual(results.mainResults.first?.text, "azooKeyは新時代のキーボードアプリです")
         }
         do {
-            let converter = KanaKanjiConverter()
+            let converter = KanaKanjiConverter.withDefaultDictionary()
             var c = ComposingText()
             c.insertAtCursorPosition("ようしょうきからてにすすいえいやきゅうしょうりんじけんぽうなどさまざまなすぽーつをけいけんしながらそだちしょうがっこうじだいはろさんぜるすきんこうにたいざいしておりごるふやてにすをならっていた", inputStyle: .direct)
             let results = converter.requestCandidates(c, options: requestOptions())
@@ -59,7 +58,7 @@ import XCTest
     // 1文字ずつ変換する
     // memo: 内部実装としては別のモジュールが呼ばれるのだが、それをテストする方法があまりないかもしれない
     func testGradualConversion() throws {
-        let converter = KanaKanjiConverter()
+        let converter = KanaKanjiConverter.withDefaultDictionary()
         var c = ComposingText()
         let text = "ようしょうきからてにすすいえいやきゅうしょうりんじけんぽうなどさまざまなすぽーつをけいけんしながらそだちしょうがっこうじだいはろさんぜるすきんこうにたいざいしておりごるふやてにすをならっていた"
         for char in text {
@@ -74,7 +73,7 @@ import XCTest
     // 1文字ずつ変換する
     // memo: 内部実装としては別のモジュールが呼ばれるのだが、それをテストする方法があまりないかもしれない
     func testRoman2KanaGradualConversion() throws {
-        let converter = KanaKanjiConverter()
+        let converter = KanaKanjiConverter.withDefaultDictionary()
         var c = ComposingText()
         let text = "youshoukikaratenisusuieiyakyuushourinjikenpounadosamazamanasupoーtuwokeikennsinagarasodatishougakkouzidaiharosanzerusukinkounitaizaisiteorigoruhuyatenisuwonaratteita"
         // 許容される変換結果
@@ -94,7 +93,7 @@ import XCTest
     // 2,3文字ずつ変換する
     // memo: 内部実装としては別のモジュールが呼ばれるのだが、それをテストする方法があまりないかもしれない
     func testSemiGradualConversion() throws {
-        let converter = KanaKanjiConverter()
+        let converter = KanaKanjiConverter.withDefaultDictionary()
         var c = ComposingText()
         let text = "ようしょうきからてにすすいえいやきゅうしょうりんじけんぽうなどさまざまなすぽーつをけいけんしながらそだちしょうがっこうじだいはろさんぜるすきんこうにたいざいしておりごるふやてにすをならっていた"
         var leftIndex = text.startIndex
@@ -116,7 +115,7 @@ import XCTest
     // 1文字ずつ入力するが、時折削除を行う
     // memo: 内部実装としてはdeleted_last_nのテストを意図している
     func testGradualConversionWithDelete() throws {
-        let converter = KanaKanjiConverter()
+        let converter = KanaKanjiConverter.withDefaultDictionary()
         var c = ComposingText()
         let text = Array("ようしょうきからてにすすいえいやきゅうしょうりんじけんぽうなどさまざまなすぽーつをけいけんしながらそだちしょうがっこうじだいはろさんぜるすきんこうにたいざいしておりごるふやてにすをならっていた")
         let deleteIndices = [1, 4, 8, 10, 15, 18, 20, 21, 23, 25, 26, 28, 29, 33, 34, 37, 39, 40, 42, 44, 45, 49, 51, 54, 58, 60, 62, 64, 67, 69, 70, 75, 80]
@@ -151,9 +150,9 @@ import XCTest
 
             // full input
             var options = requestOptions()
-            options.requireJapanesePrediction = false
+            options.requireJapanesePrediction = .disabled
             for (input, expect) in cases {
-                let converter = KanaKanjiConverter()
+                let converter = KanaKanjiConverter.withDefaultDictionary()
                 var c = ComposingText()
                 sequentialInput(&c, sequence: input, inputStyle: .direct)
                 let results = converter.requestCandidates(c, options: options)
@@ -161,7 +160,7 @@ import XCTest
             }
             // gradual input
             for (input, expect) in cases {
-                let converter = KanaKanjiConverter()
+                let converter = KanaKanjiConverter.withDefaultDictionary()
                 var c = ComposingText()
                 for char in input {
                     c.insertAtCursorPosition(String(char), inputStyle: .direct)
@@ -182,9 +181,9 @@ import XCTest
 
             // full input
             var options = requestOptions()
-            options.requireJapanesePrediction = false
+            options.requireJapanesePrediction = .disabled
             for (input, expect) in cases {
-                let converter = KanaKanjiConverter()
+                let converter = KanaKanjiConverter.withDefaultDictionary()
                 var c = ComposingText()
                 sequentialInput(&c, sequence: input, inputStyle: .roman2kana)
                 let results = converter.requestCandidates(c, options: options)
@@ -193,7 +192,7 @@ import XCTest
 
             // gradual input
             for (input, expect) in cases {
-                let converter = KanaKanjiConverter()
+                let converter = KanaKanjiConverter.withDefaultDictionary()
                 var c = ComposingText()
                 for char in input {
                     c.insertAtCursorPosition(String(char), inputStyle: .roman2kana)
@@ -264,7 +263,7 @@ import XCTest
 
         var score: Double = 0
         for (input, expect) in cases {
-            let converter = KanaKanjiConverter()
+            let converter = KanaKanjiConverter.withDefaultDictionary()
             var c = ComposingText()
             c.insertAtCursorPosition(input, inputStyle: .direct)
             let results = converter.requestCandidates(c, options: requestOptions())
@@ -313,7 +312,7 @@ import XCTest
 
         var score: Double = 0
         for (input, expect) in cases {
-            let converter = KanaKanjiConverter()
+            let converter = KanaKanjiConverter.withDefaultDictionary()
             var c = ComposingText()
             c.insertAtCursorPosition(input, inputStyle: .direct)
             let results = converter.requestCandidates(c, options: requestOptions())
@@ -612,11 +611,11 @@ import XCTest
 
         var score: Double = 0
         for (input, expect) in cases {
-            let converter = KanaKanjiConverter()
+            let converter = KanaKanjiConverter.withDefaultDictionary()
             var c = ComposingText()
             c.insertAtCursorPosition(input, inputStyle: .direct)
             var options = requestOptions()
-            options.requireJapanesePrediction = false
+            options.requireJapanesePrediction = .disabled
             let results = converter.requestCandidates(c, options: options)
 
             if results.mainResults[0].text == expect {
@@ -684,11 +683,11 @@ import XCTest
             }
 
             let argument = items[4]
-            let converter = KanaKanjiConverter()
+            let converter = KanaKanjiConverter.withDefaultDictionary()
             var c = ComposingText()
             c.insertAtCursorPosition(input, inputStyle: .direct)
             var options = requestOptions()
-            options.requireJapanesePrediction = false
+            options.requireJapanesePrediction = .disabled
             let results = converter.requestCandidates(c, options: options).mainResults
             cases += 1
             let azooKeyStatus = mozcEvaluation(command: command, argument: argument, results: results)

@@ -10,7 +10,7 @@ import AzooKeyUtils
 import CoreText
 import CustardKit
 import FoundationModels
-import KanaKanjiConverterModule
+import KanaKanjiConverterModuleWithDefaultDictionary
 import KeyboardExtensionUtils
 import KeyboardViews
 import OrderedCollections
@@ -31,7 +31,7 @@ final class InputManager {
     // TODO: isSelectedはdisplayedTextManagerが持っているべき
     var isSelected = false
     /// かな漢字変換を受け持つ変換器。
-    @MainActor private lazy var kanaKanjiConverter = KanaKanjiConverter(dicdataStore: DicdataStore(dictionaryURL: Self.dictionaryResourceURL))
+    @MainActor private lazy var kanaKanjiConverter = KanaKanjiConverter.withDefaultDictionary()
 
     init() {
         @KeyboardSetting(.liveConversion) var liveConversion
@@ -100,7 +100,6 @@ final class InputManager {
         return .init(text: text, value: 0, composingCount: .surfaceCount(self.composingText.convertTargetCursorPosition), lastMid: MIDData.一般.mid, data: [])
     }
 
-    private static let dictionaryResourceURL = Bundle.main.bundleURL.appendingPathComponent("Dictionary", isDirectory: true)
     private static let memoryDirectoryURL = (try? FileManager.default.url(for: .libraryDirectory, in: .userDomainMask, appropriateFor: nil, create: false)) ?? sharedContainerURL
     private static let sharedContainerURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: SharedStore.appGroupKey)!
     private static let zenzSmallWeightURL = Bundle.main.bundleURL.appendingPathComponent("zenz-v3.2-small-gguf/ggml-model-Q5_K_M.gguf", isDirectory: false)
