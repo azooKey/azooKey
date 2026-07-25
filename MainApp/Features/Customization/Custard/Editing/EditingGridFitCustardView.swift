@@ -132,6 +132,17 @@ struct EditingGridFitCustardView: CancelableEditor {
         self.isNewItem = editingItem == nil
     }
 
+    private func finishEditing(identifier: String) {
+        dismiss()
+        guard isNewItem, let onFinishEditing else {
+            return
+        }
+        Task { @MainActor in
+            await Task.yield()
+            onFinishEditing(identifier)
+        }
+    }
+
     private func gridFrame(
         position: KeyPosition,
         data: UserMadeKeyData
@@ -422,11 +433,7 @@ struct EditingGridFitCustardView: CancelableEditor {
                     } else {
                         self.save()
                         let saved = custard
-                        if let onFinishEditing {
-                            onFinishEditing(saved.identifier)
-                        } else {
-                            dismiss()
-                        }
+                        finishEditing(identifier: saved.identifier)
                     }
                 }
             }
