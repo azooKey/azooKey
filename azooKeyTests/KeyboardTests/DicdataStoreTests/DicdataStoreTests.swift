@@ -6,7 +6,7 @@
 //  Copyright © 2023 ensan. All rights reserved.
 //
 
-import KanaKanjiConverterModule
+import KanaKanjiConverterModuleWithDefaultDictionary
 import XCTest
 
 final class DicdataStoreTests: XCTestCase {
@@ -16,31 +16,10 @@ final class DicdataStoreTests: XCTestCase {
         }
     }
 
-    func requestOptions() -> ConvertRequestOptions {
-        ConvertRequestOptions(
-            N_best: 5,
-            requireJapanesePrediction: true,
-            requireEnglishPrediction: false,
-            keyboardLanguage: .ja_JP,
-            typographyLetterCandidate: false,
-            unicodeCandidate: true,
-            englishCandidateInRoman2KanaInput: true,
-            fullWidthRomanCandidate: false,
-            halfWidthKanaCandidate: false,
-            learningType: .nothing,
-            maxMemoryCount: 0,
-            shouldResetMemory: false,
-            dictionaryResourceURL: Bundle(for: type(of: self)).bundleURL.appendingPathComponent("Dictionary", isDirectory: true),
-            memoryDirectoryURL: URL(fileURLWithPath: ""),
-            sharedContainerURL: URL(fileURLWithPath: ""),
-            metadata: .init(appVersionString: "Tests")
-        )
-    }
-
     /// 絶対に変換できるべき候補をここに記述する
     ///  - 主に「変換できない」と報告のあった候補を追加する
     func testMustWords() throws {
-        let dicdataStore = DicdataStore(convertRequestOptions: requestOptions())
+        let dicdataStore = DicdataStore.withDefaultDictionary()
         let mustWords = [
             ("アサッテ", "明後日"),
             ("オトトシ", "一昨年"),
@@ -68,7 +47,7 @@ final class DicdataStoreTests: XCTestCase {
     /// 入っていてはおかしい候補をここに記述する
     ///  - 主に以前混入していたが取り除いた語を記述する
     func testMustNotWords() throws {
-        let dicdataStore = DicdataStore(convertRequestOptions: requestOptions())
+        let dicdataStore = DicdataStore.withDefaultDictionary()
         let mustWords = [
             ("タイ", "体."),
             ("アサッテ", "明日"),
@@ -86,7 +65,7 @@ final class DicdataStoreTests: XCTestCase {
     }
 
     func testGetLOUDSDataInRange() throws {
-        let dicdataStore = DicdataStore(convertRequestOptions: requestOptions())
+        let dicdataStore = DicdataStore.withDefaultDictionary()
         do {
             var c = ComposingText()
             c.insertAtCursorPosition("ヘンカン", inputStyle: .roman2kana)

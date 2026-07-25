@@ -40,7 +40,7 @@ Apple Developer Account（無料）が必要です。開発環境は最新のXco
 
 ### 辞書の変更
 
-azooKeyの辞書ファイルは任意に置き換えることができます。`azooKey_dictionary_storage`を任意のcommitにチェックアウトすることで、過去のバージョンの辞書を利用できます。また、[Google Drive](https://drive.google.com/drive/folders/1Kh7fgMFIzkpg7YwP3GhWTxFkXI-yzT9E?usp=sharing)ではさらに古いバージョンの辞書データも配布しています。
+標準辞書は[AzooKeyKanaKanjiConverter](https://github.com/azooKey/AzooKeyKanaKanjiConverter)の`KanaKanjiConverterModuleWithDefaultDictionary`に同梱されています。利用する辞書を変更する場合は、同リポジトリ側の辞書参照を変更してください。
 
 ### さらに詳しく
 
@@ -58,4 +58,3 @@ GitHub Sponsorsをご利用ください。
 Copyright (c) 2020-2025 Keita Miwa (ensan).
 
 azooKeyはMIT Licenseでライセンスされています。詳しくは[LICENSE](./LICENSE)をご覧ください。
-
