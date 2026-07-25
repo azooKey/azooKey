@@ -102,7 +102,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Successfuly imported '%1$@'(%2$@)"
+            "value" : "Successfully imported “%1$@ (%2$@)”"
           }
         },
         "ja" : {
@@ -242,7 +242,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can use it as a part of Custom Key settings"
+            "value" : "This feature is available as part of the Custom Key settings."
           }
         }
       }
@@ -252,7 +252,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Push 'Keyboard'"
+            "value" : "Tap “Keyboards”"
           }
         },
         "ja" : {
@@ -378,7 +378,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Support for “change to voiced kana action” is now available, through the customization of 小ﾞﾟ key in Japanese Flick Tab"
+            "value" : "You can now configure the “小ﾞﾟ” key on the Japanese Flick tab to add dakuten, as on Android."
           }
         }
       }
@@ -388,7 +388,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tap '片手'."
+            "value" : "Tap “One-Handed.”"
           }
         },
         "ja" : {
@@ -438,7 +438,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use names in 'Contacts.app' in conversion to enable more accurate conversion."
+            "value" : "Use names saved in the Contacts app to improve conversion accuracy."
           }
         }
       }
@@ -458,7 +458,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You need to grant access to \"contacts\""
+            "value" : "You need to allow access to Contacts."
           }
         },
         "ja" : {
@@ -653,7 +653,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To escape one-handed mode, tap %@."
+            "value" : "Tap %@ to return to the standard two-handed mode."
           }
         },
         "ja" : {
@@ -687,7 +687,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Longpress %@ to paste"
+            "value" : "Press and hold %@ to paste"
           }
         },
         "ja" : {
@@ -714,7 +714,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Move cursor for %@ characters repeatedly"
+            "value" : "Move the cursor %@ characters at a time"
           }
         },
         "ja" : {
@@ -731,7 +731,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Delete %@ character repeatedly"
+            "value" : "Delete %@ characters at a time"
           }
         },
         "ja" : {
@@ -747,7 +747,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Move cursor for %@ characters"
+            "value" : "Move the cursor by %@ characters"
           }
         },
         "ja" : {
@@ -763,7 +763,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Delete %@ character"
+            "value" : "Delete %@ characters"
           }
         },
         "ja" : {
@@ -813,7 +813,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@配信"
+            "value" : "Released on %@"
           }
         },
         "ja" : {
@@ -839,7 +839,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select %lldth candidate"
+            "value" : "Select candidate number %lld"
           }
         }
       }
@@ -1025,7 +1025,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You enabled azooKey!"
+            "value" : "azooKey is now enabled!"
           }
         },
         "ja" : {
@@ -1041,7 +1041,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "On azooKey, you can zoom letters and check them."
+            "value" : "azooKey can display enlarged text directly on the keyboard."
           }
         },
         "ja" : {
@@ -1105,7 +1105,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Review the implementation of azooKey"
+            "value" : "View azooKey’s source code"
           }
         },
         "ja" : {
@@ -1121,7 +1121,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "logo of azooKey"
+            "value" : "azooKey logo"
           }
         },
         "ja" : {
@@ -1217,7 +1217,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "azooKey's Text replacement"
+            "value" : "azooKey User Dictionary"
           }
         },
         "ja" : {
@@ -1282,7 +1282,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Before using azooKey, you need to add azooKey into the list of device keyboards"
+            "value" : "Before using azooKey, add it to your iPhone’s list of keyboards."
           }
         },
         "ja" : {
@@ -1563,7 +1563,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use shift key instead of Aa key in qwerty keyboards."
+            "value" : "Use a Shift key instead of the Aa key on QWERTY keyboards."
           }
         }
       }
@@ -1624,7 +1624,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Unicode letters conversion"
+            "value" : "Unicode Conversion"
           }
         },
         "ja" : {
@@ -1672,7 +1672,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wrong URL"
+            "value" : "The URL may be incorrect."
           }
         },
         "ja" : {
@@ -1720,7 +1720,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Getting URL"
+            "value" : "Fetching URL"
           }
         },
         "ja" : {
@@ -1885,7 +1885,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Items"
+            "value" : "Item"
           }
         },
         "ja" : {
@@ -1901,7 +1901,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add new item"
+            "value" : "Add Item"
           }
         },
         "ja" : {
@@ -1933,7 +1933,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Edit press action"
+            "value" : "Edit Action"
           }
         },
         "ja" : {
@@ -1949,7 +1949,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add new action"
+            "value" : "Add Action"
           }
         },
         "ja" : {
@@ -2040,7 +2040,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open source softwares (Japanese)"
+            "value" : "Open Source Software"
           }
         },
         "ja" : {
@@ -2150,7 +2150,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toggle show or not show cursor bar"
+            "value" : "Toggle Cursor Bar"
           }
         },
         "ja" : {
@@ -2182,7 +2182,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To hide the bar, you can simply input or delete letters, or tap and hold \"空白\" key again."
+            "value" : "To hide the cursor bar, enter or delete text, or press and hold the Space key again."
           }
         },
         "ja" : {
@@ -2272,7 +2272,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Custom actions doesn't work as expected"
+            "value" : "Custom Actions Don’t Work as Expected"
           }
         }
       }
@@ -2386,7 +2386,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Custom tabs have yet created"
+            "value" : "No Custom Tabs Yet"
           }
         },
         "ja" : {
@@ -2412,7 +2412,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Information of custom tab"
+            "value" : "Custom Tab Information"
           }
         },
         "ja" : {
@@ -2518,7 +2518,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Make custom tab"
+            "value" : "Create Custom Tab"
           }
         },
         "ja" : {
@@ -2534,7 +2534,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can use Tab Bar to move custom tabs."
+            "value" : "Use the tab bar to switch between custom tabs."
           }
         },
         "ja" : {
@@ -2592,7 +2592,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "starts"
+            "value" : "From"
           }
         },
         "ja" : {
@@ -2608,7 +2608,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keys"
+            "value" : "Key"
           }
         },
         "ja" : {
@@ -2640,7 +2640,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Size of this key"
+            "value" : "Key Size"
           }
         },
         "ja" : {
@@ -2673,7 +2673,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Color of key labels"
+            "value" : "Key Label Color"
           }
         },
         "ja" : {
@@ -2689,7 +2689,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Type of this key"
+            "value" : "Key Type"
           }
         },
         "ja" : {
@@ -2721,7 +2721,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Color of this key"
+            "value" : "Key Color"
           }
         },
         "ja" : {
@@ -2738,7 +2738,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Font size of key labels"
+            "value" : "Key Label Font Size"
           }
         },
         "ja" : {
@@ -2940,7 +2940,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Make keyboard able to use"
+            "value" : "Set Up the Keyboard"
           }
         },
         "ja" : {
@@ -3053,7 +3053,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enable haptics feedback when you press keys."
+            "value" : "Provide haptic feedback when a key is pressed."
           }
         },
         "ja" : {
@@ -3070,7 +3070,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Make sounds when you press keys♪"
+            "value" : "Play a sound when a key is pressed ♪"
           }
         },
         "ja" : {
@@ -3086,7 +3086,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Set letters inputted when you press this key."
+            "value" : "Set the text entered when this key is pressed."
           }
         },
         "ja" : {
@@ -3102,7 +3102,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Set the destination tab when you press this key."
+            "value" : "Set the tab to open when this key is pressed."
           }
         },
         "ja" : {
@@ -3144,7 +3144,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Set actions when you longpress this key in detail."
+            "value" : "Configure what happens when this key is pressed and held."
           }
         },
         "ja" : {
@@ -3192,7 +3192,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Forbid spider emojis"
+            "value" : "Hide Spider Emoji"
           }
         },
         "ja" : {
@@ -3224,7 +3224,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Clipboard histories"
+            "value" : "Clipboard History"
           }
         },
         "ja" : {
@@ -3241,7 +3241,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keep clipboard histories"
+            "value" : "Save Clipboard History"
           }
         },
         "ja" : {
@@ -3257,7 +3257,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Forbid cockroach emojis"
+            "value" : "Hide Cockroach Emoji"
           }
         },
         "ja" : {
@@ -3294,7 +3294,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This action could be invalid in future iOS versions"
+            "value" : "This action may become unavailable after a future major iOS update."
           }
         },
         "ja" : {
@@ -3310,7 +3310,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "An action which cannot be edited in this app"
+            "value" : "This action cannot be edited in this app."
           }
         },
         "ja" : {
@@ -3375,7 +3375,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This key doesn't have a moving tab action."
+            "value" : "This key has an action other than tab navigation assigned to it."
           }
         },
         "ja" : {
@@ -3408,7 +3408,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This key doesn't have input action."
+            "value" : "This key has a non-input action assigned to it."
           }
         },
         "ja" : {
@@ -3424,7 +3424,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This key has a non-input action assigned to it. To clear the current action and set it to input a character, press 'Set inputted letters'."
+            "value" : "This key has a non-input action assigned to it. To clear the current action and set the text to enter, tap “Set Input Text.”"
           }
         },
         "ja" : {
@@ -3440,7 +3440,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add a new alternative key which appears when longpressed"
+            "value" : "Add a Long-Press Variation"
           }
         },
         "ja" : {
@@ -3498,7 +3498,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Set this as a English default tab"
+            "value" : "Set as the Default English Tab"
           }
         }
       }
@@ -3600,7 +3600,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This operation cannot be canceled."
+            "value" : "This action cannot be undone."
           }
         },
         "ja" : {
@@ -3700,7 +3700,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Without this operation you cannot use azooKey"
+            "value" : "You cannot use azooKey until you complete this setup."
           }
         },
         "ja" : {
@@ -3717,7 +3717,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keeping histories of copied text, and make it possible to input them from clipboard history tab."
+            "value" : "Save a history of copied text and enter it from the dedicated Clipboard History tab."
           }
         },
         "ja" : {
@@ -3766,7 +3766,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ignore memories"
+            "value" : "Ignore Learning History"
           }
         },
         "ja" : {
@@ -3844,7 +3844,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keyboard Feedbacks"
+            "value" : "Keyboard Feedback"
           }
         },
         "ja" : {
@@ -3912,7 +3912,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This word is requested to be shared with other users. Please do not submit words that contain personal information."
+            "value" : "If you share this word, it will be visible to the public. Never share words that contain personal information."
           }
         }
       }
@@ -3922,7 +3922,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Save without Share"
+            "value" : "Save Without Sharing"
           }
         }
       }
@@ -4059,7 +4059,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Direct input style"
+            "value" : "Direct Input"
           }
         },
         "ja" : {
@@ -4075,7 +4075,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Others"
+            "value" : "Other"
           }
         }
       }
@@ -4296,7 +4296,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "'コピー履歴' button is added into tab bar."
+            "value" : "Added a Clipboard History button to the tab bar."
           }
         },
         "ja" : {
@@ -4371,7 +4371,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toggle show or not show tab bar"
+            "value" : "Toggle Tab Bar"
           }
         },
         "ja" : {
@@ -4452,7 +4452,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can edit the tab bar. You can rearrange, delete, append tabs and also add features like inputting, moving the cursor, and so on."
+            "value" : "Edit the tab bar to reorder, remove, or add tabs and actions such as entering text or moving the cursor."
           }
         },
         "ja" : {
@@ -4723,7 +4723,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "In another case, the application may be set to prohibit the use of the custom keyboard. If this is not fixed by restarting the application, please check there as well."
+            "value" : "Some apps may be configured to disallow custom keyboards. If restarting does not resolve the issue, check the app’s settings as well."
           }
         },
         "ja" : {
@@ -4962,7 +4962,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The font is 'Hiragino Mincho' which is commonly used in iOS. Please note that the glyphs of Mincho style are not always consistent with normative glyphs in handwriting."
+            "value" : "The font is Hiragino Mincho, which is commonly used on iOS. Please note that Mincho glyphs may differ from standard handwritten forms."
           }
         },
         "ja" : {
@@ -5064,7 +5064,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Flicking sensitivity"
+            "value" : "Flick Sensitivity"
           }
         },
         "ja" : {
@@ -5080,7 +5080,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Flick"
+            "value" : "Flick Input"
           }
         },
         "ja" : {
@@ -5112,7 +5112,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Using flick style, to flick \"a/A\" key, you can turn on caps lock."
+            "value" : "In Flick Input, flick up on the “a/A” key."
           }
         },
         "ja" : {
@@ -5128,7 +5128,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Using flick input style, you can also show it by longpressing ☆123 key at the left top edge of the keyboard. Using qwerty input style, you can show it by longpressing #+= key or 123 key at the left bottom edge of the keyboard."
+            "value" : "You can also display it by pressing and holding “☆123” at the top left in Flick Input, or “123” or “#+=” at the bottom left in QWERTY Input."
           }
         },
         "ja" : {
@@ -5355,7 +5355,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Paste copied text"
+            "value" : "Paste"
           }
         },
         "ja" : {
@@ -5372,7 +5372,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enable paste button"
+            "value" : "Paste Button"
           }
         },
         "ja" : {
@@ -5409,7 +5409,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To begin with, let's make a new template on 'Manage templates'. Push the button %@ and add a new template."
+            "value" : "First, create a template from Manage Templates. Tap %@ at the top right to add one."
           }
         },
         "ja" : {
@@ -5425,7 +5425,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "First, display the tab bar. You can display the tab bar by longpressing empty candidates space or longpressing symbols tab key."
+            "value" : "First, display the tab bar by pressing and holding the candidate area or the Symbols tab key."
           }
         },
         "ja" : {
@@ -5467,7 +5467,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ends"
+            "value" : "To"
           }
         },
         "ja" : {
@@ -5500,7 +5500,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Forbid earthworm emojis"
+            "value" : "Hide Earthworm Emoji"
           }
         }
       }
@@ -5547,7 +5547,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "More useful"
+            "value" : "Make It More Convenient"
           }
         },
         "ja" : {
@@ -5563,7 +5563,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Text replacement"
+            "value" : "User Dictionary"
           }
         },
         "ja" : {
@@ -5612,7 +5612,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "User dictionary and learning may not work well."
+            "value" : "The user dictionary and learning features may not work correctly."
           }
         }
       }
@@ -5710,7 +5710,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Settings for Live Conversion"
+            "value" : "Live Conversion Settings"
           }
         },
         "ja" : {
@@ -5742,7 +5742,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Labels"
+            "value" : "Label"
           }
         },
         "ja" : {
@@ -5758,7 +5758,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Type of label"
+            "value" : "Label Type"
           }
         },
         "ja" : {
@@ -5774,7 +5774,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Set labels"
+            "value" : "Set Label"
           }
         },
         "ja" : {
@@ -5895,7 +5895,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Roman to kana input style"
+            "value" : "Romaji-to-Kana Input"
           }
         },
         "ja" : {
@@ -5911,7 +5911,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Qwerty"
+            "value" : "QWERTY Input"
           }
         },
         "ja" : {
@@ -5927,7 +5927,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Using qwerty input style, you can register favorite letter on some of the keys in the number tab and on some of the variations which you can select by longpressing."
+            "value" : "In QWERTY Input, you can assign characters and long-press variations to some keys on the Numbers tab."
           }
         },
         "ja" : {
@@ -5943,7 +5943,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Using roman style, tap and hold \"Aa\" key, you can turn on caps lock."
+            "value" : "In QWERTY Input, press and hold the “Aa” key."
           }
         },
         "ja" : {
@@ -6103,7 +6103,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Overwrap"
+            "value" : "Overwrite"
           }
         },
         "ja" : {
@@ -6129,7 +6129,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Scroll down and push 'add'"
+            "value" : "Scroll down and tap “Add”"
           }
         },
         "ja" : {
@@ -6197,7 +6197,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Block unpleasant Emojis"
+            "value" : "Hide Unpleasant Emoji"
           }
         },
         "ja" : {
@@ -6233,7 +6233,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Paren"
+            "value" : "Parentheses"
           }
         }
       }
@@ -6260,7 +6260,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "We created 'Timestamp' template, so input %@."
+            "value" : "Since this template is named “Timestamp,” enter %@."
           }
         },
         "ja" : {
@@ -6339,7 +6339,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Make"
+            "value" : "Create"
           }
         },
         "ja" : {
@@ -6371,7 +6371,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Usage"
+            "value" : "How to Use"
           }
         },
         "ja" : {
@@ -6469,7 +6469,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The value is invalid. Please specify valid number"
+            "value" : "The value is invalid. Please enter a valid number."
           }
         },
         "ja" : {
@@ -6528,7 +6528,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Inputted letters"
+            "value" : "Text Entered"
           }
         },
         "ja" : {
@@ -6545,7 +6545,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Not necessarily equal to input letter."
+            "value" : "It does not have to match the text entered."
           }
         },
         "ja" : {
@@ -6561,7 +6561,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Complete"
+            "value" : "Confirm Input"
           }
         },
         "ja" : {
@@ -6577,7 +6577,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Set inputted letters"
+            "value" : "Set Input Text"
           }
         },
         "ja" : {
@@ -6611,7 +6611,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "By protecting composing text, azooKey will behave more stably in some web apps. \nSince this is an experimental feature, this feature may be discontinued without notice."
+            "value" : "Protects composing text to improve input stability in web apps and similar environments.\nAs this is an experimental feature, its behavior may change and issues may occur."
           }
         },
         "ja" : {
@@ -6628,7 +6628,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hiragana characters you input are immediately converted into kanji text, without manual operation"
+            "value" : "Automatically converts text as you type."
           }
         },
         "ja" : {
@@ -6687,7 +6687,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Display full-width numbers and roman letters candidates like 'ａｂｃ１２３'"
+            "value" : "Show conversion candidates for full-width alphanumeric characters, such as “ａｂｃ１２３.”"
           }
         },
         "ja" : {
@@ -6704,7 +6704,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Full-width numbers and roman letters candidates"
+            "value" : "Full-Width Alphanumeric Conversion"
           }
         },
         "ja" : {
@@ -6720,7 +6720,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Shared Links get invalid 30 days after the last download."
+            "value" : "Shared links expire about 30 days after the last download."
           }
         }
       }
@@ -6796,7 +6796,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The letter is zoomed as large as possible. Scroll right to check cut-off letters."
+            "value" : "Text is displayed as large as possible. Scroll right to view any cropped content."
           }
         },
         "ja" : {
@@ -6890,7 +6890,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Terms of use (Japanese)"
+            "value" : "Terms of Service (Japanese)"
           }
         },
         "ja" : {
@@ -6916,7 +6916,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Update"
+            "value" : "Terms of Service Update"
           }
         }
       }
@@ -6926,7 +6926,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Our Terms of Service is updated."
+            "value" : "The Terms of Service Have Been Updated"
           }
         }
       }
@@ -7000,7 +7000,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Delete & Rearrange"
+            "value" : "Delete and Reorder"
           }
         },
         "ja" : {
@@ -7016,7 +7016,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No actions"
+            "value" : "No Action"
           }
         },
         "ja" : {
@@ -7064,7 +7064,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Conversion to semi-voiced hiragana characters"
+            "value" : "Add Handakuten"
           }
         }
       }
@@ -7095,7 +7095,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Display half-width ｶﾀｶﾅ(katakana) candidates."
+            "value" : "Show conversion candidates in half-width katakana."
           }
         },
         "ja" : {
@@ -7112,7 +7112,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Half-width kana candidates"
+            "value" : "Half-Width Katakana Conversion"
           }
         },
         "ja" : {
@@ -7186,7 +7186,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "References"
+            "value" : "Reference Information"
           }
         },
         "ja" : {
@@ -7250,7 +7250,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Complete with Punctuation"
+            "value" : "Confirm with Punctuation"
           }
         }
       }
@@ -7270,7 +7270,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Insert a column to right"
+            "value" : "Insert a Column to the Right"
           }
         },
         "ja" : {
@@ -7358,7 +7358,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Japanese"
+            "value" : "Japanese Calendar"
           }
         },
         "ja" : {
@@ -7374,7 +7374,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When in trouble"
+            "value" : "Help"
           }
         },
         "ja" : {
@@ -7470,7 +7470,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Candidates"
+            "value" : "Conversion"
           }
         },
         "ja" : {
@@ -7529,7 +7529,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can add text replacements. It is different from thee device's text replacements."
+            "value" : "You can add conversion candidates. This is separate from the standard iOS user dictionary."
           }
         },
         "ja" : {
@@ -7611,7 +7611,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Request to add a candidate for conversion"
+            "value" : "Request a Conversion Candidate"
           }
         },
         "ja" : {
@@ -7644,7 +7644,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Display tab bar button when there is no candidates"
+            "value" : "Show the tab bar button when there are no conversion candidates."
           }
         },
         "ja" : {
@@ -7676,7 +7676,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Set sub label displayed in larger font"
+            "value" : "Set the text displayed in large type."
           }
         }
       }
@@ -7687,7 +7687,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zoom in"
+            "value" : "Display in Large Text"
           }
         },
         "ja" : {
@@ -7723,7 +7723,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Change uppercase ⇆ lowercase"
+            "value" : "Toggle Case, Small Kana, Dakuten, and Handakuten"
           }
         },
         "ja" : {
@@ -7771,7 +7771,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can make your original tab includes letters and sentences you need to input daily."
+            "value" : "Create a custom tab containing any text and phrases you like."
           }
         },
         "ja" : {
@@ -7804,7 +7804,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use memorizing (default)"
+            "value" : "Use Learning (Default)"
           }
         },
         "ja" : {
@@ -7820,7 +7820,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reset memories"
+            "value" : "Reset Learning History"
           }
         },
         "ja" : {
@@ -7837,7 +7837,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use memorizing"
+            "value" : "Use Learning"
           }
         },
         "ja" : {
@@ -7853,7 +7853,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reset memories. Is this alright?"
+            "value" : "Reset the learning history. Are you sure?"
           }
         },
         "ja" : {
@@ -7869,7 +7869,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Memories"
+            "value" : "Learning"
           }
         },
         "ja" : {
@@ -7921,7 +7921,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Set sub label displayed in smaller font"
+            "value" : "Set the text displayed in small type."
           }
         }
       }
@@ -7957,7 +7957,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Japanese Voiced kana key"
+            "value" : "Small Kana / Dakuten Key"
           }
         },
         "ja" : {
@@ -7973,7 +7973,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Conversion to small hiragana characters"
+            "value" : "Convert to Small Kana"
           }
         }
       }
@@ -7983,7 +7983,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fast"
+            "value" : "Slightly Fast"
           }
         },
         "ja" : {
@@ -8056,7 +8056,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add a paste button to the upper flick of the lower left cursor bar key."
+            "value" : "Add Paste to the upward flick action of the cursor key at the bottom left."
           }
         },
         "ja" : {
@@ -8098,7 +8098,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Please check it."
+            "value" : "Please make sure to review this."
           }
         }
       }
@@ -8161,7 +8161,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Color of selected keys"
+            "value" : "Pressed Key Color"
           }
         },
         "ja" : {
@@ -8178,7 +8178,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Actions when select"
+            "value" : "Tap Action"
           }
         },
         "ja" : {
@@ -8194,7 +8194,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Actions repeated during longpress"
+            "value" : "Repeat While Held"
           }
         },
         "ja" : {
@@ -8210,7 +8210,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Actions done when longpress starts"
+            "value" : "Action on Press"
           }
         },
         "ja" : {
@@ -8292,7 +8292,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enable new cursor bar which has been greatly improved usability."
+            "value" : "Enable the new cursor bar with improved usability."
           }
         },
         "ja" : {
@@ -8318,7 +8318,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Return key"
+            "value" : "Return Key"
           }
         },
         "ja" : {
@@ -8334,7 +8334,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Input Newline"
+            "value" : "Insert Newline"
           }
         }
       }
@@ -8344,7 +8344,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Numbers (qwerty style)"
+            "value" : "Numbers (QWERTY Input)"
           }
         },
         "ja" : {
@@ -8360,7 +8360,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can register your favorite letters on blue framed keys."
+            "value" : "Assign any symbols or characters to the blue-outlined keys on the Numbers tab."
           }
         },
         "ja" : {
@@ -8392,7 +8392,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Letters"
+            "value" : "Text"
           }
         },
         "ja" : {
@@ -8408,7 +8408,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Input letters"
+            "value" : "Enter Text"
           }
         },
         "ja" : {
@@ -8424,7 +8424,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Delete letters"
+            "value" : "Delete Text"
           }
         },
         "ja" : {
@@ -8440,7 +8440,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Font weight"
+            "value" : "Font Weight"
           }
         },
         "ja" : {
@@ -8466,7 +8466,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To zoom letters, you need to input the letters you want to zoom, and tap candidate and hold."
+            "value" : "To enlarge text, first enter the text you want to view, then press and hold its conversion candidate."
           }
         },
         "ja" : {
@@ -8482,7 +8482,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zooming difficult letters"
+            "value" : "Enlarge Text"
           }
         },
         "ja" : {
@@ -8498,7 +8498,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Words"
+            "value" : "Strings"
           }
         },
         "ja" : {
@@ -8550,7 +8550,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Finalize input by character type"
+            "value" : "Confirm Input by Character Type"
           }
         }
       }
@@ -8626,7 +8626,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use new cursor bar"
+            "value" : "Use the New Cursor Bar"
           }
         },
         "ja" : {
@@ -8653,7 +8653,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Stop memorizing"
+            "value" : "Stop Further Learning"
           }
         },
         "ja" : {
@@ -8737,7 +8737,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Japanese (flick style)"
+            "value" : "Japanese (Flick Input)"
           }
         },
         "ja" : {
@@ -8753,7 +8753,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Japanese (qwerty style)"
+            "value" : "Japanese (QWERTY Input)"
           }
         },
         "ja" : {
@@ -8769,7 +8769,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Japanese (follow your setting)"
+            "value" : "Japanese (Use Current Setting)"
           }
         },
         "ja" : {
@@ -8801,7 +8801,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can select Qwerty and Flick input styles for each of Japanese and English."
+            "value" : "Choose QWERTY Input or Flick Input independently for Japanese and English."
           }
         },
         "ja" : {
@@ -8817,7 +8817,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This tab is set as Japanese default tab"
+            "value" : "This tab is set as the default Japanese tab."
           }
         }
       }
@@ -8827,7 +8827,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Support for “change to voiced kana action” is now available"
+            "value" : "Custom keys in Japanese Flick Input now support adding dakuten."
           }
         }
       }
@@ -8838,7 +8838,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Conversion to English words during Japanese input"
+            "value" : "English Word Conversion During Japanese Input"
           }
         },
         "ja" : {
@@ -8854,7 +8854,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dates"
+            "value" : "Time"
           }
         },
         "ja" : {
@@ -8965,7 +8965,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Update histories (Japanese)"
+            "value" : "Update History (Japanese)"
           }
         },
         "ja" : {
@@ -9040,7 +9040,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Formats can be specified by yyyyMMddhhmmss style. You can check details on the Internet."
+            "value" : "Use a yyyyMMddhhmmss-style format. Refer to online documentation for details."
           }
         },
         "ja" : {
@@ -9162,7 +9162,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This application uses  IPAdic as the foundation for basic vocabulary."
+            "value" : "This application uses IPAdic as the foundation for basic vocabulary."
           }
         },
         "ja" : {
@@ -9306,7 +9306,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Color of border"
+            "value" : "Border Color"
           }
         },
         "ja" : {
@@ -9378,7 +9378,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Row key count"
+            "value" : "Column Count"
           }
         },
         "ja" : {
@@ -9394,7 +9394,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Request a feature or improvement"
+            "value" : "Request a Feature or Improvement"
           }
         },
         "ja" : {
@@ -9432,7 +9432,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No expected candidate"
+            "value" : "Desired Candidate Not Found"
           }
         }
       }
@@ -9490,7 +9490,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Preparation completed!"
+            "value" : "You’re All Set!"
           }
         },
         "ja" : {
@@ -9506,7 +9506,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zooming difficult letters"
+            "value" : "Enlarge Kanji"
           }
         },
         "ja" : {
@@ -9522,7 +9522,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Conversion to voiced hiragana characters"
+            "value" : "Add Dakuten"
           }
         }
       }
@@ -9533,7 +9533,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Do not display release button in one-handed mode"
+            "value" : "Hide the One-Handed Mode Exit Button"
           }
         },
         "ja" : {
@@ -9550,7 +9550,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hide the reset button displayed in one-handed mode. One-handed mode adjustment can be done from the tab bar button."
+            "value" : "Hide the exit button shown in one-handed mode. You can adjust one-handed mode from the tab bar button."
           }
         },
         "ja" : {
@@ -9630,7 +9630,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Color of special keys"
+            "value" : "Special Key Color"
           }
         },
         "ja" : {
@@ -9662,7 +9662,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Delete until certain letters"
+            "value" : "Delete Up to a Specific Character"
           }
         }
       }
@@ -9672,7 +9672,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Move cursor until certain letters"
+            "value" : "Move to a Specific Character"
           }
         }
       }
@@ -9726,7 +9726,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To delete current actions and set inputted letters, please push 'set destination tab.'"
+            "value" : "To clear the current actions and set the text to enter, tap “Set Input Text.”"
           }
         },
         "ja" : {
@@ -9743,7 +9743,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To delete current actions and set destination tab, please push 'set destination tab.'"
+            "value" : "To clear the current actions and set a destination tab, tap “Set Destination Tab.”"
           }
         },
         "ja" : {
@@ -9759,7 +9759,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Currently, azooKey doesn't support the Japanese flip phone input style."
+            "value" : "azooKey does not currently support Japanese multi-tap input."
           }
         },
         "ja" : {
@@ -9791,7 +9791,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Request adding word"
+            "value" : "Request Word Addition"
           }
         },
         "ja" : {
@@ -9807,7 +9807,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Requesting"
+            "value" : "Submitting Request"
           }
         },
         "ja" : {
@@ -9855,7 +9855,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Words to append"
+            "value" : "Text to Add"
           }
         }
       }
@@ -9865,7 +9865,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add target character"
+            "value" : "Add Target Character"
           }
         }
       }
@@ -9875,7 +9875,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Color of unimportant keys"
+            "value" : "Less Prominent Key Color"
           }
         },
         "ja" : {
@@ -9901,7 +9901,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select with relative position"
+            "value" : "Select Candidate by Relative Position"
           }
         }
       }
@@ -9927,7 +9927,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your theme is completed 🎉"
+            "value" : "Your Theme Is Ready 🎉"
           }
         },
         "ja" : {
@@ -9943,7 +9943,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Make your theme"
+            "value" : "Create Theme"
           }
         },
         "ja" : {
@@ -10180,7 +10180,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "If you want to get the list of emoji, please use the device's emojis keyboard."
+            "value" : "To browse all emoji, use the system emoji keyboard."
           }
         },
         "ja" : {
@@ -10212,7 +10212,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select with absolute position"
+            "value" : "Select Candidate by Absolute Position"
           }
         }
       }
@@ -10232,7 +10232,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select the key to which you want to register."
+            "value" : "Select the key you want to edit."
           }
         },
         "ja" : {
@@ -10248,7 +10248,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select the key to which you want to register."
+            "value" : "Select the direction you want to edit."
           }
         },
         "ja" : {
@@ -10348,7 +10348,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Column key count"
+            "value" : "Row Count"
           }
         },
         "ja" : {
@@ -10364,7 +10364,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Executed Repeatedly"
+            "value" : "Repeated"
           }
         }
       }
@@ -10374,7 +10374,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Longpress Type"
+            "value" : "Replacement Type"
           }
         }
       }
@@ -10501,7 +10501,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "With auto-prefix-completion, selecting candidate is more easy when you are inputting long text."
+            "value" : "Auto-confirmation makes it easier to select candidates when entering long text."
           }
         },
         "ja" : {
@@ -10518,7 +10518,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Display decorated font candidates like '𝕥𝕪𝕡𝕠𝕘𝕣𝕒𝕡𝕙𝕪' during English inputting."
+            "value" : "Show decorative text candidates such as “𝕥𝕪𝕡𝕠𝕘𝕣𝕒𝕡𝕙𝕪” while entering English text."
           }
         }
       }
@@ -10560,7 +10560,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "English (qwerty style)"
+            "value" : "English (QWERTY Input)"
           }
         },
         "ja" : {
@@ -10618,7 +10618,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Forbid mosquito emojis"
+            "value" : "Hide Mosquito Emoji"
           }
         }
       }
@@ -10671,7 +10671,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Decorated letters candidates"
+            "value" : "Decorative Letter Conversion"
           }
         },
         "ja" : {
@@ -10687,7 +10687,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add note if necessary"
+            "value" : "Add any additional information."
           }
         }
       }
@@ -10724,7 +10724,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gregorian - Japanese calendar conversion"
+            "value" : "Gregorian ⇄ Japanese Calendar Conversion"
           }
         },
         "ja" : {
@@ -10740,7 +10740,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To unlock, push the key again."
+            "value" : "Press the key again to turn it off."
           }
         },
         "ja" : {
@@ -10772,7 +10772,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Symbols (qwerty style)"
+            "value" : "Symbols (QWERTY Input)"
           }
         },
         "ja" : {
@@ -10900,7 +10900,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can change settings on Settings tab anytime"
+            "value" : "You can change these settings at any time in the Settings tab."
           }
         },
         "ja" : {
@@ -10948,7 +10948,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "High-level settings"
+            "value" : "Advanced Settings"
           }
         },
         "ja" : {
@@ -10980,7 +10980,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "If you mistakenly deleted letters, you could shake your device or swipe the input field with three fingers, and you can undo it."
+            "value" : "If you delete text by mistake, shake your device or swipe the input field with three fingers to undo it."
           }
         },
         "ja" : {
@@ -11056,7 +11056,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ruby"
+            "value" : "Reading"
           }
         },
         "ja" : {
@@ -11072,7 +11072,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ruby is empty"
+            "value" : "Reading is empty"
           }
         },
         "ja" : {
@@ -11088,7 +11088,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ruby and word"
+            "value" : "Reading and Word"
           }
         },
         "ja" : {
@@ -11232,7 +11232,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You have been already using a custom tab that has identifier %@. Do you overwrap it?"
+            "value" : "A custom tab with identifier %@ is already registered. Overwrite it?"
           }
         },
         "ja" : {
@@ -11318,7 +11318,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Frequency of suggestion"
+            "value" : "Prompt Frequency"
           }
         }
       }
@@ -11376,7 +11376,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Very fast"
+            "value" : "Fast"
           }
         },
         "ja" : {
@@ -11402,7 +11402,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Position Specification"
+            "value" : "Selection Method"
           }
         }
       }
@@ -11485,7 +11485,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Longpress"
+            "value" : "Long Press"
           }
         },
         "ja" : {
@@ -11501,7 +11501,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Longpress action"
+            "value" : "Long-Press Action"
           }
         },
         "ja" : {
@@ -11517,7 +11517,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Edit longpress action"
+            "value" : "Edit Long-Press Action"
           }
         },
         "ja" : {
@@ -11533,7 +11533,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Selectable variations when you longpress this key"
+            "value" : "Long-Press Variations"
           }
         },
         "ja" : {
@@ -11549,7 +11549,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Longpress Duration"
+            "value" : "Long-Press Duration"
           }
         }
       }
@@ -11611,7 +11611,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Blue framed part"
+            "value" : "Blue-Outlined Area"
           }
         },
         "ja" : {
@@ -11687,7 +11687,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Using the advanced transformation algorithm “Zenzai.”"
+            "value" : "Use the advanced conversion algorithm Zenzai."
           }
         }
       }
@@ -11697,7 +11697,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Yellow framed part"
+            "value" : "Yellow-Outlined Area"
           }
         },
         "ja" : {
