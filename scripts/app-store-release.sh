@@ -178,6 +178,10 @@ if [[ -n "${BUILD_NUMBER}" && ! "${BUILD_NUMBER}" =~ ^[0-9]+([.][0-9]+){0,2}$ ]]
     fail "ビルド番号は数字、またはピリオドで区切った数字を指定してください: ${BUILD_NUMBER}"
 fi
 
+if [[ -z "${BUILD_NUMBER}" && "${ACTION}" != "upload-only" ]]; then
+    fail "Archive作成にはビルド番号の明示指定が必要です。例: scripts/app-store-release.sh --build-number 2"
+fi
+
 if [[ -n "${MARKETING_VERSION}" && ! "${MARKETING_VERSION}" =~ ^[0-9]+([.][0-9]+){0,2}$ ]]; then
     fail "マーケティングバージョンは数字、またはピリオドで区切った数字を指定してください: ${MARKETING_VERSION}"
 fi
