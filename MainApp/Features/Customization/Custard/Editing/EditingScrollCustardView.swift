@@ -66,6 +66,17 @@ struct EditingScrollCustardView: CancelableEditor {
         self.isNewItem = editingItem == nil
     }
 
+    private func finishEditing(identifier: String) {
+        dismiss()
+        guard isNewItem, let onFinishEditing else {
+            return
+        }
+        Task { @MainActor in
+            await Task.yield()
+            onFinishEditing(identifier)
+        }
+    }
+
     private var interfaceSize: CGSize {
         let context = MainAppDesign.keyboardLayoutContext(
             containerWidth: UIScreen.main.bounds.width
@@ -246,11 +257,7 @@ struct EditingScrollCustardView: CancelableEditor {
                     } else {
                         self.save()
                         let saved = makeCustard(data: editingItem)
-                        if let onFinishEditing {
-                            onFinishEditing(saved.identifier)
-                        } else {
-                            dismiss()
-                        }
+                        finishEditing(identifier: saved.identifier)
                     }
                 }
             }
