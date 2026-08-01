@@ -149,10 +149,7 @@ struct UserDictionaryUpdater {
                 }
                 let ruby = items[0]
                 let rawWord = items[1]
-                // variation selector を除去
-                let normalizedWord = String(rawWord.unicodeScalars.filter { $0.value != 0xFE0F })
-                // denylist フィルタ
-                guard normalizedWord.allSatisfy({ !self.denylist.contains(String($0)) }) else {
+                guard let storedWord = UserDictionaryWordFilter.filter(rawWord, denylist: self.denylist) else {
                     continue
                 }
 
@@ -161,7 +158,7 @@ struct UserDictionaryUpdater {
                 let mid = Int(items[4]) ?? 0
                 let value = PValue(items[5]) ?? -30.0
                 let entry = DicdataElement(
-                    word: normalizedWord,
+                    word: storedWord,
                     ruby: ruby,
                     lcid: lcid,
                     rcid: rcid,
@@ -169,7 +166,7 @@ struct UserDictionaryUpdater {
                     value: value
                 )
                 // templateが含まれる場合ショートカット扱いする
-                let isShortcut = Candidate.parseTemplate(normalizedWord) != normalizedWord
+                let isShortcut = Candidate.parseTemplate(storedWord) != storedWord
                 if isShortcut {
                     shortcutEntries.append(entry)
                 } else {
