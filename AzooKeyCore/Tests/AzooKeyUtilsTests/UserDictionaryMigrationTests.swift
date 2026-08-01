@@ -24,7 +24,9 @@ final class UserDictionaryMigrationTests: XCTestCase {
         guard let migratedDate = td.literal as? DateTemplateLiteral else {
             XCTFail("Expected DateTemplateLiteral"); return
         }
-        XCTAssertEqual(migratedDate.format, "prefix yyyy/MM/dd suffix")
+        // v3.0.2から、前後の文字列はICUの日付パターンとして解釈されないよう
+        // シングルクォートで囲んで保存している。この保存形式を維持する。
+        XCTAssertEqual(migratedDate.format, "'prefix 'yyyy/MM/dd' suffix'")
     }
 
     func test_migrate_unknown_single_placeholder_skipped() {
