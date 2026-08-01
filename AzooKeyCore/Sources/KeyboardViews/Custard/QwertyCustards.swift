@@ -165,12 +165,20 @@ private enum DefaultQwertyCustards {
             ? legacyNumberMiddleKeys
             : customKeys.keys
         let middleKeyWidth = 7.0 / Double(middleKeys.count)
-        for (index, key) in middleKeys.enumerated() {
+        let middleKeyGeometry = middleKeys.count == punctuationGeometry.count
+            ? punctuationGeometry
+            : middleKeys.indices.map { index in
+                (
+                    x: 1.5 + Double(index) * middleKeyWidth,
+                    width: middleKeyWidth
+                )
+            }
+        for (key, geometry) in zip(middleKeys, middleKeyGeometry) {
             keys[
                 position(
-                    1.5 + Double(index) * middleKeyWidth,
+                    geometry.x,
                     2,
-                    width: middleKeyWidth
+                    width: geometry.width
                 )
             ] = customInputKey(
                 label: key.name,
