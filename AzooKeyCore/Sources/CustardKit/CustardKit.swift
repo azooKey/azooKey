@@ -247,6 +247,15 @@ public struct GridFitPositionSpecifier: Codable, Hashable, Sendable {
     public var width: Double
     public var height: Double
 
+    /// Returns whether this key frame and another frame share a positive-area region.
+    /// Frames that only touch at an edge are not considered intersecting.
+    public func intersects(_ other: Self) -> Bool {
+        self.x < other.x + other.width
+            && other.x < self.x + self.width
+            && self.y < other.y + other.height
+            && other.y < self.y + self.height
+    }
+
     private enum CodingKeys: CodingKey {
         case x, y, width, height
     }

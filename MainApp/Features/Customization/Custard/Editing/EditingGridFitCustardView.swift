@@ -39,10 +39,7 @@ private func gridFramesIntersect(
     _ lhs: GridFitPositionSpecifier,
     _ rhs: GridFitPositionSpecifier
 ) -> Bool {
-    lhs.x < rhs.x + rhs.width
-        && rhs.x < lhs.x + lhs.width
-        && lhs.y < rhs.y + rhs.height
-        && rhs.y < lhs.y + lhs.height
+    lhs.intersects(rhs)
 }
 
 fileprivate extension Dictionary where Key == KeyPosition, Value == UserMadeKeyData {
@@ -848,6 +845,15 @@ private struct GridFitKeyPlacementEditor: View {
         }
         guard placement.width > 0, placement.height > 0 else {
             return "横幅と縦幅は0より大きくしてください"
+        }
+        let placementBounds = GridFitPositionSpecifier(
+            x: 0,
+            y: 0,
+            width: Double(horizontalCount),
+            height: Double(verticalCount)
+        )
+        guard placement.frame.intersects(placementBounds) else {
+            return "キーの一部が配置範囲に入るようにしてください"
         }
         guard !occupied.contains(where: {
             $0.x == placement.x && $0.y == placement.y
