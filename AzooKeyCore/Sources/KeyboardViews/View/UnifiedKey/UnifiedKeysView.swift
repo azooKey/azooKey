@@ -1,3 +1,4 @@
+import CustardKit
 import Foundation
 import SwiftUI
 
@@ -7,12 +8,24 @@ public struct UnifiedKeysView<Extension: ApplicationSpecificKeyboardViewExtensio
     private let tabDesign: TabDependentDesign
     @State private var activeSuggestKeys: Set<String> = []
 
-    private static func isWithinBounds(_ position: UnifiedPositionSpecifier, tabDesign: TabDependentDesign) -> Bool {
-        position.x >= 0 && position.y >= 0 && position.x + position.width <= tabDesign.horizontalKeyCount && position.y + position.height <= tabDesign.verticalKeyCount
+    private static func isVisible(_ position: UnifiedPositionSpecifier, tabDesign: TabDependentDesign) -> Bool {
+        GridFitPositionSpecifier(
+            x: Double(position.x),
+            y: Double(position.y),
+            width: Double(position.width),
+            height: Double(position.height)
+        ).intersects(
+            .init(
+                x: 0,
+                y: 0,
+                width: Double(tabDesign.horizontalKeyCount),
+                height: Double(tabDesign.verticalKeyCount)
+            )
+        )
     }
 
     public init(models: [(position: UnifiedPositionSpecifier, model: any UnifiedKeyModelProtocol<Extension>)], tabDesign: TabDependentDesign, @ViewBuilder generator: @escaping (UnifiedGenericKeyView<Extension>, UnifiedPositionSpecifier) -> (Content)) {
-        self.models = models.filter { Self.isWithinBounds($0.position, tabDesign: tabDesign) }
+        self.models = models.filter { Self.isVisible($0.position, tabDesign: tabDesign) }
         self.tabDesign = tabDesign
         self.contentGenerator = generator
     }
