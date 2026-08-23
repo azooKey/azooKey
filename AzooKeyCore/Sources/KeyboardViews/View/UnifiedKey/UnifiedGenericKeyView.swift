@@ -603,7 +603,8 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                 x: theme.keyShadow?.x ?? 0,
                 y: theme.keyShadow?.y ?? 0
             ),
-            blendMode: keyBackgroundStyle.blendMode
+            blendMode: keyBackgroundStyle.blendMode,
+            appearance: theme.style
         )
         .gesture(flickGesture.simultaneously(with: qwertyGesture))
         .overlay { self.model.label(width: size.width, theme: theme, states: variableStates, color: nil) }
