@@ -14,7 +14,7 @@ struct UpdateHistoryView: View {
             // version 3系
             Group {
                 // version 3.1系
-                VersionView("3.1", releaseDate: "近日公開予定") {
+                VersionView("3.1", releaseDate: "2026年08月26日") {
                     if #unavailable(iOS 18) {
                         ParagraphView("お知らせ。") {
                             "バージョン3.2以降でiOS 17のサポートを終了します。iOS 18を最新の状態にアップデートすることで、引き続きご利用いただけます。ご不便をおかけしますが、よろしくお願いいたします"
