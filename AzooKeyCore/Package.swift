@@ -44,7 +44,7 @@ let package = Package(
         // MARK: `_: .upToNextMinor(Version)` or `exact: Version` or `revision: Version`.
         // MARK: For develop branch, you can use `revision:` specification.
         // MARK: For main branch, you must use `upToNextMinor` specification.
-        .package(url: "https://github.com/azooKey/AzooKeyKanaKanjiConverter", revision: "8e3a6eb89e088efd868aa28dadb74c697df4e6fb", traits: ["ZenzaiCPU"]),
+        .package(url: "https://github.com/azooKey/AzooKeyKanaKanjiConverter", revision: "93766c46e31fa6a18b7ced49dab31337780f6f45", traits: ["ZenzaiCPU"]),
     ],
     targets: [
         .target(
