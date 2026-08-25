@@ -662,7 +662,7 @@ public struct CustardInterfaceCustomKey: Codable, Equatable, Hashable, Sendable 
     public var variations: [CustardInterfaceVariation]
 
     /// - direction in which long-press variations expand.
-    ///   `nil` keeps the legacy center-aligned behavior.
+    ///   `nil` automatically selects a direction that minimizes screen overflow.
     public var longpress_variation_direction: CustardInterfaceLongpressVariationDirection?
 
     /// - whether the key shows a QWERTY-style tap bubble.

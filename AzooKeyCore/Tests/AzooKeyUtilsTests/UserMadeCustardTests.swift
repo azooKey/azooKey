@@ -234,51 +234,45 @@ final class UserMadeCustardTests: XCTestCase {
         }
     }
 
-    func test_defaultQwertyCustardsPreserveVariationPresentation() throws {
+    func test_defaultQwertyCustardsUseAutomaticVariationDirection() throws {
         let japaneseLetter = try customKey(
             in: .qwertyJapanese,
             at: .init(x: 0, y: 0)
         )
-        XCTAssertEqual(
-            japaneseLetter.longpress_variation_direction,
-            .right
-        )
+        XCTAssertNil(japaneseLetter.longpress_variation_direction)
         XCTAssertEqual(japaneseLetter.shows_tap_bubble, true)
 
         let japaneseBar = try customKey(
             in: .qwertyJapanese,
             at: .init(x: 9, y: 1)
         )
-        XCTAssertEqual(japaneseBar.longpress_variation_direction, .left)
+        XCTAssertNil(japaneseBar.longpress_variation_direction)
         XCTAssertEqual(japaneseBar.shows_tap_bubble, true)
 
         let numberCenter = try customKey(
             in: .qwertyNumbers,
             at: .init(x: 4, y: 0)
         )
-        XCTAssertEqual(numberCenter.longpress_variation_direction, .center)
+        XCTAssertNil(numberCenter.longpress_variation_direction)
         XCTAssertEqual(numberCenter.shows_tap_bubble, true)
 
         let numberRightEdge = try customKey(
             in: .qwertyNumbers,
             at: .init(x: 0, y: 0)
         )
-        XCTAssertEqual(numberRightEdge.longpress_variation_direction, .right)
+        XCTAssertNil(numberRightEdge.longpress_variation_direction)
 
         let numberLeftEdge = try customKey(
             in: .qwertyNumbers,
             at: .init(x: 9, y: 0)
         )
-        XCTAssertEqual(numberLeftEdge.longpress_variation_direction, .left)
+        XCTAssertNil(numberLeftEdge.longpress_variation_direction)
 
         let symbolWithoutVariations = try customKey(
             in: .qwertySymbols,
             at: .init(x: 0, y: 1)
         )
-        XCTAssertEqual(
-            symbolWithoutVariations.longpress_variation_direction,
-            .right
-        )
+        XCTAssertNil(symbolWithoutVariations.longpress_variation_direction)
         XCTAssertEqual(symbolWithoutVariations.shows_tap_bubble, false)
     }
 
