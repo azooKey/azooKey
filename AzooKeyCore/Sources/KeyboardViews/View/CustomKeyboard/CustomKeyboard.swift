@@ -38,6 +38,13 @@ fileprivate extension CustardInterfaceLayoutScrollValue {
 
 public extension CustardInterface {
     @MainActor func unifiedKeyModels<Extension: ApplicationSpecificKeyboardViewExtension>(extension _: Extension.Type) -> [(position: UnifiedPositionSpecifier, model: any UnifiedKeyModelProtocol<Extension>)] {
+        let horizontalKeyCount: CGFloat? = switch self.keyLayout {
+        case let .gridFit(layout):
+            CGFloat(layout.rowCount)
+        case .gridScroll:
+            nil
+        }
+
         func flickTabKeyModel(_ data: KeyFlickSetting.SettingData) -> any UnifiedKeyModelProtocol<Extension> {
             FlickTabKeyModel<Extension>(
                 labelType: data.labelType,
@@ -139,12 +146,22 @@ public extension CustardInterface {
                 }
                 let needSuggest = val.shows_tap_bubble ?? defaultNeedSuggest
                 let linearDirection: VariationsViewDirection = switch val.longpress_variation_direction {
-                case .center, .none:
+                case .center:
                     .center
                 case .right:
                     .right
                 case .left:
                     .left
+                case .none:
+                    if let horizontalKeyCount {
+                        .automatic(
+                            position: pos,
+                            variationCount: linear.count,
+                            horizontalKeyCount: horizontalKeyCount
+                        )
+                    } else {
+                        .center
+                    }
                 }
                 let shouldUppercaseForEnglish: Bool
                 if self.keyStyle == .pcStyle,
