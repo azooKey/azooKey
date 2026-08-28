@@ -243,6 +243,41 @@ public struct UserMadeGridFitCustard: Codable, Sendable, Equatable {
 }
 
 public extension Custard {
+    var userMadeGridScrollCustard: UserMadeGridScrollCustard? {
+        guard self.language == .none,
+              self.input_style == .direct,
+              case let .gridScroll(layout) = self.interface.keyLayout else {
+            return nil
+        }
+
+        func countDescription(_ value: Double) -> String {
+            let description = value.description
+            return description.hasSuffix(".0")
+                ? String(description.dropLast(2))
+                : description
+        }
+
+        let keys = self.interface.keys.compactMap { position, key in
+            guard case let .gridScroll(value) = position else {
+                return nil as (index: Int, key: CustardInterfaceKey)?
+            }
+            return (value.index, key)
+        }
+        .sorted { $0.index < $1.index }
+        .map {
+            UserMadeKeyData(model: $0.key, width: 1, height: 1)
+        }
+
+        return UserMadeGridScrollCustard(
+            tabName: self.identifier,
+            direction: layout.direction,
+            columnCount: countDescription(layout.columnCount),
+            rowCount: countDescription(layout.rowCount),
+            keys: keys,
+            addTabBarAutomatically: true
+        )
+    }
+
     var userMadeGridFitCustard: UserMadeGridFitCustard? {
         guard case let .gridFit(layout) = self.interface.keyLayout else {
             return nil

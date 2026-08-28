@@ -167,6 +167,11 @@ struct CustardInformationView: View {
                         }
                         .foregroundStyle(.accentColor)
                     }
+                } else if let editingItem = custard.userMadeGridScrollCustard {
+                    NavigationLink("編集する") {
+                        EditingScrollCustardView(manager: $keyboardConfiguration.custardManager, editingItem: editingItem, onFinishEditing: onFinishEditing)
+                    }
+                    .foregroundStyle(.accentColor)
                 } else if let editingItem = custard.userMadeGridFitCustard {
                     NavigationLink("編集する") {
                         EditingGridFitCustardView(manager: $keyboardConfiguration.custardManager, editingItem: editingItem, onFinishEditing: onFinishEditing)

@@ -187,6 +187,11 @@ struct ManageCustardView: View {
                                         }
                                     }
                                     Divider()
+                                } else if let editingItem = custard.userMadeGridScrollCustard {
+                                    NavigationLink("編集") {
+                                        EditingScrollCustardView(manager: $manager, editingItem: editingItem, onFinishEditing: onFinishEditing)
+                                    }
+                                    Divider()
                                 } else if let editingItem = custard.userMadeGridFitCustard {
                                     NavigationLink("編集") {
                                         EditingGridFitCustardView(manager: $manager, editingItem: editingItem, onFinishEditing: onFinishEditing)
