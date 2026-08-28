@@ -142,6 +142,72 @@ final class UserMadeCustardTests: XCTestCase {
         XCTAssertTrue(editingData.emptyKeys.isEmpty)
     }
 
+    func test_gridScrollCustardCanBeConvertedForEditing() throws {
+        let firstKey = CustardInterfaceKey.custom(
+            .init(
+                design: .init(label: .text("first"), color: .normal),
+                press_actions: [.directInput("first")],
+                longpress_actions: .none,
+                variations: []
+            )
+        )
+        let secondKey = CustardInterfaceKey.system(.enter)
+        let custard = Custard(
+            identifier: "grid-scroll",
+            language: .none,
+            input_style: .direct,
+            metadata: .init(
+                custard_version: .v1_2,
+                display_name: "Grid Scroll"
+            ),
+            interface: .init(
+                keyStyle: .tenkeyStyle,
+                keyLayout: .gridScroll(
+                    .init(
+                        direction: .horizontal,
+                        rowCount: 4,
+                        columnCount: 3
+                    )
+                ),
+                keys: [
+                    .gridScroll(.init(1)): secondKey,
+                    .gridScroll(.init(0)): firstKey,
+                ]
+            )
+        )
+
+        let editingData = try XCTUnwrap(custard.userMadeGridScrollCustard)
+
+        XCTAssertEqual(editingData.tabName, "grid-scroll")
+        XCTAssertEqual(editingData.direction, .horizontal)
+        XCTAssertEqual(editingData.rowCount, "4")
+        XCTAssertEqual(editingData.columnCount, "3")
+        XCTAssertEqual(editingData.keys.map(\.model), [firstKey, secondKey])
+        XCTAssertTrue(editingData.keys.allSatisfy { $0.width == 1 })
+        XCTAssertTrue(editingData.keys.allSatisfy { $0.height == 1 })
+    }
+
+    func test_incompatibleGridScrollCustardCannotBeConvertedForEditing() {
+        let custard = Custard(
+            identifier: "roman-grid-scroll",
+            language: .ja_JP,
+            input_style: .roman2kana,
+            metadata: .init(
+                custard_version: .v1_2,
+                display_name: "Roman Grid Scroll"
+            ),
+            interface: .init(
+                keyStyle: .tenkeyStyle,
+                keyLayout: .gridScroll(
+                    .init(direction: .vertical, rowCount: 4, columnCount: 4)
+                ),
+                keys: [:]
+            )
+        )
+
+        XCTAssertNil(custard.userMadeGridScrollCustard)
+    }
+
     func test_defaultQwertyCustardsCanBeConvertedForEditing() throws {
         let custards: [Custard] = [
             .qwertyJapanese,
