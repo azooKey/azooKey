@@ -14,6 +14,12 @@ struct UpdateHistoryView: View {
             // version 3系
             Group {
                 // version 3.1系
+                VersionView("3.1.1", releaseDate: "2026年08月29日") {
+                    ParagraphView("不具合を修正しました。") {
+                        "キーの長押し候補が画面外に表示されることがある問題を修正しました"
+                        "読み込んだ定型文タブを編集できない問題を修正しました"
+                    }
+                }
                 VersionView("3.1", releaseDate: "2026年08月26日") {
                     if #unavailable(iOS 18) {
                         ParagraphView("お知らせ。") {
