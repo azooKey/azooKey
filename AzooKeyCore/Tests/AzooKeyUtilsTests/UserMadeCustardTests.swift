@@ -319,45 +319,29 @@ final class UserMadeCustardTests: XCTestCase {
         }
     }
 
-    func test_defaultQwertyCustardsUseAutomaticVariationDirection() throws {
+    func test_defaultQwertyCustardsPreserveTapBubblePresentation() throws {
         let japaneseLetter = try customKey(
             in: .qwertyJapanese,
             at: .init(x: 0, y: 0)
         )
-        XCTAssertNil(japaneseLetter.longpress_variation_direction)
         XCTAssertEqual(japaneseLetter.shows_tap_bubble, true)
 
         let japaneseBar = try customKey(
             in: .qwertyJapanese,
             at: .init(x: 9, y: 1)
         )
-        XCTAssertNil(japaneseBar.longpress_variation_direction)
         XCTAssertEqual(japaneseBar.shows_tap_bubble, true)
 
         let numberCenter = try customKey(
             in: .qwertyNumbers,
             at: .init(x: 4, y: 0)
         )
-        XCTAssertNil(numberCenter.longpress_variation_direction)
         XCTAssertEqual(numberCenter.shows_tap_bubble, true)
-
-        let numberRightEdge = try customKey(
-            in: .qwertyNumbers,
-            at: .init(x: 0, y: 0)
-        )
-        XCTAssertNil(numberRightEdge.longpress_variation_direction)
-
-        let numberLeftEdge = try customKey(
-            in: .qwertyNumbers,
-            at: .init(x: 9, y: 0)
-        )
-        XCTAssertNil(numberLeftEdge.longpress_variation_direction)
 
         let symbolWithoutVariations = try customKey(
             in: .qwertySymbols,
             at: .init(x: 0, y: 1)
         )
-        XCTAssertNil(symbolWithoutVariations.longpress_variation_direction)
         XCTAssertEqual(symbolWithoutVariations.shows_tap_bubble, false)
     }
 

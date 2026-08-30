@@ -351,7 +351,6 @@ private enum DefaultQwertyCustards {
                         )
                     )
                 },
-                longpress_variation_direction: nil,
                 shows_tap_bubble: showsTapBubble
             )
         )
@@ -377,7 +376,6 @@ private enum DefaultQwertyCustards {
                         )
                     )
                 },
-                longpress_variation_direction: nil,
                 shows_tap_bubble: !variations.isEmpty
             )
         )
@@ -393,7 +391,6 @@ private enum DefaultQwertyCustards {
                 press_actions: [.moveTab(.system(destination))],
                 longpress_actions: .init(start: [.toggleTabBar]),
                 variations: [],
-                longpress_variation_direction: nil,
                 shows_tap_bubble: false
             )
         )
@@ -409,7 +406,6 @@ private enum DefaultQwertyCustards {
                 press_actions: [.delete(1)],
                 longpress_actions: .init(repeat: [.delete(1)]),
                 variations: [],
-                longpress_variation_direction: nil,
                 shows_tap_bubble: false
             )
         )
