@@ -57,6 +57,7 @@ struct EditingScrollCustardView: CancelableEditor {
     private let onFinishEditing: ((String) -> Void)?
     @Environment(\.dismiss) var dismiss
     @State private var showDuplicateAlert = false
+    @State private var showSaveErrorAlert = false
 
     init(manager: Binding<CustardManager>, editingItem: UserMadeGridScrollCustard? = nil, onFinishEditing: ((String) -> Void)? = nil) {
         self._manager = manager
@@ -255,15 +256,24 @@ struct EditingScrollCustardView: CancelableEditor {
                     if isNewItem && manager.availableCustards.contains(editingItem.tabName) {
                         showDuplicateAlert = true
                     } else {
-                        self.save()
-                        let saved = makeCustard(data: editingItem)
-                        finishEditing(identifier: saved.identifier)
+                        do {
+                            let saved = try self.save()
+                            finishEditing(identifier: saved.identifier)
+                        } catch {
+                            debug(error)
+                            showSaveErrorAlert = true
+                        }
                     }
                 }
             }
         }
         .alert("名前が重複しています", isPresented: $showDuplicateAlert) {
             Button("OK", role: .cancel) {}
+        }
+        .alert("保存できませんでした", isPresented: $showSaveErrorAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("編集内容は保持されています。設定を確認して、もう一度保存してください。")
         }
     }
 
@@ -288,17 +298,15 @@ struct EditingScrollCustardView: CancelableEditor {
         )
     }
 
-    private func save() {
-        do {
-            try self.manager.saveCustard(
-                custard: makeCustard(data: editingItem),
-                metadata: .init(origin: .userMade),
-                userData: .gridScroll(editingItem),
-                updateTabBar: self.isNewItem && self.editingItem.addTabBarAutomatically
-            )
-        } catch {
-            debug(error)
-        }
+    private func save() throws -> Custard {
+        let custard = makeCustard(data: editingItem)
+        try self.manager.saveCustard(
+            custard: custard,
+            metadata: .init(origin: .userMade),
+            userData: .gridScroll(editingItem),
+            updateTabBar: self.isNewItem && self.editingItem.addTabBarAutomatically
+        )
+        return custard
     }
 
     func cancel() {

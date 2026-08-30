@@ -216,6 +216,12 @@ public struct UserMadeGridFitCustard: Codable, Sendable, Equatable {
     public var keyStyle: KeyStyle
     public var addTabBarAutomatically: Bool
 
+    public func canUseKeyStyle(_ keyStyle: KeyStyle) -> Bool {
+        keyStyle == .pcStyle || !self.keys.values.contains {
+            $0.model.isQwertySystemKey
+        }
+    }
+
     private enum CodingKeys: CodingKey {
         case tabName
         case rowCount
