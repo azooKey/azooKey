@@ -624,13 +624,6 @@ public extension CustardInterfaceSystemKey {
     }
 }
 
-/// - direction in which long-press variations expand
-public enum CustardInterfaceLongpressVariationDirection: String, Codable, Equatable, Hashable, Sendable {
-    case center
-    case right
-    case left
-}
-
 /// - keys you can defined
 public struct CustardInterfaceCustomKey: Codable, Equatable, Hashable, Sendable {
     public init(
@@ -638,14 +631,12 @@ public struct CustardInterfaceCustomKey: Codable, Equatable, Hashable, Sendable 
         press_actions: [CodableActionData],
         longpress_actions: CodableLongpressActionData,
         variations: [CustardInterfaceVariation],
-        longpress_variation_direction: CustardInterfaceLongpressVariationDirection? = nil,
         shows_tap_bubble: Bool? = nil
     ) {
         self.design = design
         self.press_actions = press_actions
         self.longpress_actions = longpress_actions
         self.variations = variations
-        self.longpress_variation_direction = longpress_variation_direction
         self.shows_tap_bubble = shows_tap_bubble
     }
 
@@ -660,10 +651,6 @@ public struct CustardInterfaceCustomKey: Codable, Equatable, Hashable, Sendable 
 
     /// - variations available when user flick or longpress this key
     public var variations: [CustardInterfaceVariation]
-
-    /// - direction in which long-press variations expand.
-    ///   `nil` automatically selects a direction that minimizes screen overflow.
-    public var longpress_variation_direction: CustardInterfaceLongpressVariationDirection?
 
     /// - whether the key shows a QWERTY-style tap bubble.
     ///   `nil` keeps the legacy behavior inferred from the key style and actions.

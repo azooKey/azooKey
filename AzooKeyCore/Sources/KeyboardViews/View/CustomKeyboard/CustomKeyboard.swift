@@ -145,23 +145,14 @@ public extension CustardInterface {
                     val.longpress_actions.isEmpty
                 }
                 let needSuggest = val.shows_tap_bubble ?? defaultNeedSuggest
-                let linearDirection: VariationsViewDirection = switch val.longpress_variation_direction {
-                case .center:
+                let linearDirection: VariationsViewDirection = if let horizontalKeyCount {
+                    .automatic(
+                        position: pos,
+                        variationCount: linear.count,
+                        horizontalKeyCount: horizontalKeyCount
+                    )
+                } else {
                     .center
-                case .right:
-                    .right
-                case .left:
-                    .left
-                case .none:
-                    if let horizontalKeyCount {
-                        .automatic(
-                            position: pos,
-                            variationCount: linear.count,
-                            horizontalKeyCount: horizontalKeyCount
-                        )
-                    } else {
-                        .center
-                    }
                 }
                 let shouldUppercaseForEnglish: Bool
                 if self.keyStyle == .pcStyle,

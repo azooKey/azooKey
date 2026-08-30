@@ -1,4 +1,5 @@
 @testable import CustardKit
+import Foundation
 import XCTest
 
 final class CustardInterfaceCustomKeyTest: XCTestCase {
@@ -34,8 +35,11 @@ final class CustardInterfaceCustomKeyTest: XCTestCase {
                 )
             )
         }
-        do {
-            let target = """
+    }
+
+    func testDecodeIgnoresLegacyLongpressVariationDirection() throws {
+        let data = Data(
+            """
             {
                 "design": {"label":{"text": "A"}, "color": "normal"},
                 "press_actions": [{
@@ -50,19 +54,29 @@ final class CustardInterfaceCustomKeyTest: XCTestCase {
                 "longpress_variation_direction": "right",
                 "shows_tap_bubble": true
             }
-            """
-            XCTAssertEqual(
-                CustardInterfaceCustomKey.quickDecode(target: target),
-                .init(
-                    design: .init(label: .text("A"), color: .normal),
-                    press_actions: [.input("a")],
-                    longpress_actions: .none,
-                    variations: [],
-                    longpress_variation_direction: .right,
-                    shows_tap_bubble: true
-                )
+            """.utf8
+        )
+        let decoded = try JSONDecoder().decode(
+            CustardInterfaceCustomKey.self,
+            from: data
+        )
+
+        XCTAssertEqual(
+            decoded,
+            .init(
+                design: .init(label: .text("A"), color: .normal),
+                press_actions: [.input("a")],
+                longpress_actions: .none,
+                variations: [],
+                shows_tap_bubble: true
             )
-        }
+        )
+
+        let encoded = try JSONEncoder().encode(decoded)
+        let object = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: encoded) as? [String: Any]
+        )
+        XCTAssertNil(object["longpress_variation_direction"])
     }
 
     func testEncode() {
@@ -80,7 +94,6 @@ final class CustardInterfaceCustomKeyTest: XCTestCase {
                 press_actions: [.input("=")],
                 longpress_actions: .none,
                 variations: [],
-                longpress_variation_direction: .left,
                 shows_tap_bubble: false
             )
             XCTAssertEqual(target.quickEncodeDecode(), target)

@@ -24,6 +24,17 @@ final class VariationsViewDirectionTests: XCTestCase {
         )
     }
 
+    func test_automaticCentersThreeVariationsAtSampleKeyPosition() {
+        XCTAssertEqual(
+            VariationsViewDirection.automatic(
+                position: .init(x: 8, y: 0),
+                variationCount: 3,
+                horizontalKeyCount: 10
+            ),
+            .center
+        )
+    }
+
     func test_automaticUsesCenterWhenVariationsFit() {
         XCTAssertEqual(
             VariationsViewDirection.automatic(
