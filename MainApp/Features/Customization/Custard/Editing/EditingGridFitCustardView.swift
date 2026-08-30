@@ -82,6 +82,8 @@ struct EditingGridFitCustardView: CancelableEditor {
         var hasShown = false
     }
     @State private var showDuplicateAlert = false
+    @State private var showIncompatibleKeyStyleAlert = false
+    @State private var showSaveErrorAlert = false
 
     private var layout: CustardInterfaceLayoutGridValue {
         .init(rowCount: max(Int(editingItem.rowCount) ?? 1, 1), columnCount: max(Int(editingItem.columnCount) ?? 1, 1))
@@ -116,6 +118,21 @@ struct EditingGridFitCustardView: CancelableEditor {
                 if case let .gridFit(x: x, y: y) = item.key {
                     dict[.gridFit(.init(x: x, y: y, width: item.value.width, height: item.value.height))] = item.value.model
                 }
+            }
+        )
+    }
+
+    private var keyStyle: Binding<UserMadeGridFitCustard.KeyStyle> {
+        Binding(
+            get: {
+                editingItem.keyStyle
+            },
+            set: { newValue in
+                guard editingItem.canUseKeyStyle(newValue) else {
+                    showIncompatibleKeyStyleAlert = true
+                    return
+                }
+                editingItem.keyStyle = newValue
             }
         )
     }
@@ -289,7 +306,7 @@ struct EditingGridFitCustardView: CancelableEditor {
                     Text("そのまま入力").tag(CustardInputStyle.direct)
                     Text("ローマ字かな入力").tag(CustardInputStyle.roman2kana)
                 }
-                Picker("レイアウトスタイル", selection: $editingItem.keyStyle) {
+                Picker("レイアウトスタイル", selection: keyStyle) {
                     Text("フリック").tag(UserMadeGridFitCustard.KeyStyle.tenkeyStyle)
                     Text("QWERTY").tag(UserMadeGridFitCustard.KeyStyle.pcStyle)
                 }
@@ -368,6 +385,12 @@ struct EditingGridFitCustardView: CancelableEditor {
                             }
                             Button("ペーストする", systemImage: "doc.on.clipboard") {
                                 if let copiedKey = self.manager.editorState.copiedKey {
+                                    var candidate = editingItem
+                                    candidate.keys[.gridFit(x: x, y: y)] = copiedKey
+                                    guard candidate.canUseKeyStyle(candidate.keyStyle) else {
+                                        showIncompatibleKeyStyleAlert = true
+                                        return
+                                    }
                                     editingItem.keys[.gridFit(x: x, y: y)] = copiedKey
                                 }
                             }
@@ -428,15 +451,29 @@ struct EditingGridFitCustardView: CancelableEditor {
                     if isNewItem && manager.availableCustards.contains(editingItem.tabName) {
                         showDuplicateAlert = true
                     } else {
-                        self.save()
-                        let saved = custard
-                        finishEditing(identifier: saved.identifier)
+                        do {
+                            let saved = try self.save()
+                            finishEditing(identifier: saved.identifier)
+                        } catch {
+                            debug(error)
+                            showSaveErrorAlert = true
+                        }
                     }
                 }
             }
         }
         .alert("名前が重複しています", isPresented: $showDuplicateAlert) {
             Button("OK", role: .cancel) {}
+        }
+        .alert("QWERTY専用キーとフリックは併用できません", isPresented: $showIncompatibleKeyStyleAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("QWERTY専用キーを使用する場合はレイアウトスタイルをQWERTYにしてください。フリックに変更する場合は、QWERTY専用キーを削除してください。")
+        }
+        .alert("保存できませんでした", isPresented: $showSaveErrorAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("編集内容は保持されています。設定を確認して、もう一度保存してください。")
         }
         .onAppear {
             variableStates.setContainerWidth(
@@ -733,17 +770,15 @@ struct EditingGridFitCustardView: CancelableEditor {
             && data.height == 1
     }
 
-    private func save() {
-        do {
-            try self.manager.saveCustard(
-                custard: custard,
-                metadata: .init(origin: .userMade),
-                userData: .tenkey(editingItem),
-                updateTabBar: self.isNewItem && self.editingItem.addTabBarAutomatically
-            )
-        } catch {
-            debug(error)
-        }
+    private func save() throws -> Custard {
+        let custard = self.custard
+        try self.manager.saveCustard(
+            custard: custard,
+            metadata: .init(origin: .userMade),
+            userData: .tenkey(editingItem),
+            updateTabBar: self.isNewItem && self.editingItem.addTabBarAutomatically
+        )
+        return custard
     }
 
     func cancel() {

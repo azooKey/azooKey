@@ -32,6 +32,25 @@ final class UserMadeCustardTests: XCTestCase {
         XCTAssertEqual(decoded.keyStyle, .pcStyle)
     }
 
+    func test_gridFitKeyStyleCompatibility() {
+        var custard = makeGridFitCustard(keyStyle: .pcStyle)
+        custard.keys[.gridFit(x: 0, y: 0)] = .init(
+            model: .system(.qwertyShift),
+            width: 1,
+            height: 1
+        )
+
+        XCTAssertTrue(custard.canUseKeyStyle(.pcStyle))
+        XCTAssertFalse(custard.canUseKeyStyle(.tenkeyStyle))
+
+        custard.keys[.gridFit(x: 0, y: 0)] = .init(
+            model: .system(.enter),
+            width: 1,
+            height: 1
+        )
+        XCTAssertTrue(custard.canUseKeyStyle(.tenkeyStyle))
+    }
+
     func test_fractionalGridFitEditingDataRoundTrips() throws {
         var original = makeGridFitCustard(keyStyle: .pcStyle)
         original.keys[.gridFit(x: 1.5, y: 2.3)] = .init(
