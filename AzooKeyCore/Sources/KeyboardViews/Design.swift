@@ -21,6 +21,12 @@ public struct TabDependentDesign {
     private var interfaceWidth: CGFloat
     private var interfaceHeight: CGFloat
 
+    /// Keep the total key and spacing ratios at the standard QWERTY layout once
+    /// the layout has more than ten horizontal keys.
+    private var horizontalKeyCountForSizing: CGFloat {
+        min(horizontalKeyCount, 10)
+    }
+
     public init(
         width: Int,
         height: Int,
@@ -51,12 +57,13 @@ public struct TabDependentDesign {
 
     /// screenWidthとhorizontalKeyCountに依存
     var keyViewWidth: CGFloat {
+        let horizontalKeyCountForSizing = self.horizontalKeyCountForSizing
         let coefficient: CGFloat
         switch orientation {
         case .vertical:
-            coefficient = 5 / (5.1 + horizontalKeyCount / 10)
+            coefficient = 5 / (5.1 + horizontalKeyCountForSizing / 10)
         case .horizontal:
-            coefficient = 10 / (10.2 + horizontalKeyCount * 0.28)
+            coefficient = 10 / (10.2 + horizontalKeyCountForSizing * 0.28)
         }
         return interfaceWidth / horizontalKeyCount * coefficient
     }
@@ -95,12 +102,13 @@ public struct TabDependentDesign {
         if horizontalKeyCount <= 1 {
             return 0
         }
+        let horizontalKeyCountForSizing = self.horizontalKeyCountForSizing
         let coefficient: CGFloat
         switch orientation {
         case .vertical:
-            coefficient = (5 + horizontalKeyCount) / (7.5 + horizontalKeyCount)
+            coefficient = (5 + horizontalKeyCountForSizing) / (7.5 + horizontalKeyCountForSizing)
         case .horizontal:
-            coefficient = (8 + horizontalKeyCount) / (10 + horizontalKeyCount * 1.3)
+            coefficient = (8 + horizontalKeyCountForSizing) / (10 + horizontalKeyCountForSizing * 1.3)
         }
         return (interfaceWidth - keyViewWidth * horizontalKeyCount) / (horizontalKeyCount - 1) * coefficient
     }
