@@ -25,6 +25,9 @@ struct UnifiedQwertySuggestView<Extension: ApplicationSpecificKeyboardViewExtens
     private var keyBorderWidth: CGFloat { theme.borderWidth }
 
     private var suggestColor: Color {
+        if theme.style == .minimal, let color = theme.suggestKeyFillColor?.color {
+            return color
+        }
         let def = Extension.ThemeExtension.default
         let nat = Extension.ThemeExtension.native
         return switch (colorScheme, theme) {

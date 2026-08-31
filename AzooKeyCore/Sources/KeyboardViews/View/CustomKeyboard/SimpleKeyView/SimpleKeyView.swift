@@ -64,7 +64,8 @@ public struct SimpleKeyView<Extension: ApplicationSpecificKeyboardViewExtension>
                         x: theme.keyShadow?.x ?? 0,
                         y: theme.keyShadow?.y ?? 0
                     ),
-                    blendMode: keyBackground.blendMode
+                    blendMode: keyBackground.blendMode,
+                    appearance: theme.style
                 )
             }
             .frame(width: keyViewWidth, height: keyViewHeight)

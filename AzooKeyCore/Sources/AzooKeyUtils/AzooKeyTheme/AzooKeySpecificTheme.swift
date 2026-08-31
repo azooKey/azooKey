@@ -10,6 +10,30 @@ import Foundation
 import KeyboardThemes
 import KeyboardViews
 import SwiftUI
+import UIKit
+
+private enum SystemThemeColors {
+    typealias Components = (red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat)
+
+    static let minimumNormal = color(light: (0, 0, 0, 0.22), dark: (1, 1, 1, 0.26))
+    static let minimumSpecial = color(light: (0, 0, 0, 0.52), dark: (1, 1, 1, 0.56))
+    static let minimumPushed = color(light: (0.86, 0.87, 0.89, 1), dark: (0.16, 0.16, 0.18, 0.98))
+    static let minimumSuggest = color(light: (0.93, 0.93, 0.95, 1), dark: (0.16, 0.16, 0.18, 0.98))
+    static let minimumSuggestText = color(light: (0.08, 0.08, 0.09, 1), dark: (1, 1, 1, 1))
+    static let technoAccent = color(light: (0.95, 0.34, 0.06, 0.95), dark: (0.96, 0.76, 0.36, 0.92))
+    static let technoNormal = color(light: (1, 1, 1, 1), dark: (0.025, 0.03, 0.04, 0.9))
+    static let technoPushed = color(light: (0.929, 0.933, 0.949, 1), dark: (0.76, 0.52, 0.22, 0.96))
+    static let technoSpecial = color(light: (0.87, 0.88, 0.9, 1), dark: (0.045, 0.055, 0.075, 0.92))
+    static let technoText = color(light: (0.055, 0.07, 0.09, 1), dark: (0.96, 0.76, 0.36, 1))
+    static let technoShadow = color(light: (0, 0, 0, 0.14), dark: (0, 0, 0, 0.35))
+
+    private static func color(light: Components, dark: Components) -> Color {
+        Color(uiColor: UIColor { traits in
+            let value = traits.userInterfaceStyle == .dark ? dark : light
+            return UIColor(red: value.red, green: value.green, blue: value.blue, alpha: value.alpha)
+        })
+    }
+}
 
 public enum AzooKeySpecificTheme: ApplicationSpecificTheme {
     public enum ApplicationColor: ApplicationSpecificColor {
@@ -56,6 +80,44 @@ public extension AzooKeyTheme {
         suggestLabelTextColor: .color(Color(.displayP3, white: 0, opacity: 1)),
         keyShadow: nil
     )
+
+    /// A keyless typographic theme: labels float over a small orientation mark.
+    static let minimum: Self = {
+        var theme = AzooKeySpecificTheme.native
+        theme.textFont = .light
+        theme.style = .minimal
+        theme.borderWidth = 1.5
+        theme.normalKeyFillColor = .color(SystemThemeColors.minimumNormal)
+        theme.specialKeyFillColor = .color(SystemThemeColors.minimumSpecial)
+        theme.pushedKeyFillColor = .color(SystemThemeColors.minimumPushed)
+        theme.suggestKeyFillColor = .color(SystemThemeColors.minimumSuggest)
+        theme.suggestLabelTextColor = .color(SystemThemeColors.minimumSuggestText)
+        theme.keyShadow = nil
+        return theme
+    }()
+
+    /// Chamfered instrument panels with a technical light/dark interpretation.
+    static let techno: Self = {
+        var theme = AzooKeySpecificTheme.native
+        theme.textColor = .color(SystemThemeColors.technoText)
+        theme.textFont = .semibold
+        theme.style = .faceted
+        theme.borderColor = .color(SystemThemeColors.technoAccent)
+        theme.borderWidth = 0.8
+        theme.normalKeyFillColor = .color(SystemThemeColors.technoNormal)
+        theme.specialKeyFillColor = .color(SystemThemeColors.technoSpecial)
+        theme.pushedKeyFillColor = .color(SystemThemeColors.technoPushed)
+        theme.suggestKeyFillColor = theme.specialKeyFillColor
+        theme.suggestLabelTextColor = theme.textColor
+        theme.keyShadow = .init(
+            color: .color(SystemThemeColors.technoShadow),
+            radius: 2,
+            x: 0,
+            y: 2
+        )
+        return theme
+    }()
+
 }
 
 extension AzooKeySpecificTheme: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable {

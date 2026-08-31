@@ -263,7 +263,7 @@ public enum Design {
         }
 
         @MainActor func iconImageFont(keyViewFontSizePreference: CGFloat, theme: ThemeData<some ApplicationSpecificTheme>) -> Font {
-            Font.system(size: self.iconFontSize(keyViewFontSizePreference: keyViewFontSizePreference), weight: theme.textFont.weight)
+            Font.system(size: self.iconFontSize(keyViewFontSizePreference: keyViewFontSizePreference), weight: theme.textFont.weight, design: theme.style.fontDesign)
         }
 
         func resultViewFontSize(userPrefrerence: CGFloat) -> CGFloat {
@@ -271,7 +271,7 @@ public enum Design {
         }
 
         func resultViewFont(theme: ThemeData<some ApplicationSpecificTheme>, userSizePrefrerence: CGFloat, fontSize: CGFloat? = nil) -> Font {
-            Font.system(size: fontSize ?? resultViewFontSize(userPrefrerence: userSizePrefrerence)).weight(theme.textFont.weight)
+            Font.system(size: fontSize ?? resultViewFontSize(userPrefrerence: userSizePrefrerence), weight: theme.textFont.weight, design: theme.style.fontDesign)
         }
 
         func forceJapaneseFont(text: String) -> AttributedString {
@@ -339,11 +339,11 @@ public enum Design {
         @MainActor func keyLabelFont(text: String, width: CGFloat, fontSize: LabelFontSizeStrategy, userDecidedSize: CGFloat, theme: ThemeData<some ApplicationSpecificTheme>) -> Font {
             if case .max = fontSize {
                 let size = self.getMaximumFontSize(for: text, width: width, maxFontSize: 100)
-                return Font.system(size: size, weight: theme.textFont.weight, design: .default)
+                return Font.system(size: size, weight: theme.textFont.weight, design: theme.style.fontDesign)
             }
 
             if userDecidedSize != -1 {
-                return .system(size: userDecidedSize * fontSize.scale, weight: theme.textFont.weight, design: .default)
+                return .system(size: userDecidedSize * fontSize.scale, weight: theme.textFont.weight, design: theme.style.fontDesign)
             }
             let maxFontSize = if text.count == 1 {
                 Int(25 * fontSize.scale)
@@ -351,7 +351,7 @@ public enum Design {
                 Int(22 * fontSize.scale)
             }
             let size = self.getMaximumFontSize(for: text, width: width, maxFontSize: maxFontSize)
-            return Font.system(size: size, weight: theme.textFont.weight, design: .default)
+            return Font.system(size: size, weight: theme.textFont.weight, design: theme.style.fontDesign)
         }
     }
 
