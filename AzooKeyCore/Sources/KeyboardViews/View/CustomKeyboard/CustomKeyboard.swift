@@ -154,17 +154,6 @@ public extension CustardInterface {
                 } else {
                     .center
                 }
-                let shouldUppercaseForEnglish: Bool
-                if self.keyStyle == .pcStyle,
-                   case let .text(label) = val.design.label,
-                   label.count == 1,
-                   val.press_actions.count == 1,
-                   case let .input(input) = val.press_actions[0],
-                   label == input {
-                    shouldUppercaseForEnglish = true
-                } else {
-                    shouldUppercaseForEnglish = false
-                }
                 let model = UnifiedGeneralKeyModel<Extension>(
                     labelType: val.design.label.keyLabelType,
                     pressActions: val.press_actions.map { $0.actionType },
@@ -174,7 +163,7 @@ public extension CustardInterface {
                     linearDirection: linearDirection,
                     showsTapBubble: needSuggest,
                     colorRole: colorRole,
-                    shouldUppercaseForEnglish: shouldUppercaseForEnglish
+                    shouldUppercaseForEnglish: self.keyStyle == .pcStyle
                 )
                 models.append((pos, model))
             }
