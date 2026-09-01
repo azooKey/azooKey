@@ -89,12 +89,16 @@ public struct TabDependentDesign {
     }
 
     var verticalSpacing: CGFloat {
-        switch orientation {
+        let spacing = switch orientation {
         case .vertical:
-            return interfaceWidth / 50
+            interfaceWidth / 50
         case .horizontal:
-            return interfaceWidth / 107
+            interfaceWidth / 107
         }
+        guard verticalKeyCount > 4 else {
+            return spacing
+        }
+        return spacing * 3 / (verticalKeyCount - 1)
     }
 
     /// screenWidthとhorizontalKeyCountとkeyViewWidthに依存
