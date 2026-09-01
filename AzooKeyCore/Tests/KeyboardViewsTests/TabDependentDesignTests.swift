@@ -4,10 +4,14 @@ import XCTest
 final class TabDependentDesignTests: XCTestCase {
     private let interfaceSize = CGSize(width: 1_000, height: 300)
 
-    private func design(horizontalKeyCount: CGFloat, orientation: KeyboardOrientation) -> TabDependentDesign {
+    private func design(
+        horizontalKeyCount: CGFloat = 10,
+        verticalKeyCount: CGFloat = 4,
+        orientation: KeyboardOrientation
+    ) -> TabDependentDesign {
         TabDependentDesign(
             width: horizontalKeyCount,
-            height: 4,
+            height: verticalKeyCount,
             interfaceSize: interfaceSize,
             layoutContext: KeyboardLayoutContext(
                 containerWidth: interfaceSize.width,
@@ -51,5 +55,31 @@ final class TabDependentDesignTests: XCTestCase {
         XCTAssertEqual(verticalDesign.horizontalSpacing, verticalSpacing, accuracy: 0.001)
         XCTAssertEqual(horizontalDesign.keyViewWidth, horizontalKeyWidth, accuracy: 0.001)
         XCTAssertEqual(horizontalDesign.horizontalSpacing, horizontalSpacing, accuracy: 0.001)
+    }
+
+    @MainActor func test_verticalSizingKeepsFourKeyRatiosForLargerLayouts() {
+        for orientation in [KeyboardOrientation.vertical, .horizontal] {
+            let fourKeyDesign = design(verticalKeyCount: 4, orientation: orientation)
+            let eightKeyDesign = design(verticalKeyCount: 8, orientation: orientation)
+
+            XCTAssertEqual(
+                fourKeyDesign.keyViewHeight * 4,
+                eightKeyDesign.keyViewHeight * 8,
+                accuracy: 0.001
+            )
+            XCTAssertEqual(
+                fourKeyDesign.verticalSpacing * 3,
+                eightKeyDesign.verticalSpacing * 7,
+                accuracy: 0.001
+            )
+        }
+    }
+
+    func test_verticalSpacingPreservesExistingFormulaUpToFourKeys() {
+        let verticalDesign = design(verticalKeyCount: 3, orientation: .vertical)
+        let horizontalDesign = design(verticalKeyCount: 3, orientation: .horizontal)
+
+        XCTAssertEqual(verticalDesign.verticalSpacing, interfaceSize.width / 50, accuracy: 0.001)
+        XCTAssertEqual(horizontalDesign.verticalSpacing, interfaceSize.width / 107, accuracy: 0.001)
     }
 }
