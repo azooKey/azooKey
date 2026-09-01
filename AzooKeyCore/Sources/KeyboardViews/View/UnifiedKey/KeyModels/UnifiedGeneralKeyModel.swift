@@ -69,21 +69,33 @@ struct UnifiedGeneralKeyModel<Extension: ApplicationSpecificKeyboardViewExtensio
         flickMap.keys.contains(direction)
     }
 
-    @MainActor func getFlickVariationMap(variableStates _: VariableStates) -> [FlickDirection: UnifiedVariation] {
-        flickMap
+    @MainActor func getFlickVariationMap(variableStates: VariableStates) -> [FlickDirection: UnifiedVariation] {
+        guard usesUppercaseLabel(states: variableStates) else {
+            return flickMap
+        }
+        return flickMap.mapValues { $0.uppercasedForEnglishIfInputMatches() }
     }
     @MainActor func getLinearVariations(variableStates _: VariableStates) ->
     (arr: [QwertyVariationsModel.VariationElement], direction: VariationsViewDirection) { (linearVariations, linearDirection)
     }
 
     func label<ThemeExtension>(width: CGFloat, theme _: ThemeData<ThemeExtension>, states: VariableStates, color _: Color?) -> KeyLabel<Extension> where ThemeExtension: ApplicationSpecificKeyboardViewExtensionLayoutDependentDefaultThemeProvidable {
-        if shouldUppercaseForEnglish,
-           states.boolStates.isCapsLocked || states.boolStates.isShifted,
-           states.keyboardLanguage == .en_US,
-           case let .text(text) = labelType {
-            return KeyLabel(.text(text.uppercased()), width: width)
+        if usesUppercaseLabel(states: states) {
+            return KeyLabel(
+                labelType.uppercasedForEnglishIfInputMatches(
+                    pressActions: centerPress,
+                    flickMap: flickMap
+                ),
+                width: width
+            )
         }
         return KeyLabel(labelType, width: width)
+    }
+
+    private func usesUppercaseLabel(states: VariableStates) -> Bool {
+        shouldUppercaseForEnglish
+            && (states.boolStates.isCapsLocked || states.boolStates.isShifted)
+            && states.keyboardLanguage == .en_US
     }
 
     @MainActor
