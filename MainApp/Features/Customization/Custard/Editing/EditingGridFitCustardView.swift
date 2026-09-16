@@ -140,7 +140,7 @@ struct EditingGridFitCustardView: CancelableEditor {
     init(manager: Binding<CustardManager>, editingItem: UserMadeGridFitCustard? = nil, onFinishEditing: ((String) -> Void)? = nil) {
         self._manager = manager
         self.onFinishEditing = onFinishEditing
-        self.baseSelectionSheetState = .init(hasShown: editingItem != nil)  // 編集の場合はすでにbase選択は終わったと考える
+        self._baseSelectionSheetState = State(initialValue: .init(hasShown: editingItem != nil))  // 編集の場合はすでにbase選択は終わったと考える
         self.base = editingItem ?? Self.emptyItem
         self._editingItem = State(initialValue: self.base)
         self.isNewItem = editingItem == nil
