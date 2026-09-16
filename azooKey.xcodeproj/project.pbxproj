@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AA2700012026091700000001 /* KeyboardViews in Frameworks */ = {isa = PBXBuildFile; productRef = AA2700012026091700000002 /* KeyboardViews */; };
 		1A2E58542951EC87004F959B /* (null) in Sources */ = {isa = PBXBuildFile; };
 		1A2E58592951EC87004F959B /* (null) in Sources */ = {isa = PBXBuildFile; };
 		1A2E585A2951EC87004F959B /* (null) in Sources */ = {isa = PBXBuildFile; };
@@ -186,6 +187,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1ABDFC352A18C60A00CED3A3 /* KanaKanjiConverterModuleWithDefaultDictionary in Frameworks */,
+				AA2700012026091700000001 /* KeyboardViews in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -356,6 +358,7 @@
 			name = azooKeyTests;
 			packageProductDependencies = (
 				1ABDFC342A18C60A00CED3A3 /* KanaKanjiConverterModuleWithDefaultDictionary */,
+				AA2700012026091700000002 /* KeyboardViews */,
 			);
 			productName = azooKeyTests;
 			productReference = 1A3DC1D82500D44E002CAA93 /* azooKeyTests.xctest */;
@@ -1017,6 +1020,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		AA2700012026091700000002 /* KeyboardViews */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = KeyboardViews;
+		};
 		1A7F37732A683428009AC382 /* SwiftUIUtils */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SwiftUIUtils;
