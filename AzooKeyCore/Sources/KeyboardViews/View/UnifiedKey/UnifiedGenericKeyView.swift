@@ -238,9 +238,9 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
     }
 
     // MARK: FourWay (Flick) gesture
-    private var flickGesture: some Gesture {
-        DragGesture(minimumDistance: .zero, coordinateSpace: .global)
-            .onChanged { value in
+    private var flickGesture: KeyPressHandlers {
+        KeyPressHandlers(
+            onChanged: { value in
                 // Enable only when flick variations exist
                 guard !self.flickMap().isEmpty else { return }
                 if lifecycle.mode == .none {
@@ -379,8 +379,8 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                     // Flickハンドラでは特に処理しない
                     break
                 }
-            }
-            .onEnded { _ in
+            },
+            onEnded: {
                 guard !self.flickMap().isEmpty else { return }
                 let dismiss: Task<Void, Never> = Task { @MainActor in
                     try? await Task.sleep(nanoseconds: 70_000_000)
@@ -442,12 +442,13 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                 // keep dismiss task alive; don't cancel it here
                 self.lifecycle.reset(cancelTasks: false)
             }
+        )
     }
 
     // MARK: Linear (Qwerty) gesture
-    private var qwertyGesture: some Gesture {
-        DragGesture(minimumDistance: .zero)
-            .onChanged { value in
+    private var qwertyGesture: KeyPressHandlers {
+        KeyPressHandlers(
+            onChanged: { value in
                 // For keys with flick variations, allow linear handling only when linear mode is locked/active
                 if !self.flickMap().isEmpty && lifecycle.lockedOutcome != .linearVariation {
                     if case .linearVariations = lifecycle.state {} else {
@@ -530,8 +531,8 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                 case .longFlicked:
                     break
                 }
-            }
-            .onEnded { _ in
+            },
+            onEnded: {
                 // Commit only if linear mode is active or key has no flicks
                 if !self.flickMap().isEmpty && lifecycle.lockedOutcome != .linearVariation {
                     if case .linearVariations = lifecycle.state {} else {
@@ -579,6 +580,23 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                 // ダブルタップ判定のため、直近のUp情報は維持
                 self.lifecycle.reset(preserveDoublePress: true)
             }
+        )
+    }
+
+    private func cancelPress() {
+        self.action.registerLongPressActionEnd(self.model.longPressActions(variableStates: variableStates))
+        switch lifecycle.state {
+        case let .flickOneSuggested(direction, _), let .longFlicked(direction):
+            if let variation = variation(for: direction) {
+                self.action.registerLongPressActionEnd(variation.longPressActions)
+            }
+        default:
+            break
+        }
+        self.lifecycle.reset()
+        self.flickSuggestType = nil
+        self.qwertySuggestType = nil
+        self.isSuggesting = false
     }
 
     // MARK: background/label
@@ -605,7 +623,7 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
             ),
             blendMode: keyBackgroundStyle.blendMode
         )
-        .gesture(flickGesture.simultaneously(with: qwertyGesture))
+        .modifier(KeyPressGestureModifier(flick: flickGesture, linear: qwertyGesture, onCancelled: cancelPress))
         .overlay { self.model.label(width: size.width, theme: theme, states: variableStates, color: nil) }
         .overlay(alignment: .center) {
             if let flickSuggestType, !self.flickMap().isEmpty {

@@ -12,7 +12,7 @@ import SwiftUI
 public extension Shape {
     @ViewBuilder
     func strokeAndFill(fillContent: some ShapeStyle, strokeContent: some ShapeStyle, lineWidth: CGFloat) -> some View {
-        if #available(iOS 17, *) {
+        if #available(iOS 26, macOS 26, *) {
             self
                 .fill(fillContent)
                 .stroke(strokeContent, lineWidth: lineWidth)

@@ -31,6 +31,17 @@ struct KeyboardBarView<Extension: ApplicationSpecificKeyboardViewExtension>: Vie
     }
 
     var body: some View {
+        if #available(iOS 26.0, *) {
+            // Automatic scroll edge effects can cover the entire short bar in a
+            // keyboard extension, blurring candidates and unpinned tab labels.
+            barContent.scrollEdgeEffectHidden()
+        } else {
+            barContent
+        }
+    }
+
+    @ViewBuilder
+    private var barContent: some View {
         switch variableStates.barState {
         case .cursor:
             Group {
