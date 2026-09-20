@@ -14,7 +14,7 @@ struct UpdateHistoryView: View {
             // version 3系
             Group {
                 // version 3.1系
-                VersionView("3.1.2", releaseDate: "TestFlightで先行") {
+                VersionView("3.1.2", releaseDate: "2026年09月20日") {
                     ParagraphView("不具合を修正しました。") {
                         "iOS 27・iPadOS 27で、変換候補欄に近いキーのフリック入力が反応しないことがある問題を修正しました"
                     }
