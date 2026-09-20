@@ -623,7 +623,12 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
             ),
             blendMode: keyBackgroundStyle.blendMode
         )
-        .modifier(KeyPressGestureModifier(flick: flickGesture, linear: qwertyGesture, onCancelled: cancelPress))
+        .modifier(KeyPressGestureModifier(
+            hitSize: CGSize(width: size.width + tabDesign.horizontalSpacing, height: size.height + tabDesign.verticalSpacing),
+            flick: flickGesture,
+            linear: qwertyGesture,
+            onCancelled: cancelPress
+        ))
         .overlay { self.model.label(width: size.width, theme: theme, states: variableStates, color: nil) }
         .overlay(alignment: .center) {
             if let flickSuggestType, !self.flickMap().isEmpty {

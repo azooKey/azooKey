@@ -26,6 +26,7 @@ struct KeyPressHandlers {
 
 @MainActor
 struct KeyPressGestureModifier: ViewModifier {
+    var hitSize: CGSize
     var flick: KeyPressHandlers
     var linear: KeyPressHandlers
     var onCancelled: () -> Void
@@ -34,17 +35,20 @@ struct KeyPressGestureModifier: ViewModifier {
     func body(content: Content) -> some View {
         #if os(iOS)
         if #available(iOS 27.0, *) {
-            content.gesture(ImmediateKeyGesture(
-                onChanged: { value in
-                    flick.onChanged(value)
-                    linear.onChanged(value)
-                },
-                onEnded: {
-                    flick.onEnded()
-                    linear.onEnded()
-                },
-                onCancelled: onCancelled
-            ))
+            content.overlay {
+                ImmediateKeyGesture(
+                    onChanged: { value in
+                        flick.onChanged(value)
+                        linear.onChanged(value)
+                    },
+                    onEnded: {
+                        flick.onEnded()
+                        linear.onEnded()
+                    },
+                    onCancelled: onCancelled
+                )
+                .frame(width: hitSize.width, height: hitSize.height)
+            }
         } else {
             legacyGesture(content: content)
         }
@@ -70,33 +74,52 @@ struct KeyPressGestureModifier: ViewModifier {
 #if os(iOS)
 import UIKit
 
-// iOS 27 can defer the first zero-distance DragGesture update while system
-// gestures arbitrate a stationary touch. Start the existing key lifecycle from
-// UIKit touch delivery instead; the configured long-press duration stays intact.
+// iOS 27 can defer zero-distance DragGesture updates near system gestures.
+// Give each key a concrete UIKit hit-test surface, including its share of the
+// spacing between keys. A recognizer bridged onto the SwiftUI hosting view can
+// miss touches near the candidate bar before touchesBegan is ever called.
+// Deliver the lifecycle directly from UIKit to preserve immediate touch-down.
 @available(iOS 18.0, *)
-struct ImmediateKeyGesture: UIGestureRecognizerRepresentable {
+struct ImmediateKeyGesture: UIViewRepresentable {
     var onChanged: (KeyPressValue) -> Void
     var onEnded: () -> Void
     var onCancelled: () -> Void
 
-    func makeUIGestureRecognizer(context: Context) -> Recognizer {
+    func makeUIView(context: Context) -> TouchSurface {
+        let view = TouchSurface()
+        updateUIView(view, context: context)
+        return view
+    }
+
+    func updateUIView(_ view: TouchSurface, context: Context) {
+        view.recognizer.onChanged = onChanged
+        view.recognizer.onEnded = onEnded
+        view.recognizer.onCancelled = onCancelled
+    }
+
+    static func dismantleUIView(_ view: TouchSurface, coordinator: ()) {
+        view.recognizer.cancel()
+        view.recognizer.isEnabled = false
+    }
+
+    final class TouchSurface: UIView {
         let recognizer = Recognizer()
-        recognizer.cancelsTouchesInView = false
-        recognizer.delaysTouchesBegan = false
-        recognizer.delaysTouchesEnded = false
-        updateUIGestureRecognizer(recognizer, context: context)
-        return recognizer
-    }
 
-    func updateUIGestureRecognizer(_ recognizer: Recognizer, context: Context) {
-        recognizer.onChanged = onChanged
-        recognizer.onEnded = onEnded
-        recognizer.onCancelled = onCancelled
-    }
+        init() {
+            super.init(frame: .zero)
+            backgroundColor = .clear
+            isOpaque = false
+            isMultipleTouchEnabled = true
+            recognizer.cancelsTouchesInView = false
+            recognizer.delaysTouchesBegan = false
+            recognizer.delaysTouchesEnded = false
+            addGestureRecognizer(recognizer)
+        }
 
-    // Target/action delivery can itself wait for another recognizer to fail.
-    // The touch callbacks below deliver each phase directly, including cancellation.
-    func handleUIGestureRecognizerAction(_ recognizer: Recognizer, context: Context) {}
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+    }
 
     final class Recognizer: UIGestureRecognizer {
         var onChanged: ((KeyPressValue) -> Void)?
@@ -149,7 +172,7 @@ struct ImmediateKeyGesture: UIGestureRecognizerRepresentable {
             super.reset()
         }
 
-        private func cancel() {
+        fileprivate func cancel() {
             guard trackedTouch != nil else {
                 return
             }
