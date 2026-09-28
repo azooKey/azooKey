@@ -621,7 +621,8 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                 x: theme.keyShadow?.x ?? 0,
                 y: theme.keyShadow?.y ?? 0
             ),
-            blendMode: keyBackgroundStyle.blendMode
+            blendMode: keyBackgroundStyle.blendMode,
+            appearance: theme.style
         )
         .modifier(KeyPressGestureModifier(
             hitSize: CGSize(width: size.width + tabDesign.horizontalSpacing, height: size.height + tabDesign.verticalSpacing),

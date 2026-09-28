@@ -15,6 +15,8 @@ import UIKit
 struct ThemeIndices: Codable, Equatable {
     static var defaultThemeIndex: Int { 0 }
     static var classicDefaultThemeIndex: Int { -1 }
+    static var minimumThemeIndex: Int { -2 }
+    static var technoThemeIndex: Int { -3 }
     var currentIndices: [Int] = [0]
     var selectedIndex: Int = 0
     var selectedIndex_dark: Int = 0
@@ -47,6 +49,10 @@ struct ThemeIndices: Codable, Equatable {
 
 public struct ThemeIndexManager: Equatable {
     private var index: ThemeIndices
+
+    init(index: ThemeIndices) {
+        self.index = index
+    }
 
     private static func fileURL(name: String) -> URL {
         let directoryPath = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: SharedStore.appGroupKey)!
@@ -97,6 +103,10 @@ public struct ThemeIndexManager: Equatable {
             "Classic"
         case ThemeIndices.defaultThemeIndex:
             "Default"
+        case ThemeIndices.minimumThemeIndex:
+            "Minimum"
+        case ThemeIndices.technoThemeIndex:
+            "Techno"
         default:
             nil
         }
@@ -109,6 +119,12 @@ public struct ThemeIndexManager: Equatable {
         }
         if index == ThemeIndices.classicDefaultThemeIndex {
             return AzooKeySpecificTheme.default
+        }
+        if index == ThemeIndices.minimumThemeIndex {
+            return AzooKeyTheme.minimum
+        }
+        if index == ThemeIndices.technoThemeIndex {
+            return AzooKeyTheme.techno
         }
         let themeFileURL = Self.fileURL(name: "themes/theme_\(index).theme")
         let data = try Data(contentsOf: themeFileURL)
@@ -197,7 +213,7 @@ public struct ThemeIndexManager: Equatable {
     public var indices: [Int] {
         let indices = index.currentIndices.filter {$0 > 0}.sorted()
         // 負のindexについてはシステム側で並べる
-        return [ThemeIndices.defaultThemeIndex, ThemeIndices.classicDefaultThemeIndex] + indices
+        return [ThemeIndices.defaultThemeIndex, ThemeIndices.classicDefaultThemeIndex, ThemeIndices.technoThemeIndex, ThemeIndices.minimumThemeIndex] + indices
     }
 
     public var selectedIndex: Int {

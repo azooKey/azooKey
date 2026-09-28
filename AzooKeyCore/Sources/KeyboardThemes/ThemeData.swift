@@ -17,6 +17,7 @@ public struct ThemeData<ApplicationExtension: ApplicationSpecificTheme>: Codable
     public var picture: ThemePicture
     public var textColor: ColorData
     public var textFont: ThemeFontWeight
+    public var style: ThemeStyle
     public var resultTextColor: ColorData
     public var resultBackgroundColor: ColorData
     public var borderColor: ColorData
@@ -28,12 +29,13 @@ public struct ThemeData<ApplicationExtension: ApplicationSpecificTheme>: Codable
     public var suggestLabelTextColor: ColorData?        // 設定は露出させない
     public var keyShadow: ThemeShadowData<ColorData>?   // 設定は露出させない
 
-    public init(id: Int? = nil, backgroundColor: ColorData, picture: ThemePicture, textColor: ColorData, textFont: ThemeFontWeight, resultTextColor: ColorData, resultBackgroundColor: ColorData, borderColor: ColorData, borderWidth: Double, normalKeyFillColor: ColorData, specialKeyFillColor: ColorData, pushedKeyFillColor: ColorData, suggestKeyFillColor: ColorData? = nil, suggestLabelTextColor: ColorData? = nil, keyShadow: ThemeShadowData<ColorData>? = nil) {
+    public init(id: Int? = nil, backgroundColor: ColorData, picture: ThemePicture, textColor: ColorData, textFont: ThemeFontWeight, style: ThemeStyle = .standard, resultTextColor: ColorData, resultBackgroundColor: ColorData, borderColor: ColorData, borderWidth: Double, normalKeyFillColor: ColorData, specialKeyFillColor: ColorData, pushedKeyFillColor: ColorData, suggestKeyFillColor: ColorData? = nil, suggestLabelTextColor: ColorData? = nil, keyShadow: ThemeShadowData<ColorData>? = nil) {
         self.id = id
         self.backgroundColor = backgroundColor
         self.picture = picture
         self.textColor = textColor
         self.textFont = textFont
+        self.style = style
         self.resultTextColor = resultTextColor
         self.resultBackgroundColor = resultBackgroundColor
         self.borderColor = borderColor
@@ -52,6 +54,7 @@ public struct ThemeData<ApplicationExtension: ApplicationSpecificTheme>: Codable
         case picture
         case textColor
         case textFont
+        case style
         case resultTextColor
         case resultBackgroundColor
         case borderColor
@@ -72,6 +75,7 @@ public struct ThemeData<ApplicationExtension: ApplicationSpecificTheme>: Codable
         self.picture = try container.decode(ThemePicture.self, forKey: .picture)
         self.textColor = try container.decode(ColorData.self, forKey: .textColor)
         self.textFont = try container.decode(ThemeFontWeight.self, forKey: .textFont)
+        self.style = (try? container.decode(ThemeStyle.self, forKey: .style)) ?? .standard
         self.resultTextColor = try container.decode(ColorData.self, forKey: .resultTextColor)
         self.resultBackgroundColor = (try? container.decode(ColorData.self, forKey: .resultBackgroundColor)) ?? backgroundColor
         self.borderColor = try container.decode(ColorData.self, forKey: .borderColor)
@@ -92,21 +96,51 @@ public struct ThemeData<ApplicationExtension: ApplicationSpecificTheme>: Codable
     }
 
     public var tabBarButtonBackgroundColor: Color {
+        if style == .minimal {
+            return .clear
+        }
+        if style == .faceted {
+            return specialKeyFillColor.color
+        }
         if case .dynamic(.clear, .normal) = self.resultBackgroundColor {
-            .white
+            return .white
         } else {
-            prominentBackgroundColor
+            return prominentBackgroundColor
         }
     }
 
     public var tabBarButtonForegroundColor: Color {
+        if style != .standard {
+            return textColor.color
+        }
         if case .dynamic(.clear, .normal) = self.resultBackgroundColor {
-            Color(red: 0.5, green: 0.043, blue: 0.016)
+            return Color(red: 0.5, green: 0.043, blue: 0.016)
         } else {
-            self.resultTextColor.color
+            return self.resultTextColor.color
         }
     }
 
+    public var tabBarButtonBorderColor: Color {
+        style == .minimal ? specialKeyFillColor.color : borderColor.color
+    }
+
+}
+
+public enum ThemeStyle: String, Codable, Equatable, Sendable {
+    case standard
+    case minimal
+    case faceted
+
+    public var fontDesign: Font.Design {
+        switch self {
+        case .standard:
+            .default
+        case .minimal:
+            .monospaced
+        case .faceted:
+            .serif
+        }
+    }
 }
 
 public struct ThemeShadowData<ColorData>: Codable, Equatable, Sendable where ColorData: Codable & Equatable & Sendable {
