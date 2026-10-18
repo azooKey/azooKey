@@ -10,6 +10,7 @@ import AzooKeyUtils
 import Foundation
 import KanaKanjiConverterModule
 import enum KeyboardExtensionUtils.AnyTextDocumentProxy
+import struct KeyboardExtensionUtils.ObservedTextState
 import struct KeyboardExtensionUtils.TextChangeContext
 import KeyboardViews
 import SwiftUI
@@ -542,7 +543,10 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
 
     /// 何かが変化する前に状態の保存を行う関数。
     override func notifySomethingWillChange(left: String, center: String, right: String) {
-        self.textChangeContext.willChange(before: .init(left: left, center: center, right: right))
+        let before = ObservedTextState(left: left, center: center, right: right)
+        if self.textChangeContext.willChange(before: before) {
+            self.inputManager.displayedTextManager.discardExpectedEditsReflected(in: before)
+        }
     }
     // MARK: iOS16以降
     /*

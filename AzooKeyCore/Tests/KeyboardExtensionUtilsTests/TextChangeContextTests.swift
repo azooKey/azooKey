@@ -8,8 +8,8 @@ final class TextChangeContextTests: XCTestCase {
 
     func testRepeatedWillChangePreservesOriginalContext() {
         var context = TextChangeContext()
-        context.willChange(before: state("桜"))
-        context.willChange(before: state("", right: "桜"))
+        XCTAssertTrue(context.willChange(before: state("桜")))
+        XCTAssertFalse(context.willChange(before: state("", right: "桜")))
         XCTAssertEqual(context.before, state("桜"))
     }
 
@@ -43,9 +43,44 @@ final class TextChangeContextTests: XCTestCase {
     func testRepeatedWillChangeAfterContinuationKeepsFirstFreshContext() {
         var context = TextChangeContext()
         context.didConsumeExpectedEdit(after: state("\n"), hasMoreEdits: true)
-        context.willChange(before: state("\n🏊"))
-        context.willChange(before: state("\n"))
+        XCTAssertTrue(context.willChange(before: state("\n🏊")))
+        XCTAssertFalse(context.willChange(before: state("\n")))
         XCTAssertEqual(context.before, state("\n🏊"))
+    }
+
+    func testDuplicateWillChangeDoesNotDiscardEditsForOriginalNotification() {
+        var context = TextChangeContext()
+        var tracker = ExpectedEditTracker()
+        let initial = state("さく")
+        let final = state("桜")
+        XCTAssertTrue(context.willChange(before: initial))
+        tracker.record(before: initial, after: final)
+
+        if context.willChange(before: final) {
+            tracker.discardEditsReflected(in: final)
+        }
+
+        XCTAssertEqual(context.before, initial)
+        XCTAssertEqual(tracker.consume(before: initial, after: final), .matched(hasMoreEdits: false))
+    }
+
+    func testPendingRoundTripKeepsIntermediateCallbacksForOriginalNotification() {
+        var context = TextChangeContext()
+        var tracker = ExpectedEditTracker()
+        let composition = state("\n🏊")
+        let intermediate = state("\n")
+        context.willChange(before: composition)
+        tracker.record(before: composition, after: intermediate)
+        tracker.record(before: intermediate, after: composition)
+
+        if context.willChange(before: composition) {
+            tracker.discardEditsReflected(in: composition)
+        }
+
+        XCTAssertEqual(tracker.consume(before: composition, after: intermediate), .matched(hasMoreEdits: true))
+        context.didConsumeExpectedEdit(after: intermediate, hasMoreEdits: true)
+        XCTAssertEqual(context.before, intermediate)
+        XCTAssertEqual(tracker.consume(before: intermediate, after: composition), .matched(hasMoreEdits: false))
     }
 
     func testSamePositionTapStillHasEqualBeforeAndAfterContext() {

@@ -30,6 +30,14 @@ public struct ExpectedEditTracker: Sendable {
         self.maxStoredEdits = maxStoredEdits
     }
 
+    /// 新しい変更前通知ですでに反映済みと確認できた編集を破棄する。
+    public mutating func discardEditsReflected(in before: ObservedTextState) {
+        guard self.expectedEdits.last?.after == before else {
+            return
+        }
+        self.expectedEdits.removeAll(keepingCapacity: true)
+    }
+
     public mutating func record(before: ObservedTextState?, after: ObservedTextState?) {
         guard let before, let after, before != after else {
             return
