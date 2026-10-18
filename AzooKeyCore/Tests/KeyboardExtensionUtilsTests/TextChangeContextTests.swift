@@ -13,6 +13,27 @@ final class TextChangeContextTests: XCTestCase {
         XCTAssertEqual(context.before, state("桜"))
     }
 
+    func testLegacyWillChangePreservesExpectedEditContext() {
+        var context = TextChangeContext()
+        context.willChange(before: state("\nさく"), replacingExpectedEditContext: false)
+        context.didConsumeExpectedEdit(after: state("\n"), hasMoreEdits: true)
+
+        XCTAssertFalse(context.willChange(before: state("\n🏊"), replacingExpectedEditContext: false))
+        XCTAssertEqual(context.before, state("\n"))
+    }
+
+    func testLegacyWillChangeAcceptsNextChangeAfterCompletionOrReset() {
+        var context = TextChangeContext()
+        context.willChange(before: state("さく"), replacingExpectedEditContext: false)
+        context.didConsumeExpectedEdit(after: state("桜"), hasMoreEdits: false)
+        XCTAssertTrue(context.willChange(before: state("次の入力"), replacingExpectedEditContext: false))
+        XCTAssertEqual(context.before, state("次の入力"))
+
+        context.reset()
+        XCTAssertTrue(context.willChange(before: state("別の入力"), replacingExpectedEditContext: false))
+        XCTAssertEqual(context.before, state("別の入力"))
+    }
+
     func testExpectedEditRetainsContextForDidChangeWithoutWillChange() {
         var context = TextChangeContext()
         context.willChange(before: state("さく"))

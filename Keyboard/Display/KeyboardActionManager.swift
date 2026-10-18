@@ -544,8 +544,13 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
     /// 何かが変化する前に状態の保存を行う関数。
     override func notifySomethingWillChange(left: String, center: String, right: String) {
         let before = ObservedTextState(left: left, center: center, right: right)
-        if self.textChangeContext.willChange(before: before) {
-            self.inputManager.displayedTextManager.discardExpectedEditsReflected(in: before)
+        if #available(iOS 27.0, *) {
+            if self.textChangeContext.willChange(before: before) {
+                self.inputManager.displayedTextManager.discardExpectedEditsReflected(in: before)
+            }
+        } else {
+            // iOS 26以前は、内部編集の途中状態も従来のtempTextDataと同様に保持する。
+            self.textChangeContext.willChange(before: before, replacingExpectedEditContext: false)
         }
     }
     // MARK: iOS16以降

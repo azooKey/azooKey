@@ -38,7 +38,10 @@ final class InputManagerTests: XCTestCase {
         return (manager, proxy)
     }
 
-    func testEnterAfterExternalChangeEndsCompositionWithoutEditingDocument() {
+    func testEnterAfterExternalChangeEndsCompositionWithoutEditingDocument() throws {
+        guard #available(iOS 27.0, *) else {
+            throw XCTSkip("The external-change workaround applies to iOS 27 and later")
+        }
         withLiveConversion {
             for prefix in ["", "今日は"] {
                 for position in [0, 1] {
@@ -63,7 +66,10 @@ final class InputManagerTests: XCTestCase {
         }
     }
 
-    func testInputAfterExternalChangeStartsNewComposition() {
+    func testInputAfterExternalChangeStartsNewComposition() throws {
+        guard #available(iOS 27.0, *) else {
+            throw XCTSkip("The external-change workaround applies to iOS 27 and later")
+        }
         withLiveConversion {
             let (manager, proxy) = makeComposition(prefix: "今日は")
             proxy.adjustTextPosition(byCharacterOffset: -"桜の花".utf16.count)
@@ -77,6 +83,28 @@ final class InputManagerTests: XCTestCase {
             XCTAssertNil(manager.liveConversionManager.lastUsedCandidate)
             XCTAssertEqual(proxy.documentContextBeforeInput, "今日は")
             XCTAssertEqual(proxy.documentContextAfterInput, "桜の花")
+        }
+    }
+
+    func testLegacyEnterAfterExternalChangePreservesExistingBehavior() throws {
+        if #available(iOS 27.0, *) {
+            throw XCTSkip("Legacy behavior applies to iOS 26 and earlier")
+        }
+        withLiveConversion {
+            let (manager, proxy) = makeComposition(prefix: "今日は")
+            proxy.adjustTextPosition(byCharacterOffset: -"桜の花".utf16.count)
+            let before = proxy.documentContextBeforeInput
+            let after = proxy.documentContextAfterInput
+            let edits = proxy.textEditCount
+
+            _ = manager.enter(shouldModifyDisplayedText: false, requireSetResult: false)
+
+            XCTAssertEqual(manager.composingText.convertTarget, "さくらのはな")
+            XCTAssertEqual(manager.displayedTextManager.composingText.convertTarget, "さくらのはな")
+            XCTAssertEqual(manager.liveConversionManager.lastUsedCandidate?.text, "桜の花")
+            XCTAssertEqual(proxy.documentContextBeforeInput, before)
+            XCTAssertEqual(proxy.documentContextAfterInput, after)
+            XCTAssertEqual(proxy.textEditCount, edits)
         }
     }
 
