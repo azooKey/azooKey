@@ -10,6 +10,7 @@ import AzooKeyUtils
 import Foundation
 import KanaKanjiConverterModule
 import enum KeyboardExtensionUtils.AnyTextDocumentProxy
+import struct KeyboardExtensionUtils.TextChangeContext
 import KeyboardViews
 import SwiftUI
 import SwiftUtils
@@ -23,7 +24,7 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
 
     // 即時変数
     private var tasks: [(type: LongpressActionType, task: Task<Void, any Error>)] = []
-    private var tempTextData: (left: String, center: String, right: String)?
+    private var textChangeContext = TextChangeContext()
     private var pendingReportDismissTask: Task<Void, Never>?
 
     // キーボードを閉じる際に呼び出す
@@ -34,7 +35,7 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
             task.cancel()
         }
         self.tasks = []
-        self.tempTextData = nil
+        self.textChangeContext.reset()
     }
 
     @MainActor func importDynamicUserDictionary(_ userDictionary: [DicdataElement]) {
@@ -541,12 +542,7 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
 
     /// 何かが変化する前に状態の保存を行う関数。
     override func notifySomethingWillChange(left: String, center: String, right: String) {
-        // self.tempTextDataが`nil`でない場合、上書きせず終了する
-        guard self.tempTextData == nil else {
-            debug("notifySomethingWillChange: There is already `tempTextData`: \(tempTextData!)")
-            return
-        }
-        self.tempTextData = (left: left, center: center, right: right)
+        self.textChangeContext.willChange(before: .init(left: left, center: center, right: right))
     }
     // MARK: iOS16以降
     /*
@@ -618,10 +614,11 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
             }
         }
         // 前のデータが保存されていない場合は操作しない
-        guard let (tempLeft, b_center, b_right) = self.tempTextData else {
-            debug("notifySomethingDidChange: Could not found `tempTextData`")
+        guard let before = self.textChangeContext.before else {
+            debug("notifySomethingDidChange: Could not find a before-change context")
             return
         }
+        let (tempLeft, b_center, b_right) = (before.left, before.center, before.right)
         let expectedEditConsumption = self.inputManager.consumeExpectedEdit(
             beforeLeft: tempLeft,
             beforeCenter: b_center,
@@ -632,15 +629,18 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
         )
         switch expectedEditConsumption {
         case .matched(let hasMoreEdits):
-            self.tempTextData = hasMoreEdits ? (left: a_left, center: a_center, right: a_right) : nil
+            self.textChangeContext.didConsumeExpectedEdit(
+                after: .init(left: a_left, center: a_center, right: a_right),
+                hasMoreEdits: hasMoreEdits
+            )
             return
         case .noMatch:
             break
         }
 
-        // 終了時に必ずtempTextDataを`nil`にする
+        // 終了時に変更前のコンテキストをクリアする
         defer {
-            self.tempTextData = nil
+            self.textChangeContext.reset()
         }
 
         // iOS16以降左側の文字列の設計が変わったので、adjustする
