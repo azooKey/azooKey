@@ -34,22 +34,6 @@ public struct ExpectedEditTracker: Sendable {
         guard let before, let after, before != after else {
             return
         }
-        // 削除・再挿入で元の状態へ戻った区間は、途中の空状態が後の外部操作と一致し得る。
-        // 途中の履歴を取り除き、表示が変わらない通知だけを一度受け取れるようにする。
-        // 連続した未消費の編集だけをたどり、別の編集列や消費済みの通知は対象にしない。
-        var currentBefore = before
-        var index = self.expectedEdits.endIndex
-        while index > self.expectedEdits.startIndex {
-            let previous = self.expectedEdits[index - 1]
-            guard previous.after == currentBefore else { break }
-            index -= 1
-            if previous.before == after {
-                self.expectedEdits.removeSubrange(index...)
-                self.expectedEdits.append(.init(before: after, after: after))
-                return
-            }
-            currentBefore = previous.before
-        }
         self.expectedEdits.append(.init(before: before, after: after))
         if self.expectedEdits.count > self.maxStoredEdits {
             self.expectedEdits.removeFirst(self.expectedEdits.count - self.maxStoredEdits)
