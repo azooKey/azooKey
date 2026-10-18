@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AA0774002026101800000001 /* AzooKeyUtils in Frameworks */ = {isa = PBXBuildFile; productRef = AA0774002026101800000002 /* AzooKeyUtils */; };
 		AA2700012026091700000001 /* KeyboardViews in Frameworks */ = {isa = PBXBuildFile; productRef = AA2700012026091700000002 /* KeyboardViews */; };
 		1A2E58542951EC87004F959B /* (null) in Sources */ = {isa = PBXBuildFile; };
 		1A2E58592951EC87004F959B /* (null) in Sources */ = {isa = PBXBuildFile; };
@@ -137,6 +138,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				KeyboardActionManager.swift,
+				"KeyboardActionManager+Reporting.swift",
 				KeyboardViewController.swift,
 			);
 			target = 1A3DC1D72500D44E002CAA93 /* azooKeyTests */;
@@ -186,6 +188,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA0774002026101800000001 /* AzooKeyUtils in Frameworks */,
 				1ABDFC352A18C60A00CED3A3 /* KanaKanjiConverterModuleWithDefaultDictionary in Frameworks */,
 				AA2700012026091700000001 /* KeyboardViews in Frameworks */,
 			);
@@ -357,6 +360,7 @@
 			);
 			name = azooKeyTests;
 			packageProductDependencies = (
+				AA0774002026101800000002 /* AzooKeyUtils */,
 				1ABDFC342A18C60A00CED3A3 /* KanaKanjiConverterModuleWithDefaultDictionary */,
 				AA2700012026091700000002 /* KeyboardViews */,
 			);
@@ -817,7 +821,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = azooKeyTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -839,7 +843,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = azooKeyTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1020,6 +1024,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		AA0774002026101800000002 /* AzooKeyUtils */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AzooKeyUtils;
+		};
 		AA2700012026091700000002 /* KeyboardViews */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = KeyboardViews;

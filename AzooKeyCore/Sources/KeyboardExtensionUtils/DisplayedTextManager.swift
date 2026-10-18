@@ -381,6 +381,11 @@ final public class DisplayedTextManager {
     }
 
     @MainActor
+    public func discardExpectedEditsReflected(in before: ObservedTextState) {
+        self.expectedEditTracker.discardEditsReflected(in: before)
+    }
+
+    @MainActor
     public func consumeExpectedEdit(before: ObservedTextState, after: ObservedTextState) -> ExpectedEditTracker.Consumption {
         self.expectedEditTracker.consume(before: before, after: after)
     }

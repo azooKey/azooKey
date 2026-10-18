@@ -2,6 +2,61 @@
 import XCTest
 
 final class ExpectedEditTrackerTests: XCTestCase {
+    func testRepeatedCursorMoveDoesNotMatchPreviouslyReflectedDeletion() {
+        var tracker = ExpectedEditTracker()
+        let blankLine = ObservedTextState(left: "\n", center: "", right: "")
+        let composition = ObservedTextState(left: "\n🏊", center: "", right: "")
+
+        for _ in 0 ..< 3 {
+            tracker.record(before: blankLine, after: composition)
+            // A fresh will-change observes the completed input before the user moves.
+            tracker.discardEditsReflected(in: composition)
+            XCTAssertEqual(tracker.consume(before: composition, after: blankLine), .noMatch)
+
+            // The user returns and removes the previous word before typing again.
+            // Keyboard edits need not each produce a callback from the host.
+            tracker.record(before: composition, after: blankLine)
+        }
+    }
+
+    func testObservingFinalStateDiscardsCompletedRoundTrip() {
+        var tracker = ExpectedEditTracker()
+        let composition = ObservedTextState(left: "\n🏊", center: "", right: "")
+        let blankLine = ObservedTextState(left: "\n", center: "", right: "")
+        tracker.record(before: composition, after: blankLine)
+        tracker.record(before: blankLine, after: composition)
+
+        tracker.discardEditsReflected(in: composition)
+
+        XCTAssertEqual(tracker.consume(before: composition, after: blankLine), .noMatch)
+    }
+
+    func testUnreflectedEditsStillConsumeIntermediateCallbacks() {
+        var tracker = ExpectedEditTracker()
+        let initial = ObservedTextState(left: "さく", center: "", right: "")
+        let intermediate = ObservedTextState(left: "さ", center: "", right: "")
+        let final = ObservedTextState(left: "桜", center: "", right: "")
+        tracker.record(before: initial, after: intermediate)
+        tracker.record(before: intermediate, after: final)
+
+        tracker.discardEditsReflected(in: initial)
+
+        XCTAssertEqual(tracker.consume(before: initial, after: intermediate), .matched(hasMoreEdits: true))
+        XCTAssertEqual(tracker.consume(before: intermediate, after: final), .matched(hasMoreEdits: false))
+    }
+
+    func testEditsRecordedAfterWillChangeRemainExpected() {
+        var tracker = ExpectedEditTracker()
+        let initial = ObservedTextState(left: "さ", center: "", right: "")
+        let before = ObservedTextState(left: "さく", center: "", right: "")
+        let after = ObservedTextState(left: "桜", center: "", right: "")
+        tracker.record(before: initial, after: before)
+        tracker.discardEditsReflected(in: before)
+        tracker.record(before: before, after: after)
+
+        XCTAssertEqual(tracker.consume(before: before, after: after), .matched(hasMoreEdits: false))
+    }
+
     func testConsumeSingleEdit() {
         var tracker = ExpectedEditTracker()
         let before = ObservedTextState(left: "a", center: "", right: "")

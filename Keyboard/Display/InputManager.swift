@@ -467,7 +467,10 @@ final class InputManager {
             self.composingText.prefixComplete(composingCount: candidate.composingCount)
             self.displayedTextManager.updateComposingText(composingText: self.composingText, completedPrefix: candidate.text, isSelected: self.isSelected)
         }
-        if self.displayedTextManager.composingText.isEmpty {
+        if #available(iOS 27.0, *), !shouldModifyDisplayedText {
+            // iOS 27以降では、ホスト側の変更後は表示を再更新せず入力状態だけを終了する。
+            self.stopComposition()
+        } else if self.displayedTextManager.composingText.isEmpty {
             self.stopComposition()
             self.conversionCompleted(candidate: candidate)
         } else if requireSetResult {
