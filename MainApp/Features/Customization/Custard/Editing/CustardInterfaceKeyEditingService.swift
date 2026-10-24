@@ -574,7 +574,7 @@ extension CustardInterfaceVariationKey {
             case .systemImage:
                 design.label = .systemImage("circle.fill")
             case .mainAndSub:
-                design.label = .mainAndSub("A", "BC")
+                design.label = .mainAndSub(self[.labelMain], self[.labelSub])
             case .mainAndDirections:
                 design.label = .mainAndDirections("", .init())
             }
