@@ -48,7 +48,8 @@ public enum AvailableLayoutRegion {
 
     @MainActor
     public static func obstacles(in geometry: GeometryProxy) -> [CGRect] {
-        #if os(iOS)
+        // Xcode 27.1 SDK APIs must also be hidden from older SDK builds.
+        #if os(iOS) && compiler(>=6.4) && canImport(SwiftUI, _version: 8.0.85.29)
         if #available(iOS 27.1, *) {
             // Use physical local coordinates, including for right-to-left UI.
             return geometry.reservedRegions(kind: .division, layoutDirectionBehavior: .fixed).map(\.frame)

@@ -69,9 +69,11 @@ final class ReservedRegionLayoutTests: XCTestCase {
 
     func test_multipleAndOverlappingRegionsDoNotCoverControls() {
         let bounds = CGRect(x: 0, y: 0, width: 1_024, height: 214)
-        let obstacles = [CGRect(x: 500, y: -50, width: 30, height: 400),
-                         CGRect(x: 900, y: 0, width: 200, height: 60),
-                         CGRect(x: 510, y: 0, width: 30, height: 300)]
+        let obstacles = [
+            CGRect(x: 500, y: -50, width: 30, height: 400),
+            CGRect(x: 900, y: 0, width: 200, height: 60),
+            CGRect(x: 510, y: 0, width: 30, height: 300),
+        ]
         let frame = AvailableLayoutRegion.largest(in: bounds, avoiding: obstacles)
         XCTAssertTrue(bounds.contains(frame))
         assertSafe([frame], obstacles: obstacles)
@@ -79,9 +81,11 @@ final class ReservedRegionLayoutTests: XCTestCase {
 
     func test_invalidAndOutsideRegionsAreIgnored() {
         let bounds = CGRect(x: 0, y: 0, width: 760, height: 56)
-        let regions = [CGRect.null, CGRect.infinite, .zero,
-                       CGRect(x: CGFloat.nan, y: 0, width: 50, height: 56),
-                       CGRect(x: 800, y: 0, width: 20, height: 56)]
+        let regions = [
+            CGRect.null, CGRect.infinite, .zero,
+            CGRect(x: CGFloat.nan, y: 0, width: 50, height: 56),
+            CGRect(x: 800, y: 0, width: 20, height: 56),
+        ]
         XCTAssertEqual(AvailableLayoutRegion.largest(in: bounds, avoiding: regions), bounds)
         XCTAssertEqual(AvailableLayoutRegion.largest(in: .zero, avoiding: []), .zero)
     }

@@ -343,7 +343,9 @@ struct QwertyCustomKeysSettingView<SettingKey: QwertyCustomKeyKeyboardSetting>: 
     }
 
     private func moveSelectedKey(by offset: Int) {
-        guard canMoveSelection(by: offset) else { return }
+        guard canMoveSelection(by: offset) else {
+            return
+        }
         if selection.longpressSelectIndex >= 0 {
             let source = selection.longpressSelectIndex
             setting.value.keys[selection.selectIndex].longpresses.swapAt(source, source + offset)

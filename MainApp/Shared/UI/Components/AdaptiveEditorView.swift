@@ -13,6 +13,7 @@ struct AdaptiveEditorView<Editor: View, Preview: View>: View {
     }
 
     var body: some View {
+        #if compiler(>=6.4) && canImport(SwiftUI, _version: 8.0.85.29)
         if #available(iOS 27.1, *) {
             ArrangementView {
                 editor
@@ -22,15 +23,22 @@ struct AdaptiveEditorView<Editor: View, Preview: View>: View {
             }
             .arrangementViewStyle(.split)
         } else {
-            GeometryReader { geometry in
-                if horizontalSizeClass == .regular && geometry.size.width >= 700 {
-                    HStack(spacing: 0) {
-                        editor
-                        preview
-                    }
-                } else {
+            fallback
+        }
+        #else
+        fallback
+        #endif
+    }
+
+    private var fallback: some View {
+        GeometryReader { geometry in
+            if horizontalSizeClass == .regular && geometry.size.width >= 700 {
+                HStack(spacing: 0) {
                     editor
+                    preview
                 }
+            } else {
+                editor
             }
         }
     }

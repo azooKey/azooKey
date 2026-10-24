@@ -108,10 +108,12 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func currentReservedFrames() -> [CGRect] {
+        #if compiler(>=6.4) && canImport(SwiftUI, _version: 8.0.85.29)
         if #available(iOS 27.1, *) {
             return view.reservedRegions(kind: .division).map(\.frame)
                 + view.reservedRegions(kind: .occlusion).map(\.frame)
         }
+        #endif
         return []
     }
 

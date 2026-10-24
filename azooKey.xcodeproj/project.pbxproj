@@ -534,7 +534,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
-			shellScript = "PATH=/opt/homebrew/bin:$PATH\nif which swiftlint >/dev/null; then\n  swiftlint --fix --format\n  swiftlint\nelse\n  echo \"Warning: SwiftLint does not exist, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "PATH=/opt/homebrew/bin:$PATH\nif which swiftlint >/dev/null; then\n  if [ \"${CI:-}\" != \"true\" ]; then\n    swiftlint --fix --format\n  fi\n  swiftlint\nelse\n  echo \"Warning: SwiftLint does not exist, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 		1A4E1F4A261582E8009B6EB7 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -552,7 +552,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
-			shellScript = "PATH=/opt/homebrew/bin:$PATH\nif which swiftlint >/dev/null; then\n  swiftlint --fix --format\n  swiftlint\nelse\n  echo \"Warning: SwiftLint does not exist, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "PATH=/opt/homebrew/bin:$PATH\nif which swiftlint >/dev/null; then\n  if [ \"${CI:-}\" != \"true\" ]; then\n    swiftlint --fix --format\n  fi\n  swiftlint\nelse\n  echo \"Warning: SwiftLint does not exist, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

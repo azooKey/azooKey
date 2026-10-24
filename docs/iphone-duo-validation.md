@@ -39,7 +39,10 @@ xcodebuild -project azooKey.xcodeproj -scheme DuoAppTests \
 - iPad mini / iOS 27.0: 広い画面でUIテスト2件が成功。
 - アプリ本体とキーボード拡張: シミュレータ・iOS 27.1実機向けビルドが成功。
 - Duo実機（ビルド6）: 利用者より、一連のDuo実機テスト完了の報告を受領（2026-10-24）。
-- SwiftLint: 検証環境に未導入のため未実行。
+- CI追加後の再確認: Releaseの実機向けビルド、パッケージテスト64件、iPhone／iPadのUIテスト各2件が成功。
+- 一時コピーで新SDK向けのコンパイル条件を無効にし、フォールバックのみのReleaseビルドも成功（使用コンパイラ・SDKは27.1）。
+- SwiftLint 0.65.1: エラー0件。上流の基点と比較して新規の違反0件（既存の警告は残す）。
+- actionlint 1.7.12、シェル構文、Xcodeプロジェクト形式、`git diff --check`: 成功。
 
 予約領域を渡すテストは幾何計算を検証します。Duoの姿勢に応じてOSが返す実際の領域や、iOS 27.1の`ArrangementView`・縦向きバーの表示を確認したことにはなりません。今回利用できたシミュレータはiOS 27.0までで、Duo機種はそのランタイムと非互換でした。iOS 18.5／27.0のUIテストは旧OS向けフォールバックを検証しています。Duo固有の実機動作は、これらの自動テストとは別に利用者の実機テスト完了報告で補完しています。
 
@@ -59,3 +62,21 @@ xcodebuild -project azooKey.xcodeproj -scheme DuoAppTests \
 - ライト／ダーク、大きい文字、VoiceOver、フルアクセスの有無、外付けキーボードの接続を確認する。
 
 個人の署名情報、実機識別子、App Groupの個人用変更は共有する差分に含めません。
+
+## CI
+
+- `build-on-push.yml`: 既存の`Xcode Build`をXcode 26.3で実行し、旧SDKのコンパイル互換性を確認します。別の`Duo Build and Tests (Xcode 27.1)`は、公式の`xcode-27`ホストランナーでReleaseビルド、上記のパッケージテスト、iPhone 18 ProとiPad miniのUIテストを実行し、ログと`.xcresult`を保存します。
+- `SwiftLint`: `.github/scripts/swiftlint.sh`で公式バイナリの版とSHA-256を固定します。自動修正は行いません。既存のXcodeビルドフェーズもCIでは読み取りのみです。
+- `swift.yml`: 既存のmacOS向けパッケージビルド・CustardKitテストをXcode 26.3へ固定します。キャッシュはOS・CPU・Xcode版で分けます。
+- `CodeQL`: `main`向けPRでも実行します。現在の[対応表](https://codeql.github.com/docs/codeql-overview/supported-languages-and-frameworks/)ではSwift 6.3までのため、Swift 6.4を使うXcode 27.1とは分け、Xcode 26.3で解析します。27.1専用APIの分岐はこの解析に含まれず、Duoビルド側でコンパイルします。
+- App Store Connect用ワークフローもDuoのAPIを含むXcode 27.1へ揃えます。配布条件と署名用Secretsは変更しません。
+
+2026-10-24時点の[公式ランナー](https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md)は、Xcode 27.1とiOS 27.1 SDKを含み、シミュレータのランタイムはiOS 27.0です。そのためCIでも27.1専用の表示自体は実機確認を補完するものです。
+
+GitHub上のワークフロー実行、CodeQLの実解析、Xcode 26.3そのものでの実行はPush後に確認します。ローカルにはXcode 27.1のみがあり、CI全体の成功を確認したものではありません。
+
+ローカルで固定版のlintを再現するコマンド:
+
+```sh
+bash .github/scripts/swiftlint.sh
+```
