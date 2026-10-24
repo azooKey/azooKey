@@ -298,17 +298,26 @@ extension CustardInterfaceKey {
 @MainActor
 struct CustomKeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>: View {
     private let custard: Custard
+    private let interfaceSize: CGSize?
+    private let keySpacing: CGFloat?
+    private let keyAreaHeight: CGFloat?
     private var tabDesign: TabDependentDesign {
-        custard.interface.tabDesign(
-            interfaceSize: variableStates.interfaceSize,
+        var design = custard.interface.tabDesign(
+            interfaceSize: interfaceSize ?? variableStates.interfaceSize,
             layoutContext: variableStates.layoutContext
         )
+        design.keySpacing = keySpacing
+        design.keyAreaHeight = keyAreaHeight
+        return design
     }
     @EnvironmentObject private var variableStates: VariableStates
     @State private var activeSuggestKeys: Set<String> = []
 
-    init(custard: Custard) {
+    init(custard: Custard, interfaceSize: CGSize? = nil, keySpacing: CGFloat? = nil, keyAreaHeight: CGFloat? = nil) {
         self.custard = custard
+        self.interfaceSize = interfaceSize
+        self.keySpacing = keySpacing
+        self.keyAreaHeight = keyAreaHeight
     }
 
     var body: some View {

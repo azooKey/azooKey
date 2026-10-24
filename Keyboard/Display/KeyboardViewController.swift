@@ -56,7 +56,8 @@ final class KeyboardViewController: UIInputViewController {
         clipboardHistoryManagerConfig: ClipboardHistoryManagerConfig(),
         tabManagerConfig: TabManagerConfig(),
         userDefaults: UserDefaults.standard,
-        sharedUserDefaults: SharedStore.userDefaults
+        sharedUserDefaults: SharedStore.userDefaults,
+        duoFlickEnabled: AzooKeySettingProvider.duoFlickEnabled
     )
 
     struct Keyboard: View {
@@ -70,32 +71,35 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private var keyboardHeightConstraint: NSLayoutConstraint?
+    private var hostViewLeadingConstraint: NSLayoutConstraint?
     private var hostViewWidthConstraint: NSLayoutConstraint?
     private var hostViewHeightConstraint: NSLayoutConstraint?
     private var hostViewBottomConstraint: NSLayoutConstraint?
     private var cancellables = Set<AnyCancellable>()
     private var lastKnownContainerSize: CGSize = .zero
 
-    // 現在のデバイス向きをWindowSceneから判定（取得不能時はUIDeviceでフォールバック）
+    private var lastKnownSafeAreaInsets: UIEdgeInsets = .zero
+    private var lastKnownOrientation: KeyboardOrientation?
+    private var lastKnownReservedFrames: [CGRect] = []
+
     private func currentKeyboardOrientation() -> KeyboardOrientation {
-        if let orientation = self.view.window?.windowScene?.interfaceOrientation {
-            if orientation.isPortrait {
-                return .vertical
-            }
-            if orientation.isLandscape {
-                return .horizontal
-            }
-        }
-        // Fallback: UIDeviceの向き
-        switch UIDevice.current.orientation {
-        case .landscapeLeft, .landscapeRight:
+        // Size classes describe the available presentation, including a closed
+        // landscape display and a narrow multitasking window.
+        if traitCollection.verticalSizeClass == .compact {
             return .horizontal
-        case .portrait, .portraitUpsideDown:
-            return .vertical
-        default:
-            // 不明時は現在値を維持
-            return KeyboardViewController.variableStates.keyboardOrientation
         }
+        if let size = view.window?.bounds.size, size.width > 0, size.height > 0 {
+            return size.width > size.height ? .horizontal : .vertical
+        }
+        return KeyboardViewController.variableStates.keyboardOrientation
+    }
+
+    private func currentReservedFrames() -> [CGRect] {
+        if #available(iOS 27.1, *) {
+            return view.reservedRegions(kind: .division).map(\.frame)
+                + view.reservedRegions(kind: .occlusion).map(\.frame)
+        }
+        return []
     }
 
     private func currentKeyboardViewSize() -> CGSize {
@@ -221,11 +225,12 @@ final class KeyboardViewController: UIInputViewController {
         self.keyboardHeightConstraint = self.keyboardHeightConstraint ?? self.view.heightAnchor.constraint(equalToConstant: 0)
         self.keyboardHeightConstraint?.isActive = false
 
+        self.hostViewLeadingConstraint = self.hostViewLeadingConstraint ?? host.view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor)
         self.hostViewWidthConstraint = self.hostViewWidthConstraint ?? host.view.widthAnchor.constraint(equalTo: self.view.widthAnchor)
         self.hostViewHeightConstraint = self.hostViewHeightConstraint ?? host.view.heightAnchor.constraint(equalTo: self.view.heightAnchor)
         self.hostViewBottomConstraint = self.hostViewBottomConstraint ?? host.view.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
         NSLayoutConstraint.activate([
-            self.hostViewWidthConstraint!, self.hostViewHeightConstraint!, self.hostViewBottomConstraint!
+            self.hostViewLeadingConstraint!, self.hostViewWidthConstraint!, self.hostViewHeightConstraint!, self.hostViewBottomConstraint!
         ])
         KeyboardViewController.keyboardViewHost = host
         KeyboardViewController.action.setDelegateViewController(self)
@@ -258,6 +263,7 @@ final class KeyboardViewController: UIInputViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        Self.variableStates.duoFlickEnabled = AzooKeySettingProvider.duoFlickEnabled
         // サイズに関する情報はこのタイミングで設定する
         if #available(iOS 26, *) {
             let size = self.currentKeyboardViewSize()
@@ -306,16 +312,19 @@ final class KeyboardViewController: UIInputViewController {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        // iOS 26以上で、レイアウト確定後に向き・サイズを反映
-        if #available(iOS 26, *) {
-            let size = self.currentKeyboardViewSize()
-            guard size != .zero, size != lastKnownContainerSize else {
-                return
-            }
-            lastKnownContainerSize = size
-            self.applySizeUpdate(size: size, shouldUpdateHeight: true)
-            debug(#function, "size updated:", size, "orientation:", currentKeyboardOrientation())
+        let size = self.currentKeyboardViewSize()
+        let orientation = currentKeyboardOrientation()
+        let reservedFrames = currentReservedFrames()
+        guard size != .zero,
+              size != lastKnownContainerSize || orientation != lastKnownOrientation
+                || view.safeAreaInsets != lastKnownSafeAreaInsets || reservedFrames != lastKnownReservedFrames else {
+            return
         }
+        lastKnownContainerSize = size
+        lastKnownOrientation = orientation
+        lastKnownSafeAreaInsets = view.safeAreaInsets
+        lastKnownReservedFrames = reservedFrames
+        self.applySizeUpdate(size: size, orientation: orientation, shouldUpdateHeight: true)
     }
 
     func updateStates() {

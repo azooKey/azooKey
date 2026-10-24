@@ -154,6 +154,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				MainAppUITests.swift,
+				Info.plist,
 			);
 			target = 1A3DC1E22500D44E002CAA93 /* azooKeyUITests */;
 		};
@@ -380,6 +381,9 @@
 			);
 			dependencies = (
 				1A3DC1E52500D44E002CAA93 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				559E90652CAC29EC00E016FA /* MainAppUITests */,
 			);
 			name = azooKeyUITests;
 			productName = MainAppUITests;
@@ -879,7 +883,7 @@
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = MainApp;
+				TEST_TARGET_NAME = azooKey;
 			};
 			name = Debug;
 		};
@@ -902,7 +906,7 @@
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = MainApp;
+				TEST_TARGET_NAME = azooKey;
 			};
 			name = Release;
 		};

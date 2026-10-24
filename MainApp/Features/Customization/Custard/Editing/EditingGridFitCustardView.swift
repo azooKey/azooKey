@@ -260,13 +260,17 @@ struct EditingGridFitCustardView: CancelableEditor {
         )
     }
 
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+    @State private var containerWidth: CGFloat = 320
+
     private var interfaceSize: CGSize {
         let context = MainAppDesign.keyboardLayoutContext(
-            containerWidth: UIScreen.main.bounds.width
+            containerWidth: containerWidth,
+            orientation: verticalSizeClass == .compact ? .horizontal : .vertical
         )
         return .init(
             width: context.containerWidth,
-            height: Design.keyboardHeight(context: context)
+            height: min(320, Design.keyboardHeight(context: context))
         )
     }
 
@@ -439,14 +443,20 @@ struct EditingGridFitCustardView: CancelableEditor {
         }
         .background(Color.secondarySystemBackground)
         .navigationBarBackButtonHidden(true)
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
+            if width > 0 {
+                containerWidth = width
+                variableStates.setContainerWidth(width, orientation: verticalSizeClass == .compact ? .horizontal : .vertical)
+            }
+        }
         .navigationTitle(Text("カスタムタブを作る"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
+            ToolbarItem(placement: .cancellationAction) {
                 let hasChanges: Bool = self.base != self.editingItem
                 EditCancelButton(confirmationRequired: hasChanges)
             }
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .confirmationAction) {
                 EditConfirmButton {
                     if isNewItem && manager.availableCustards.contains(editingItem.tabName) {
                         showDuplicateAlert = true
@@ -477,8 +487,8 @@ struct EditingGridFitCustardView: CancelableEditor {
         }
         .onAppear {
             variableStates.setContainerWidth(
-                SemiStaticStates.shared.screenWidth,
-                orientation: MainAppDesign.keyboardOrientation
+                containerWidth,
+                orientation: verticalSizeClass == .compact ? .horizontal : .vertical
             )
             normalizeEmptyKeys()
             if !self.baseSelectionSheetState.hasShown {

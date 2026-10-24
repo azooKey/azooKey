@@ -32,6 +32,13 @@ public enum KeyboardTab: Equatable {
         case custard(Custard)
         case special(SpecialTab)
 
+        var supportsDuoFlick: Bool {
+            switch self {
+            case .flick_hira, .flick_abc, .flick_numbersymbols: true
+            default: false
+            }
+        }
+
         public static func == (lhs: ExistentialTab, rhs: ExistentialTab) -> Bool {
             switch (lhs, rhs) {
             case (.flick_hira, .flick_hira), (.flick_abc, .flick_abc), (.flick_numbersymbols, .flick_numbersymbols), (.qwerty_hira, .qwerty_hira), (.qwerty_abc, .qwerty_abc), (.qwerty_numbers, .qwerty_numbers), (.qwerty_symbols, .qwerty_symbols): return true

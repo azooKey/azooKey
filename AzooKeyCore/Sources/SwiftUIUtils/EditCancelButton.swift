@@ -29,7 +29,7 @@ public struct EditConfirmButton: View {
             }
             .labelStyle(.iconOnly)
         } else {
-            Button(self.confirmationType.label) {
+            Button(self.confirmationType.label, systemImage: "checkmark") {
                 self.action()
             }
         }
@@ -70,11 +70,11 @@ public struct EditCancelButton: View {
                 Button("編集を中止する", role: .destructive, action: self.cancel)
             }
         } else {
-            Button("キャンセル", role: .cancel) {
+            Button("キャンセル", systemImage: "xmark", role: .cancel) {
                 if confirmationRequired {
                     self.showCancellationAlert = true
                 } else {
-                    self.dismiss()
+                    self.cancel()
                 }
             }
             .alert("編集を中止します。変更はすべて失われます。", isPresented: $showCancellationAlert) {

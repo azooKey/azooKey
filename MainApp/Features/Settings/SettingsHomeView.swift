@@ -51,6 +51,16 @@ struct SettingsHomeView: View {
                 }
                 .searchKeys("キーボードの種類", "レイアウト", "フリック", "ローマ字")
 
+                Section("両手入力") {
+                    NavigationLink {
+                        DuoFlickSettingView()
+                    } label: {
+                        Label("Duoフリック", systemImage: "rectangle.split.2x1")
+                    }
+                    .accessibilityIdentifier("duo-flick-settings")
+                }
+                .searchKeys("Duo", "見開き", "折りたたみ", "両手", "左右", "フリック")
+
                 Section("ライブ変換") {
                     BoolSettingView(.liveConversion)
                     NavigationLink("詳しい設定") {

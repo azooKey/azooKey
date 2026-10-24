@@ -37,7 +37,7 @@ struct DraggableView<Content: View, Collection: BidirectionalCollection & Random
     }
 
     var body: some View {
-        VStack {
+        ScrollView(.horizontal) {
             HStack(spacing: 0) {
                 ForEach(items.indices, id: \.self) {i in
                     if targetIndex == i {
@@ -55,7 +55,8 @@ struct DraggableView<Content: View, Collection: BidirectionalCollection & Random
                     separator
                         .focus(.accentColor, focused: true)
                 }
-            }.scaledToFit()
+            }
+                .padding(.vertical, 4)
         }
     }
 
@@ -191,7 +192,8 @@ private struct DraggableItem<Content: View>: View {
                         if enabled {
                             self.onEnd()
                         }
-                    }
+                    },
+                including: enabled ? .all : .subviews
             )
     }
 }

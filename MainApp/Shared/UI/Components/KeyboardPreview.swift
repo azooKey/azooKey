@@ -57,17 +57,18 @@ enum KeyboardPreviewSizing: Equatable {
 
     @MainActor
     static func resolvedExtensionSize(
-        fallbackWidth: CGFloat
+        fallbackWidth: CGFloat,
+        orientation: KeyboardOrientation = .vertical
     ) -> CGSize {
-        let orientation = MainAppDesign.keyboardOrientation
         if let size = SharedStore.resolvedKeyboardSize(
             orientation: orientation
-        ) {
+        ), abs(size.width - fallbackWidth) < 1 {
             return size
         }
-        let context = MainAppDesign.keyboardLayoutContext(
-            containerWidth: fallbackWidth
+        var context = MainAppDesign.keyboardLayoutContext(
+            containerWidth: fallbackWidth, orientation: orientation
         )
+        context.duoFlickEnabled = AzooKeySettingProvider.duoFlickEnabled
         return CGSize(
             width: fallbackWidth,
             height: Design.keyboardHeight(
@@ -80,11 +81,12 @@ enum KeyboardPreviewSizing: Equatable {
 
     @MainActor
     fileprivate func resolvedContainerSize(
-        for measuredWidth: CGFloat
+        for measuredWidth: CGFloat,
+        orientation: KeyboardOrientation
     ) -> CGSize {
         switch self {
         case .fitToExtension:
-            Self.resolvedExtensionSize(fallbackWidth: measuredWidth)
+            Self.resolvedExtensionSize(fallbackWidth: measuredWidth, orientation: orientation)
         case let .render(resolvedSize, _):
             resolvedSize
         }
@@ -95,6 +97,7 @@ enum KeyboardPreviewSizing: Equatable {
 struct KeyboardPreview: View {
     private let theme: AzooKeyTheme
 
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     @Environment(\.scenePhase) private var scenePhase
     private let sizing: KeyboardPreviewSizing
     private let defaultTab: KeyboardTab.ExistentialTab?
@@ -116,19 +119,20 @@ struct KeyboardPreview: View {
 
         let variableStates = VariableStates(
             interfaceWidth: sizing.initialResolvedSize?.width,
-            orientation: MainAppDesign.keyboardOrientation,
+            orientation: .vertical,
             clipboardHistoryManagerConfig: ClipboardHistoryManagerConfig(),
             tabManagerConfig: TabManagerConfig(),
-            userDefaults: UserDefaults.standard
+            userDefaults: UserDefaults.standard,
+            duoFlickEnabled: AzooKeySettingProvider.duoFlickEnabled
         )
+        if let defaultTab {
+            variableStates.setTabForPreview(defaultTab)
+        }
         if let resolvedHeight = sizing.initialResolvedSize?.height {
             variableStates.interfaceSize.height = max(
                 0,
                 resolvedHeight - Design.keyboardScreenBottomPadding
             )
-        }
-        if let defaultTab {
-            variableStates.setTabForPreview(defaultTab)
         }
         variableStates.resultModel.setResults([
             CandidateMock(text: "azooKey"),
@@ -185,11 +189,7 @@ struct KeyboardPreview: View {
                     resolvedKeyboardHeight: resolvedSize.height
                 )
             }
-            .onReceive(
-                NotificationCenter.default.publisher(
-                    for: UIDevice.orientationDidChangeNotification
-                )
-            ) { _ in
+            .onChange(of: verticalSizeClass) { _, _ in
                 updateCurrentLayout()
             }
             .onChange(of: scenePhase) { _, scenePhase in
@@ -198,6 +198,10 @@ struct KeyboardPreview: View {
                 }
                 updateCurrentLayout()
             }
+    }
+
+    private var previewOrientation: KeyboardOrientation {
+        verticalSizeClass == .compact ? .horizontal : .vertical
     }
 
     private var keyboardHeight: CGFloat {
@@ -223,7 +227,7 @@ struct KeyboardPreview: View {
 
     private func updateLayout(for displayWidth: CGFloat) {
         let resolvedSize = sizing.resolvedContainerSize(
-            for: displayWidth
+            for: displayWidth, orientation: previewOrientation
         )
         updateContainerWidth(
             resolvedSize.width,
@@ -256,7 +260,7 @@ struct KeyboardPreview: View {
         }
         variableStates.setContainerWidth(
             width,
-            orientation: MainAppDesign.keyboardOrientation
+            orientation: previewOrientation
         )
         if let resolvedKeyboardHeight {
             variableStates.interfaceSize.height = max(

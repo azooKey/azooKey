@@ -9,6 +9,7 @@
 import CustardKit
 import Foundation
 import SwiftUI
+import SwiftUIUtils
 
 @MainActor
 public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>: View {
@@ -140,16 +141,18 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
                     } else if isResultViewExpanded {
                         ExpandedResultView<Extension>(isResultViewExpanded: $isResultViewExpanded)
                     } else {
-                        KeyboardBarView<Extension>(isResultViewExpanded: $isResultViewExpanded)
+                        ReservedRegionAvoidingContent {
+                            KeyboardBarView<Extension>(isResultViewExpanded: $isResultViewExpanded)
+                        }
                             .frame(
                                 height: Design.keyboardBarHeight(
                                     interfaceHeight: variableStates.interfaceSize.height,
                                     context: variableStates.layoutContext
-                                )
+                                ) + 12
                             )
-                            // バーのタッチ判定領域はpaddingより前まで
+                            // Include the former vertical padding in the bar's
+                            // interactive area without changing keyboard height.
                             .contentShape(Rectangle())
-                            .padding(.vertical, 6)
                         keyboardView(tab: defaultTab ?? variableStates.tabManager.existentialTab())
                             .zIndex(1)
                     }
@@ -217,11 +220,11 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
     func keyboardView(tab: KeyboardTab.ExistentialTab) -> some View {
         switch tab {
         case .flick_hira:
-            CustomKeyboardView<Extension>(custard: settingAppliedFlickCustard(.flickJapanese))
+            flickKeyboard(custard: .flickJapanese)
         case .flick_abc:
-            CustomKeyboardView<Extension>(custard: settingAppliedFlickCustard(.flickEnglish))
+            flickKeyboard(custard: .flickEnglish)
         case .flick_numbersymbols:
-            CustomKeyboardView<Extension>(custard: settingAppliedFlickCustard(.flickNumberSymbols))
+            flickKeyboard(custard: .flickNumberSymbols)
         case .qwerty_hira:
             CustomKeyboardView<Extension>(custard: .qwertyJapanese)
         case .qwerty_abc:
@@ -245,6 +248,21 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
             case .emoji:
                 EmojiTab<Extension>()
             }
+        }
+    }
+
+    @ViewBuilder
+    private func flickKeyboard(custard: Custard) -> some View {
+        let custard = settingAppliedFlickCustard(custard)
+        if Extension.SettingProvider.duoFlickEnabled,
+           let layout = DuoFlickLayout(
+               containerWidth: variableStates.interfaceSize.width,
+               preferredPanelWidth: Extension.SettingProvider.duoFlickPanelWidth,
+               minimumCenterGap: Extension.SettingProvider.duoFlickCenterGap
+           ) {
+            DuoFlickKeyboardView<Extension>(custard: custard, layout: layout)
+        } else {
+            CustomKeyboardView<Extension>(custard: custard)
         }
     }
 

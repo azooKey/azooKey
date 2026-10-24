@@ -1,5 +1,8 @@
 # azooKey
 
+iPhone Duo向けの画面追従と、左右に同じ日本語12キーを配置する「Duoフリック」に対応しています。
+設定・ビルド・検証手順は[iPhone Duo対応ガイド](docs/iphone-duo.md)をご覧ください。
+
 azooKeyはiOS / iPadOS向けの日本語キーボードアプリです。Swiftで実装され、「ニューラルかな漢字変換システム Zenzai」を含む独自開発の高精度変換エンジン、ライブ変換、さらにカスタムキー・カスタムタブなどのユニークなカスタマイズ機能を提供します。
 
 azooKeyは[App Store](https://apps.apple.com/jp/app/azookey-%E8%87%AA%E7%94%B1%E8%87%AA%E5%9C%A8%E3%81%AA%E3%82%AD%E3%83%BC%E3%83%9C%E3%83%BC%E3%83%89%E3%82%A2%E3%83%97%E3%83%AA/id1542709230)で公開しています。

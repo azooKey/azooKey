@@ -8,15 +8,13 @@
 
 import Foundation
 import SwiftUI
+import SwiftUIUtils
 
 @MainActor
 struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: View {
     @EnvironmentObject private var variableStates: VariableStates
     @Binding private var isResultViewExpanded: Bool
 
-    private var splitedResults: [SplitedResultData] {
-        Self.registerResults(results: variableStates.resultModel.results, interfaceWidth: variableStates.interfaceSize.width)
-    }
     private var buttonWidth: CGFloat {
         Design.keyboardBarHeight(
             interfaceHeight: variableStates.interfaceSize.height,
@@ -38,6 +36,22 @@ struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: 
     }
 
     var body: some View {
+        GeometryReader { geometry in
+            let frame = AvailableLayoutRegion.largest(
+                in: CGRect(origin: .zero, size: geometry.size),
+                avoiding: AvailableLayoutRegion.obstacles(in: geometry)
+            )
+            content(availableWidth: frame.width)
+                .frame(width: frame.width, height: frame.height)
+                .clipped()
+                .allowsHitTesting(!frame.isEmpty)
+                .accessibilityHidden(frame.isEmpty)
+                .position(x: frame.midX, y: frame.midY)
+        }
+        .frame(height: variableStates.interfaceSize.height)
+    }
+
+    private func content(availableWidth: CGFloat) -> some View {
         VStack {
             HStack(alignment: .center) {
                 Spacer()
@@ -54,15 +68,16 @@ struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: 
                             .frame(height: 18)
                     }
                 }
-                .buttonStyle(ResultButtonStyle<Extension>(height: buttonHeight))
+                .buttonStyle(ResultButtonStyle<Extension>(height: buttonHeight, hitHeight: 44))
+                .accessibilityLabel("変換候補を閉じる")
                 .padding(.trailing, 10)
             }
             .padding(.top, 10)
             ScrollView {
                 LazyVStack(alignment: .leading) {
-                    ForEach(splitedResults, id: \.id) {results in
+                    ForEach(Self.registerResults(results: variableStates.resultModel.results, interfaceWidth: max(0, availableWidth - 30)), id: \.id) {results in
                         Divider()
-                        HStack {
+                        HStack(spacing: 0) {
                             ForEach(results.results, id: \.id) {datum in
                                 Button {
                                     self.pressed(data: datum)
@@ -75,7 +90,8 @@ struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: 
                                             .accessibilityLabel(accessibilityLabel ?? name)
                                     }
                                 }
-                                .buttonStyle(ResultButtonStyle<Extension>(height: 18))
+                                .buttonStyle(ResultButtonStyle<Extension>(height: 18, hitHeight: 44))
+                                .lineLimit(1)
                                 .contextMenu {
                                     ResultContextMenuView(candidate: datum.candidate, displayResetLearningButton: Extension.SettingProvider.canResetLearningForCandidate)
                                 }
@@ -87,7 +103,7 @@ struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: 
                 .padding(.leading, 15)
             }
         }
-        .frame(height: variableStates.interfaceSize.height, alignment: .bottom)
+        .frame(maxHeight: .infinity, alignment: .bottom)
     }
 
     private func pressed(data: ResultData) {
@@ -109,11 +125,11 @@ struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: 
             let width: CGFloat
             switch datum.candidate.label {
             case .text(let value):
-                width = value.size(withAttributes: [.font: font]).width + 20
+                width = max(44, value.size(withAttributes: [.font: font]).width + 20)
             case .systemImage:
                 width = 44
             }
-            if (curSum + width) < interfaceWidth {
+            if curResult.isEmpty || (curSum + width) <= interfaceWidth {
                 curResult.append(datum)
                 curSum += width
             } else {

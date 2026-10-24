@@ -55,7 +55,7 @@ struct CodableActionDataEditor: View {
             .presentationBackgroundInteraction(.enabled)
         }
         .navigationBarTitle(Text("動作の編集"), displayMode: .inline)
-        .navigationBarItems(trailing: editButton)
+        .toolbar { ToolbarItem(placement: .primaryAction) { editButton } }
         .environment(\.editMode, $state.editMode)
     }
 
@@ -63,7 +63,7 @@ struct CodableActionDataEditor: View {
     private var editButton: some View {
         switch state.editMode {
         case .inactive:
-            Button("削除と順番") {
+            Button("削除と順番", systemImage: "list.bullet") {
                 state.editMode = .active
             }
         case .active, .transient:
@@ -129,7 +129,7 @@ struct CodableLongpressActionDataEditor: View {
             .presentationBackgroundInteraction(.enabled)
         }
         .navigationBarTitle(Text("動作の編集"), displayMode: .inline)
-        .navigationBarItems(trailing: editButton)
+        .toolbar { ToolbarItem(placement: .primaryAction) { editButton } }
         .environment(\.editMode, $state.editMode)
     }
 
@@ -172,7 +172,7 @@ struct CodableLongpressActionDataEditor: View {
     private var editButton: some View {
         switch state.editMode {
         case .inactive:
-            Button("編集") {
+            Button("編集", systemImage: "pencil") {
                 state.editMode = .active
             }
         case .active, .transient:

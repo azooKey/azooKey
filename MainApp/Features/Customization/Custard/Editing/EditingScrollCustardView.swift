@@ -78,13 +78,17 @@ struct EditingScrollCustardView: CancelableEditor {
         }
     }
 
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+    @State private var containerWidth: CGFloat = 320
+
     private var interfaceSize: CGSize {
         let context = MainAppDesign.keyboardLayoutContext(
-            containerWidth: UIScreen.main.bounds.width
+            containerWidth: containerWidth,
+            orientation: verticalSizeClass == .compact ? .horizontal : .vertical
         )
         return .init(
             width: context.containerWidth,
-            height: Design.keyboardHeight(context: context)
+            height: min(320, Design.keyboardHeight(context: context))
         )
     }
 
@@ -245,13 +249,19 @@ struct EditingScrollCustardView: CancelableEditor {
         }
         .background(Color.secondarySystemBackground)
         .navigationBarBackButtonHidden(true)
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
+            if width > 0 {
+                containerWidth = width
+                variableStates.setContainerWidth(width, orientation: verticalSizeClass == .compact ? .horizontal : .vertical)
+            }
+        }
         .navigationTitle(Text("カスタムタブを作る"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
+            ToolbarItem(placement: .cancellationAction) {
                 EditCancelButton()
             }
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .confirmationAction) {
                 EditConfirmButton {
                     if isNewItem && manager.availableCustards.contains(editingItem.tabName) {
                         showDuplicateAlert = true

@@ -24,9 +24,11 @@ public final class VariableStates: ObservableObject {
         tabManagerConfig: any TabManagerConfiguration,
         userDefaults: UserDefaults,
         sharedUserDefaults: UserDefaults? = nil,
-        layoutIdiom: KeyboardLayoutIdiom? = nil
+        layoutIdiom: KeyboardLayoutIdiom? = nil,
+        duoFlickEnabled: Bool = false
     ) {
         self.layoutIdiom = layoutIdiom ?? .current
+        self.duoFlickEnabled = duoFlickEnabled
         self.tabManager = TabManager(config: tabManagerConfig)
         self.clipboardHistoryManager = ClipboardHistoryManager(config: clipboardHistoryManagerConfig)
         self.keyboardInternalSettingManager = KeyboardInternalSettingManager(userDefaults: userDefaults)
@@ -35,6 +37,7 @@ public final class VariableStates: ObservableObject {
         } else {
             nil
         }
+        self.setDuoFlickTab(self.tabManager.existentialTab())
         if let interfaceWidth {
             self.setContainerWidth(interfaceWidth, orientation: orientation ?? .vertical)
         } else if let orientation {
@@ -134,12 +137,21 @@ public final class VariableStates: ObservableObject {
     @Published public var keyboardLanguage: KeyboardLanguage = .ja_JP
     @Published private(set) public var keyboardOrientation: KeyboardOrientation = .vertical
     public let layoutIdiom: KeyboardLayoutIdiom
+    @Published public var duoFlickEnabled: Bool
+    @Published private var isDuoFlickTab = false
+
+    private var usesDuoFlick: Bool { duoFlickEnabled && isDuoFlickTab }
+
+    @MainActor func setDuoFlickTab(_ tab: KeyboardTab.ExistentialTab) {
+        isDuoFlickTab = tab.supportsDuoFlick
+    }
 
     public var layoutContext: KeyboardLayoutContext {
         KeyboardLayoutContext(
             containerWidth: containerWidth,
             orientation: keyboardOrientation,
-            idiom: layoutIdiom
+            idiom: layoutIdiom,
+            duoFlickEnabled: usesDuoFlick
         )
     }
 
@@ -225,12 +237,13 @@ public final class VariableStates: ObservableObject {
 
     @MainActor public func setResizingMode(_ state: ResizingState) {
         let baseHeight = Design.keyboardHeight(context: layoutContext)
+        let heightSetting = keyboardInternalSettingManager.oneHandedModeSetting.heightItem(orientation: keyboardOrientation)
+        let storedHeight = duoFlickEnabled && !heightSetting.userHasOverwrittenKeyboardHeightSetting ? nil : heightSetting.height
         switch state {
         case .fullwidth:
-            let height = keyboardInternalSettingManager.oneHandedModeSetting.heightItem(orientation: keyboardOrientation).height
             interfaceSize = .init(
                 width: containerWidth,
-                height: (height ?? baseHeight) * self.heightScaleFromKeyboardHeightSetting
+                height: (storedHeight ?? baseHeight) * self.heightScaleFromKeyboardHeightSetting
             )
             interfacePosition = .zero
             interfaceBottomOffset = 0
@@ -241,8 +254,7 @@ public final class VariableStates: ObservableObject {
         case .resizing:
             // リサイズ開始時は、保存された値から初期状態を読み込むので変更なし
             let item = keyboardInternalSettingManager.oneHandedModeSetting.item(orientation: keyboardOrientation)
-            let height = keyboardInternalSettingManager.oneHandedModeSetting.heightItem(orientation: keyboardOrientation).height
-            interfaceSize = CGSize(width: min(item.width, containerWidth), height: (height ?? baseHeight) * heightScaleFromKeyboardHeightSetting)
+            interfaceSize = CGSize(width: min(item.width, containerWidth), height: (storedHeight ?? baseHeight) * heightScaleFromKeyboardHeightSetting)
             interfacePosition = CGPoint(x: item.position.x, y: 0)
             interfaceBottomOffset = keyboardInternalSettingManager.oneHandedModeSetting.bottomOffset(
                 orientation: keyboardOrientation
@@ -365,7 +377,8 @@ public final class VariableStates: ObservableObject {
         let updatedContext = KeyboardLayoutContext(
             containerWidth: width,
             orientation: orientation,
-            idiom: layoutIdiom
+            idiom: layoutIdiom,
+            duoFlickEnabled: usesDuoFlick
         )
         let height = Design.keyboardHeight(context: updatedContext)
         if self.keyboardOrientation != orientation {
@@ -376,8 +389,10 @@ public final class VariableStates: ObservableObject {
         keyboardInternalSettingManager.update(\.oneHandedModeSetting) {value in
             value.setIfFirst(orientation: orientation, size: .init(width: width, height: height), position: .zero)
         }
-        let idealHeight = keyboardInternalSettingManager.oneHandedModeSetting.heightItem(orientation: orientation).height
-        let ignoreStoredHeight = layoutIdiom == .pad && width < 400
+        let heightSetting = keyboardInternalSettingManager.oneHandedModeSetting.heightItem(orientation: orientation)
+        let idealHeight = heightSetting.height
+        let ignoreStoredHeight = (layoutIdiom == .pad && width < 400)
+            || (duoFlickEnabled && !heightSetting.userHasOverwrittenKeyboardHeightSetting)
         let effectiveHeight = (ignoreStoredHeight ? height : (idealHeight ?? height)) * heightScaleFromKeyboardHeightSetting
         switch self.resizingState {
         case .fullwidth:

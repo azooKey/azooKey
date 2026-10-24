@@ -38,9 +38,9 @@ struct CustardInterfaceKeyEditor: View {
         self.supportsQwertySystemKeys = supportsQwertySystemKeys
     }
 
-    private var screenWidth: CGFloat {
-        UIScreen.main.bounds.width
-    }
+    @State private var containerWidth: CGFloat = 320
+
+    private var screenWidth: CGFloat { containerWidth }
 
     private var keySize: CGSize {
         CGSize(width: min(100, screenWidth / 5.6), height: min(70, screenWidth / 8))
@@ -85,6 +85,9 @@ struct CustardInterfaceKeyEditor: View {
             }
         }
         .background(Color.secondarySystemBackground)
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
+            if width > 0 { containerWidth = width }
+        }
         .navigationTitle(Text("キーの編集"))
         .navigationBarTitleDisplayMode(.inline)
     }

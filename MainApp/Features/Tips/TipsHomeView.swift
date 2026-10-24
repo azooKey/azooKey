@@ -79,12 +79,8 @@ struct TipsHomeView: View {
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    HeaderLogoView()
-                        .padding(.vertical, 4)
-                }
-            }
+            .navigationTitle("使い方")
+
         }
     }
 }

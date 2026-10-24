@@ -54,6 +54,13 @@ public enum AzooKeyKeyboardViewExtension: ApplicationSpecificKeyboardViewExtensi
         FlickSensitivitySettingKey.value
     }
 
+    public static var duoFlickEnabled: Bool {
+        DuoFlickLayoutDefaults.migrateIfNeeded()
+        return EnableDuoFlick.value
+    }
+    public static var duoFlickPanelWidth: Double { DuoFlickPanelWidth.value }
+    public static var duoFlickCenterGap: Double { DuoFlickCenterGap.value }
+
     public static var resultViewFontSize: Double {
         ResultViewFontSize.value
     }

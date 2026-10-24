@@ -122,8 +122,8 @@ struct ContributionDetailView: View {
 
 private struct MockReportSuggestionView: View {
     @StateObject private var variableStates = VariableStates(
-        interfaceWidth: UIScreen.main.bounds.width,
-        orientation: MainAppDesign.keyboardOrientation,
+        interfaceWidth: 390,
+        orientation: .vertical,
         clipboardHistoryManagerConfig: ClipboardHistoryManagerConfig(),
         tabManagerConfig: TabManagerConfig(),
         userDefaults: UserDefaults.standard,

@@ -157,7 +157,7 @@ struct EditingTabBarView: View {
                 self.save(newValue)
             }
             .navigationBarTitle(Text("タブバーの編集"), displayMode: .inline)
-            .navigationBarItems(trailing: editButton)
+            .toolbar { ToolbarItem(placement: .primaryAction) { editButton } }
             .environment(\.editMode, $editMode)
         }
     }
@@ -200,7 +200,7 @@ struct EditingTabBarView: View {
     private var editButton: some View {
         switch editMode {
         case .inactive:
-            Button("編集") {
+            Button("編集", systemImage: "pencil") {
                 editMode = .active
             }
         case .active, .transient:
