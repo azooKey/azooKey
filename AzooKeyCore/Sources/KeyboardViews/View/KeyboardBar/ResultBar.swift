@@ -58,8 +58,7 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
 
     @ViewBuilder
     private var tabBarButton: some View {
-        if Extension.SettingProvider.duoFlickEnabled,
-           variableStates.interfaceSize.width >= DuoFlickLayout.minimumContainerWidth {
+        if variableStates.layoutContext.duoFlickEnabled {
             Button {
                 self.action.registerAction(.setTabBar(.toggle), variableStates: variableStates)
             } label: {

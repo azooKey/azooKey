@@ -21,6 +21,7 @@ final class ShareImage {
 }
 
 struct ThemeShareView: View {
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     private let theme: AzooKeyTheme
     private let dismissProcess: () -> Void
 
@@ -41,14 +42,18 @@ struct ThemeShareView: View {
 
     @MainActor @ViewBuilder private var captureKeyboardPreview: some View {
         let resolvedSize = KeyboardPreviewSizing.resolvedExtensionSize(
-            fallbackWidth: previewContainerWidth
+            fallbackWidth: previewContainerWidth,
+            orientation: verticalSizeClass == .compact ? .horizontal : .vertical,
+            allowsDuoFlickPanels: verticalSizeClass != .compact
         )
         KeyboardPreview(
             theme: theme,
             sizing: .render(
                 resolvedSize: resolvedSize,
                 scale: 0.9
-            )
+            ),
+            allowsDuoFlickPanels: verticalSizeClass != .compact,
+            orientation: verticalSizeClass == .compact ? .horizontal : .vertical
         )
     }
     var body: some View {

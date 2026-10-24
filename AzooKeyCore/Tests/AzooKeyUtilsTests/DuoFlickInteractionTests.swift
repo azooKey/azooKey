@@ -50,10 +50,61 @@ final class DuoFlickInteractionTests: XCTestCase {
         let states = makeStates()
         for width: CGFloat in [390, 760, 390, 1_024, 390] {
             states.setContainerWidth(width, orientation: .vertical)
-            let expectedHeight = width >= 600 ? DuoFlickLayout.keyboardHeight : 51 / 74 * width + 12
+            let expectedHeight = width >= 600 ? DuoFlickLayout.keyboardHeight : CompactFlickLayout.keyboardHeight(containerWidth: width, orientation: .vertical)
             XCTAssertEqual(states.interfaceSize.height, expectedHeight, accuracy: 0.001)
             XCTAssertEqual(states.interfaceSize.width, width)
         }
+    }
+
+    func test_closedLandscapeIsSingleAndOpeningRestoresSplitWithoutChangingCandidates() {
+        let states = makeStates()
+        states.resultModel.setResults([CandidateMock(text: "日本語")])
+        states.setContainerWidth(678, orientation: .horizontal, allowsDuoFlickPanels: false)
+        XCTAssertFalse(states.layoutContext.usesSplitFlick)
+        XCTAssertEqual(states.interfaceSize.height, 200, accuracy: 0.001)
+        states.setContainerWidth(952, orientation: .horizontal, allowsDuoFlickPanels: true)
+        XCTAssertTrue(states.layoutContext.usesSplitFlick)
+        XCTAssertEqual(states.interfaceSize.height, 270, accuracy: 0.001)
+        states.setContainerWidth(452, orientation: .vertical, allowsDuoFlickPanels: true)
+        XCTAssertFalse(states.layoutContext.usesSplitFlick)
+        XCTAssertEqual(states.interfaceSize.height, 270, accuracy: 0.001)
+        XCTAssertEqual(states.resultModel.results.first?.candidate.textualRepresentation, "日本語")
+    }
+
+    func test_foldedKeyboardHasOneFullWidthPanelAndTheCompactHeight() async throws {
+        guard #available(iOS 27.0, *) else { throw XCTSkip("UIKit touch surfaces require iOS 27") }
+        let enabled = EnableDuoFlick.value
+        EnableDuoFlick.value = true
+        defer { EnableDuoFlick.value = enabled }
+        let states = makeStates()
+        states.setTabForPreview(.flick_hira)
+        states.setContainerWidth(452, orientation: .vertical)
+        let content = KeyboardView<AzooKeyKeyboardViewExtension>(defaultTab: .flick_hira)
+            .environmentObject(states)
+            .themeEnvironment(AzooKeyTheme.base)
+            .environment(\.showMessage, false)
+        let controller = UIHostingController(rootView: content)
+        // This is a keyboard-local window, without the test app's status bar.
+        controller.safeAreaRegions = []
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 452, height: 272))
+        window.rootViewController = controller
+        window.isHidden = false
+        defer { window.isHidden = true }
+        controller.view.frame = window.bounds
+        await Task.yield()
+        controller.view.layoutIfNeeded()
+        func surfaces(in view: UIView) -> [ImmediateKeyGesture.TouchSurface] {
+            view.subviews.flatMap { child in
+                (child as? ImmediateKeyGesture.TouchSurface).map { [$0] } ?? surfaces(in: child)
+            }
+        }
+        let keys = surfaces(in: controller.view)
+        XCTAssertEqual(keys.count, 19)
+        let frames = keys.map { $0.convert($0.bounds, to: window) }
+        XCTAssertEqual(try XCTUnwrap(frames.map(\.minX).min()), 0, accuracy: 0.5)
+        XCTAssertEqual(try XCTUnwrap(frames.map(\.maxX).max()), 452, accuracy: 0.5)
+        XCTAssertEqual(try XCTUnwrap(frames.map(\.minY).min()), 48, accuracy: 0.5)
+        XCTAssertLessThanOrEqual(try XCTUnwrap(frames.map(\.maxY).max()), 270.5)
     }
 
     func test_qwertyAndCustomTabsKeepTheirOriginalHeightWhenDuoIsEnabled() {

@@ -10,6 +10,7 @@ xcodebuild -project azooKey.xcodeproj -scheme DuoFlickTests \
   -only-testing:KeyboardViewsTests \
   -only-testing:AzooKeyUtilsTests/DuoFlickInteractionTests \
   -only-testing:AzooKeyUtilsTests/DuoFlickLayoutDefaultsTests \
+  -only-testing:AzooKeyUtilsTests/ResolvedKeyboardSizeTests \
   CODE_SIGNING_ALLOWED=NO test
 
 xcodebuild -project azooKey.xcodeproj -scheme DuoAppTests \
@@ -22,6 +23,9 @@ xcodebuild -project azooKey.xcodeproj -scheme DuoAppTests \
 | 対象 | 検証範囲 |
 | --- | --- |
 | `DuoFlickLayoutTests` | 600pt境界、左右の幅・間隔、異常な保存値、標準の高さ・キーサイズ |
+| `CompactFlickLayoutTests` | 閉じた縦画面の270pt上限、7pt間隔と余白、閉じた横画面の200pt上限 |
+| `KeyboardPresentationTests` | 入力ウィンドウが横長でも画面シーンの縦向きを維持すること、閉じた表示と見開きの識別 |
+| `ResolvedKeyboardSizeTests` | 古い版・異なる表示のキャッシュを破棄し、同じ表示の寸法だけを使用すること |
 | `ReservedRegionLayoutTests` | 中央／偏った折り目、カメラ、領域外・重複・無効な予約領域、手動で低くした高さ、完全に遮られた領域 |
 | `DuoFlickInteractionTests` | 重なった左右フリック、候補バー境界のヒット判定、開閉・回転時の候補とタブの保持、移動するキーへのタッチのキャンセル、QWERTY／カスタムタブへの復帰 |
 | `DuoFlickLayoutDefaultsTests` | 初期の狭い設定からの一度だけの移行と、その後の手動調整の保持 |
@@ -29,8 +33,8 @@ xcodebuild -project azooKey.xcodeproj -scheme DuoAppTests \
 
 2026-10-24の確認結果:
 
-- iPhone 18 Pro / iOS 27.0: 選択したパッケージテスト49件が成功。
-- iPhone 16 Pro / iOS 18.5: 48件が成功、UIKitのiOS 27専用タッチ処理1件をスキップ。
+- iPhone 18 Pro / iOS 27.0: 選択したパッケージテスト64件が成功。
+- iPhone 16 Pro / iOS 18.5: 62件が成功、UIKitのiOS 27専用タッチ処理2件をスキップ。
 - iPhone 18 Pro / iOS 27.0: UIテスト2件が成功。
 - iPad mini / iOS 27.0: 広い画面でUIテスト2件が成功。
 - アプリ本体とキーボード拡張: シミュレータ・iOS 27.1実機向けビルドが成功。
@@ -42,6 +46,7 @@ xcodebuild -project azooKey.xcodeproj -scheme DuoAppTests \
 
 キーボード拡張とアプリの両方を更新し、Duoフリックを有効にして確認します。以下は実機操作による確認が必要な項目で、チェック前の状態を合格として扱いません。
 
+- [ ] 閉じた縦画面が低く潰れず、閉じた横画面が誤って2面表示にならない。
 - [ ] 閉じた画面、内側の全開、部分的に折った姿勢を、縦横それぞれで切り替える。設定の現在位置、選択中のタブ、編集中のラベル・文章を保持する。
 - [ ] 内側の縦・横の折り目とカメラ領域に、キー・変換候補・設定の重要な操作が重ならない。バーが縦に配置されても戻る・保存・キャンセル・キーの種類選択へアクセスできる。
 - [ ] 左右の「あ・か」などを交互／同時にフリックし、濁点、小文字、句読点、削除、空白、確定・検索を確認する。操作途中に開閉して余分な文字が確定しない。

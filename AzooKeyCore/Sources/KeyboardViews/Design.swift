@@ -199,8 +199,11 @@ public enum Design {
         } else {
             scale = 1
         }
-        if context.duoFlickEnabled, context.containerWidth >= DuoFlickLayout.minimumContainerWidth {
-            return (DuoFlickLayout.keyboardHeight - 12) * scale + 12
+        if context.duoFlickEnabled {
+            let height = context.usesSplitFlick ? DuoFlickLayout.keyboardHeight : CompactFlickLayout.keyboardHeight(
+                containerWidth: context.containerWidth, orientation: context.orientation
+            )
+            return (height - 12) * scale + 12
         }
         let width = max(0, context.containerWidth)
         switch layoutMode(context: context) {
@@ -238,8 +241,9 @@ public enum Design {
         interfaceHeight: CGFloat,
         context: KeyboardLayoutContext
     ) -> CGFloat {
-        if context.duoFlickEnabled, context.containerWidth >= DuoFlickLayout.minimumContainerWidth {
-            return max(0, min(44, (interfaceHeight - 12) * 0.18))
+        if context.duoFlickEnabled {
+            let height = context.usesSplitFlick ? 44 : CompactFlickLayout.barHeight(orientation: context.orientation)
+            return max(0, min(height, (interfaceHeight - 12) * 0.18))
         }
         switch layoutMode(context: context) {
         case .phoneVertical:

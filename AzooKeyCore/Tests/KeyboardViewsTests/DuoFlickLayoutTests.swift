@@ -48,7 +48,7 @@ final class DuoFlickLayoutTests: XCTestCase {
             }
         }
         let folded = KeyboardLayoutContext(containerWidth: 390, orientation: .vertical, idiom: .phone, duoFlickEnabled: true)
-        XCTAssertEqual(Design.keyboardHeight(context: folded), 51 / 74 * 390 + 12, accuracy: 0.001)
+        XCTAssertEqual(Design.keyboardHeight(context: folded), CompactFlickLayout.maximumPortraitHeight, accuracy: 0.001)
     }
 
     @MainActor

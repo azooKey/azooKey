@@ -81,17 +81,30 @@ final class KeyboardViewController: UIInputViewController {
     private var lastKnownSafeAreaInsets: UIEdgeInsets = .zero
     private var lastKnownOrientation: KeyboardOrientation?
     private var lastKnownReservedFrames: [CGRect] = []
+    private var lastKnownAllowsDuoFlickPanels: Bool?
+
+    private var allowsDuoFlickPanels: Bool {
+        keyboardPresentation.allowsDuoFlickPanels
+    }
+
+    private var keyboardPresentation: KeyboardPresentation {
+        guard let scene = view.window?.windowScene else {
+            return KeyboardPresentation(sceneSize: .zero, interfaceOrientation: .unknown,
+                                        fallbackOrientation: Self.variableStates.keyboardOrientation)
+        }
+        let geometry = scene.effectiveGeometry
+        let size: CGSize
+        if #available(iOS 26, *) {
+            size = geometry.coordinateSpace.bounds.size
+        } else {
+            size = scene.coordinateSpace.bounds.size
+        }
+        return KeyboardPresentation(sceneSize: size, interfaceOrientation: geometry.interfaceOrientation,
+                                    fallbackOrientation: Self.variableStates.keyboardOrientation)
+    }
 
     private func currentKeyboardOrientation() -> KeyboardOrientation {
-        // Size classes describe the available presentation, including a closed
-        // landscape display and a narrow multitasking window.
-        if traitCollection.verticalSizeClass == .compact {
-            return .horizontal
-        }
-        if let size = view.window?.bounds.size, size.width > 0, size.height > 0 {
-            return size.width > size.height ? .horizontal : .vertical
-        }
-        return KeyboardViewController.variableStates.keyboardOrientation
+        keyboardPresentation.orientation
     }
 
     private func currentReservedFrames() -> [CGRect] {
@@ -125,7 +138,9 @@ final class KeyboardViewController: UIInputViewController {
             orientation = baseOrientation
         }
         SemiStaticStates.shared.setScreenWidth(size.width)
-        KeyboardViewController.variableStates.setContainerWidth(size.width, orientation: orientation)
+        KeyboardViewController.variableStates.setContainerWidth(
+            size.width, orientation: orientation, allowsDuoFlickPanels: allowsDuoFlickPanels
+        )
         if shouldUpdateHeight {
             self.updateScreenHeight()
         }
@@ -195,7 +210,8 @@ final class KeyboardViewController: UIInputViewController {
                         width: KeyboardViewController.variableStates.containerWidth,
                         height: interfaceSize.height + bottomOffset + Design.keyboardScreenBottomPadding
                     ),
-                    orientation: KeyboardViewController.variableStates.keyboardOrientation
+                    orientation: KeyboardViewController.variableStates.keyboardOrientation,
+                    layoutProfile: KeyboardViewController.variableStates.layoutContext.resolvedSizeCacheIdentifier
                 )
 
                 // 4. 計算した全体の高さを制約に設定する
@@ -264,18 +280,8 @@ final class KeyboardViewController: UIInputViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         Self.variableStates.duoFlickEnabled = AzooKeySettingProvider.duoFlickEnabled
-        // サイズに関する情報はこのタイミングで設定する
-        if #available(iOS 26, *) {
-            let size = self.currentKeyboardViewSize()
-            self.applySizeUpdate(size: size)
-        } else {
-            let size = self.rootParentViewController.view.bounds.size
-            SemiStaticStates.shared.setScreenWidth(size.width)
-            KeyboardViewController.variableStates.setContainerWidth(
-                size.width,
-                orientation: UIScreen.main.bounds.width < UIScreen.main.bounds.height ? .vertical : .horizontal
-            )
-        }
+        let size = self.currentKeyboardViewSize()
+        self.applySizeUpdate(size: size)
         // キーボードのセットアップはこの段階で行う
         self.setupKeyboardView()
     }
@@ -284,25 +290,11 @@ final class KeyboardViewController: UIInputViewController {
         super.viewDidAppear(animated)
         self.updateStates()
 
-        // Floating Keyboardなどの一部の処理に限り、このタイミングにならないとウィンドウ幅が不明なケースが存在する
-        if #available(iOS 26, *) {
-            let size = self.currentKeyboardViewSize()
-            self.applySizeUpdate(size: size, shouldUpdateHeight: true)
-            debug(#function, size)
-        } else {
-            let size = self.rootParentViewController.view.bounds.size
-            if size.width < SemiStaticStates.shared.screenWidth {
-                SemiStaticStates.shared.setScreenWidth(size.width)
-                KeyboardViewController.variableStates.setContainerWidth(
-                    size.width,
-                    orientation: UIScreen.main.bounds.size.width < UIScreen.main.bounds.size.height ? .vertical : .horizontal
-                )
-                self.updateScreenHeight()
-                debug(#function, size)
-            }
-        }
+        // The input window and scene are available after presentation.
+        let size = self.currentKeyboardViewSize()
+        self.applySizeUpdate(size: size, shouldUpdateHeight: true)
+        debug(#function, size)
 
-        // viewDidAppearで実施する
         let window = self.view.window!
         let gr0 = window.gestureRecognizers![0] as UIGestureRecognizer
         let gr1 = window.gestureRecognizers![1] as UIGestureRecognizer
@@ -315,15 +307,18 @@ final class KeyboardViewController: UIInputViewController {
         let size = self.currentKeyboardViewSize()
         let orientation = currentKeyboardOrientation()
         let reservedFrames = currentReservedFrames()
+        let allowsPanels = allowsDuoFlickPanels
         guard size != .zero,
               size != lastKnownContainerSize || orientation != lastKnownOrientation
-                || view.safeAreaInsets != lastKnownSafeAreaInsets || reservedFrames != lastKnownReservedFrames else {
+                || view.safeAreaInsets != lastKnownSafeAreaInsets || reservedFrames != lastKnownReservedFrames
+                || allowsPanels != lastKnownAllowsDuoFlickPanels else {
             return
         }
         lastKnownContainerSize = size
         lastKnownOrientation = orientation
         lastKnownSafeAreaInsets = view.safeAreaInsets
         lastKnownReservedFrames = reservedFrames
+        lastKnownAllowsDuoFlickPanels = allowsPanels
         self.applySizeUpdate(size: size, orientation: orientation, shouldUpdateHeight: true)
     }
 
@@ -430,31 +425,13 @@ final class KeyboardViewController: UIInputViewController {
 
     override func viewWillTransition(to size: CGSize, with coordinator: any UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        if #available(iOS 26, *) {
-            // 幅は即時反映しておき、向きは完了時のWindowSceneから決定する
-            coordinator.animate(alongsideTransition: nil) { [weak self] _ in
-                guard let self else { return }
-                let updatedSize = self.currentKeyboardViewSize()
-                let orientation = self.currentKeyboardOrientation()
-                self.applySizeUpdate(size: updatedSize, orientation: orientation, shouldUpdateHeight: true)
-                debug(#function, "completed with size:", updatedSize, "orientation:", orientation)
+        coordinator.animate(alongsideTransition: nil) { [weak self] _ in
+            guard let self else {
+                return
             }
-            return
+            let updatedSize = self.currentKeyboardViewSize()
+            self.applySizeUpdate(size: updatedSize, shouldUpdateHeight: true)
         }
-        // 旧OS向けの従来の判定・更新ロジック
-        SemiStaticStates.shared.setScreenWidth(size.width)
-        if #available(iOS 18, *), UIDevice.current.userInterfaceIdiom == .phone {
-            KeyboardViewController.variableStates.setContainerWidth(
-                size.width,
-                orientation: UIScreen.main.bounds.width < UIScreen.main.bounds.height ? .vertical : .horizontal
-            )
-        } else {
-            KeyboardViewController.variableStates.setContainerWidth(
-                size.width,
-                orientation: UIScreen.main.bounds.width < UIScreen.main.bounds.height ? .horizontal : .vertical
-            )
-        }
-        self.updateScreenHeight()
     }
 
     var rootParentViewController: UIViewController {

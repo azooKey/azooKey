@@ -58,17 +58,21 @@ enum KeyboardPreviewSizing: Equatable {
     @MainActor
     static func resolvedExtensionSize(
         fallbackWidth: CGFloat,
-        orientation: KeyboardOrientation = .vertical
+        orientation: KeyboardOrientation = .vertical,
+        allowsDuoFlickPanels: Bool = true,
+        duoFlickEnabled: Bool? = nil
     ) -> CGSize {
-        if let size = SharedStore.resolvedKeyboardSize(
-            orientation: orientation
-        ), abs(size.width - fallbackWidth) < 1 {
-            return size
-        }
         var context = MainAppDesign.keyboardLayoutContext(
             containerWidth: fallbackWidth, orientation: orientation
         )
-        context.duoFlickEnabled = AzooKeySettingProvider.duoFlickEnabled
+        context.duoFlickEnabled = duoFlickEnabled ?? (AzooKeySettingProvider.duoFlickEnabled && AzooKeySettingProvider.japaneseKeyboardLayout == .flick)
+        context.allowsDuoFlickPanels = allowsDuoFlickPanels
+        if let size = SharedStore.resolvedKeyboardSize(
+            orientation: orientation,
+            layoutProfile: context.resolvedSizeCacheIdentifier
+        ), abs(size.width - fallbackWidth) < 1 {
+            return size
+        }
         return CGSize(
             width: fallbackWidth,
             height: Design.keyboardHeight(
@@ -82,11 +86,16 @@ enum KeyboardPreviewSizing: Equatable {
     @MainActor
     fileprivate func resolvedContainerSize(
         for measuredWidth: CGFloat,
-        orientation: KeyboardOrientation
+        orientation: KeyboardOrientation,
+        allowsDuoFlickPanels: Bool,
+        duoFlickEnabled: Bool
     ) -> CGSize {
         switch self {
         case .fitToExtension:
-            Self.resolvedExtensionSize(fallbackWidth: measuredWidth, orientation: orientation)
+            Self.resolvedExtensionSize(
+                fallbackWidth: measuredWidth, orientation: orientation,
+                allowsDuoFlickPanels: allowsDuoFlickPanels, duoFlickEnabled: duoFlickEnabled
+            )
         case let .render(resolvedSize, _):
             resolvedSize
         }
@@ -101,6 +110,8 @@ struct KeyboardPreview: View {
     @Environment(\.scenePhase) private var scenePhase
     private let sizing: KeyboardPreviewSizing
     private let defaultTab: KeyboardTab.ExistentialTab?
+    private let allowsDuoFlickPanelsOverride: Bool?
+    private let orientationOverride: KeyboardOrientation?
     @State private var availableWidth: CGFloat
     @State private var measuredDisplayWidth: CGFloat = 0
     @StateObject private var variableStates: VariableStates
@@ -108,23 +119,33 @@ struct KeyboardPreview: View {
     init(
         theme: AzooKeyTheme? = nil,
         sizing: KeyboardPreviewSizing = .fitToExtension,
-        defaultTab: KeyboardTab.ExistentialTab? = nil
+        defaultTab: KeyboardTab.ExistentialTab? = nil,
+        allowsDuoFlickPanels: Bool? = nil,
+        orientation: KeyboardOrientation? = nil
     ) {
         self.theme = theme ?? AzooKeySpecificTheme.default
         self.sizing = sizing
         self.defaultTab = defaultTab
+        self.allowsDuoFlickPanelsOverride = allowsDuoFlickPanels
+        self.orientationOverride = orientation
         self._availableWidth = State(
             initialValue: sizing.initialResolvedSize?.width ?? 0
         )
 
         let variableStates = VariableStates(
             interfaceWidth: sizing.initialResolvedSize?.width,
-            orientation: .vertical,
+            orientation: orientation ?? .vertical,
             clipboardHistoryManagerConfig: ClipboardHistoryManagerConfig(),
             tabManagerConfig: TabManagerConfig(),
             userDefaults: UserDefaults.standard,
             duoFlickEnabled: AzooKeySettingProvider.duoFlickEnabled
         )
+        if let allowsDuoFlickPanels, let width = sizing.initialResolvedSize?.width {
+            variableStates.setContainerWidth(
+                width, orientation: orientation ?? .vertical,
+                allowsDuoFlickPanels: allowsDuoFlickPanels
+            )
+        }
         if let defaultTab {
             variableStates.setTabForPreview(defaultTab)
         }
@@ -201,7 +222,12 @@ struct KeyboardPreview: View {
     }
 
     private var previewOrientation: KeyboardOrientation {
-        verticalSizeClass == .compact ? .horizontal : .vertical
+        orientationOverride ?? (verticalSizeClass == .compact ? .horizontal : .vertical)
+    }
+
+    private var allowsDuoFlickPanels: Bool {
+        // A deliberately rendered unfolded preview stays split on a small phone.
+        allowsDuoFlickPanelsOverride ?? (!sizing.measuresAvailableWidth || verticalSizeClass != .compact)
     }
 
     private var keyboardHeight: CGFloat {
@@ -227,7 +253,9 @@ struct KeyboardPreview: View {
 
     private func updateLayout(for displayWidth: CGFloat) {
         let resolvedSize = sizing.resolvedContainerSize(
-            for: displayWidth, orientation: previewOrientation
+            for: displayWidth, orientation: previewOrientation,
+            allowsDuoFlickPanels: allowsDuoFlickPanels,
+            duoFlickEnabled: variableStates.layoutContext.duoFlickEnabled
         )
         updateContainerWidth(
             resolvedSize.width,
@@ -260,7 +288,8 @@ struct KeyboardPreview: View {
         }
         variableStates.setContainerWidth(
             width,
-            orientation: previewOrientation
+            orientation: previewOrientation,
+            allowsDuoFlickPanels: allowsDuoFlickPanels
         )
         if let resolvedKeyboardHeight {
             variableStates.interfaceSize.height = max(

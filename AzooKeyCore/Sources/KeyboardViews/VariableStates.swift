@@ -138,6 +138,7 @@ public final class VariableStates: ObservableObject {
     @Published private(set) public var keyboardOrientation: KeyboardOrientation = .vertical
     public let layoutIdiom: KeyboardLayoutIdiom
     @Published public var duoFlickEnabled: Bool
+    @Published private(set) public var allowsDuoFlickPanels = true
     @Published private var isDuoFlickTab = false
 
     private var usesDuoFlick: Bool { duoFlickEnabled && isDuoFlickTab }
@@ -151,7 +152,8 @@ public final class VariableStates: ObservableObject {
             containerWidth: containerWidth,
             orientation: keyboardOrientation,
             idiom: layoutIdiom,
-            duoFlickEnabled: usesDuoFlick
+            duoFlickEnabled: usesDuoFlick,
+            allowsDuoFlickPanels: allowsDuoFlickPanels
         )
     }
 
@@ -369,16 +371,20 @@ public final class VariableStates: ObservableObject {
         self.inputStyle = style
     }
 
-    @MainActor public func setContainerWidth(_ width: CGFloat, orientation: KeyboardOrientation) {
+    @MainActor public func setContainerWidth(_ width: CGFloat, orientation: KeyboardOrientation, allowsDuoFlickPanels: Bool? = nil) {
         guard width > 0 else {
             return
         }
         containerWidth = width
+        if let allowsDuoFlickPanels {
+            self.allowsDuoFlickPanels = allowsDuoFlickPanels
+        }
         let updatedContext = KeyboardLayoutContext(
             containerWidth: width,
             orientation: orientation,
             idiom: layoutIdiom,
-            duoFlickEnabled: usesDuoFlick
+            duoFlickEnabled: usesDuoFlick,
+            allowsDuoFlickPanels: self.allowsDuoFlickPanels
         )
         let height = Design.keyboardHeight(context: updatedContext)
         if self.keyboardOrientation != orientation {
