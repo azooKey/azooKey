@@ -56,25 +56,9 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
         self._isResultViewExpanded = isResultViewExpanded
     }
 
-    @ViewBuilder
     private var tabBarButton: some View {
-        if variableStates.layoutContext.duoFlickEnabled {
-            Button {
-                self.action.registerAction(.setTabBar(.toggle), variableStates: variableStates)
-            } label: {
-                Image(systemName: "ellipsis")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundStyle(theme.resultTextColor.color)
-                    .frame(width: 44, height: hitHeight)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("キーボードのメニュー")
+        TabBarButton<Extension>()
             .zIndex(10)
-        } else {
-            TabBarButton<Extension>()
-                .zIndex(10)
-        }
     }
 
     var body: some View {

@@ -20,9 +20,6 @@ import Foundation
     static var englishKeyboardLayout: LanguageLayout { get }
 
     static var flickSensitivity: Double { get }
-    static var duoFlickEnabled: Bool { get }
-    static var duoFlickPanelWidth: Double { get }
-    static var duoFlickCenterGap: Double { get }
     static var resultViewFontSize: Double { get }
     static var keyViewFontSize: Double { get }
 
@@ -54,10 +51,6 @@ enum QwertyShiftBehaviorPreference {
 }
 
 extension ApplicationSpecificKeyboardViewSettingProvider {
-    public static var duoFlickEnabled: Bool { false }
-    public static var duoFlickPanelWidth: Double { 0 }
-    public static var duoFlickCenterGap: Double { 16 }
-
     static var qwertyShiftBehaviorPreference: QwertyShiftBehaviorPreference {
         if #available(iOS 18, *) {
             useShiftKey ? .leftBottom : .off

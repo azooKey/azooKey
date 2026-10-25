@@ -77,12 +77,11 @@ jobs:
 
       - name: Run keyboard regression tests
         run: |
-          xcodebuild test -project azooKey.xcodeproj -scheme DuoFlickTests \
+          xcodebuild test -project azooKey.xcodeproj -scheme DuoLayoutTests \
             -destination 'platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0' \
             -resultBundlePath TestResults/keyboard.xcresult \
             -only-testing:KeyboardViewsTests \
-            -only-testing:AzooKeyUtilsTests/DuoFlickInteractionTests \
-            -only-testing:AzooKeyUtilsTests/DuoFlickLayoutDefaultsTests \
+            -only-testing:AzooKeyUtilsTests/KeyboardLayoutInteractionTests \
             -only-testing:AzooKeyUtilsTests/ResolvedKeyboardSizeTests \
             CODE_SIGNING_ALLOWED=NO | tee TestResults/keyboard.log
 

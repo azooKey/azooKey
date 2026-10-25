@@ -220,11 +220,11 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
     func keyboardView(tab: KeyboardTab.ExistentialTab) -> some View {
         switch tab {
         case .flick_hira:
-            flickKeyboard(custard: .flickJapanese)
+            CustomKeyboardView<Extension>(custard: settingAppliedFlickCustard(.flickJapanese))
         case .flick_abc:
-            flickKeyboard(custard: .flickEnglish)
+            CustomKeyboardView<Extension>(custard: settingAppliedFlickCustard(.flickEnglish))
         case .flick_numbersymbols:
-            flickKeyboard(custard: .flickNumberSymbols)
+            CustomKeyboardView<Extension>(custard: settingAppliedFlickCustard(.flickNumberSymbols))
         case .qwerty_hira:
             CustomKeyboardView<Extension>(custard: .qwertyJapanese)
         case .qwerty_abc:
@@ -248,24 +248,6 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
             case .emoji:
                 EmojiTab<Extension>()
             }
-        }
-    }
-
-    @ViewBuilder
-    private func flickKeyboard(custard: Custard) -> some View {
-        let custard = settingAppliedFlickCustard(custard)
-        if Extension.SettingProvider.duoFlickEnabled,
-           variableStates.allowsDuoFlickPanels,
-           let layout = DuoFlickLayout(
-               containerWidth: variableStates.interfaceSize.width,
-               preferredPanelWidth: Extension.SettingProvider.duoFlickPanelWidth,
-               minimumCenterGap: Extension.SettingProvider.duoFlickCenterGap
-           ) {
-            DuoFlickKeyboardView<Extension>(custard: custard, layout: layout)
-        } else if Extension.SettingProvider.duoFlickEnabled {
-            CompactFlickKeyboardView<Extension>(custard: custard)
-        } else {
-            CustomKeyboardView<Extension>(custard: custard)
         }
     }
 

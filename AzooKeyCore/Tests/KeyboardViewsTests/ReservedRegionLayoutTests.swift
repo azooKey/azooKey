@@ -4,63 +4,6 @@ import SwiftUIUtils
 import XCTest
 
 final class ReservedRegionLayoutTests: XCTestCase {
-    func test_flatDisplayKeepsNativeReferenceGeometry() throws {
-        let layout = try XCTUnwrap(DuoFlickLayout(containerWidth: 760, preferredPanelWidth: 0, minimumCenterGap: 16))
-        XCTAssertEqual(layout.panelFrames(keyAreaHeight: 214, avoiding: []), [
-            CGRect(x: 7, y: 0, width: 365, height: 214),
-            CGRect(x: 388, y: 0, width: 365, height: 214),
-        ])
-    }
-
-    func test_manualShorterHeightKeepsBothPanelsWhenUnobstructed() throws {
-        let layout = try XCTUnwrap(DuoFlickLayout(containerWidth: 760, preferredPanelWidth: 0, minimumCenterGap: 16))
-        let frames = layout.panelFrames(keyAreaHeight: 170, avoiding: [])
-        XCTAssertEqual(frames.count, 2)
-        XCTAssertTrue(frames.allSatisfy { $0.height == 170 })
-    }
-
-    func test_invalidHeightDoesNotCreateTouchablePanels() throws {
-        let layout = try XCTUnwrap(DuoFlickLayout(containerWidth: 760, preferredPanelWidth: 0, minimumCenterGap: 16))
-        for height: CGFloat in [0, -1, .nan, .infinity] {
-            XCTAssertTrue(layout.panelFrames(keyAreaHeight: height, avoiding: []).isEmpty)
-        }
-    }
-
-    func test_verticalFoldExpandsTheGapWithoutAddingSystemMarginsAgain() throws {
-        let layout = try XCTUnwrap(DuoFlickLayout(containerWidth: 760, preferredPanelWidth: 0, minimumCenterGap: 16))
-        let fold = CGRect(x: 360, y: -50, width: 40, height: 400)
-        let frames = layout.panelFrames(keyAreaHeight: 214, avoiding: [fold])
-        XCTAssertEqual(frames.count, 2)
-        XCTAssertEqual(frames[0].maxX, fold.minX)
-        XCTAssertEqual(frames[1].minX, fold.maxX)
-        XCTAssertEqual(frames[0].minX, 7)
-        XCTAssertEqual(frames[1].maxX, 753)
-    }
-
-    func test_cameraOcclusionIsClippedToTheLocalKeyArea() throws {
-        let layout = try XCTUnwrap(DuoFlickLayout(containerWidth: 1_024, preferredPanelWidth: 0, minimumCenterGap: 16))
-        let camera = CGRect(x: 950, y: -25, width: 100, height: 75)
-        let frames = layout.panelFrames(keyAreaHeight: 214, avoiding: [camera])
-        XCTAssertEqual(frames.count, 2)
-        assertSafe(frames, obstacles: [camera])
-        XCTAssertEqual(frames[1].maxX, 950)
-    }
-
-    func test_offCenterFoldFallsBackToOneCompleteUsablePanel() throws {
-        let layout = try XCTUnwrap(DuoFlickLayout(containerWidth: 760, preferredPanelWidth: 0, minimumCenterGap: 16))
-        let fold = CGRect(x: 200, y: -20, width: 40, height: 300)
-        let frames = layout.panelFrames(keyAreaHeight: 214, avoiding: [fold])
-        XCTAssertEqual(frames.count, 1)
-        XCTAssertGreaterThanOrEqual(frames[0].width, 250)
-        assertSafe(frames, obstacles: [fold])
-    }
-
-    func test_foldAboveKeyboardDoesNotConsumeKeyboardSpace() throws {
-        let layout = try XCTUnwrap(DuoFlickLayout(containerWidth: 760, preferredPanelWidth: 0, minimumCenterGap: 16))
-        XCTAssertEqual(layout.panelFrames(keyAreaHeight: 214, avoiding: [CGRect(x: 0, y: -50, width: 760, height: 30)]),
-                       layout.panelFrames(keyAreaHeight: 214, avoiding: []))
-    }
-
     func test_barKeepsAllControlsInOneUnobstructedRectangle() {
         let bounds = CGRect(x: 0, y: 0, width: 760, height: 56)
         let fold = CGRect(x: 360, y: -20, width: 40, height: 100)

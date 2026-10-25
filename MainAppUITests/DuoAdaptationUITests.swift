@@ -23,12 +23,13 @@ final class DuoAdaptationUITests: XCTestCase {
         return app
     }
 
-    private func openDuoSettings(_ app: XCUIApplication) {
+    private func openFlickEditor(_ app: XCUIApplication) {
         app.descendants(matching: .any)["設定"].firstMatch.tap()
-        let duo = app.buttons["duo-flick-settings"]
-        XCTAssertTrue(duo.waitForExistence(timeout: 5))
-        duo.tap()
-        XCTAssertTrue(app.switches["duo-flick-enabled"].waitForExistence(timeout: 5))
+        let configure = app.buttons["flick-custom-key-settings"]
+        for _ in 0..<8 where !configure.isHittable { app.swipeUp() }
+        XCTAssertTrue(configure.isHittable)
+        configure.tap()
+        XCTAssertTrue(app.buttons["flick-editor-direction"].waitForExistence(timeout: 5))
     }
 
     private func rotate(_ orientation: UIDeviceOrientation, app: XCUIApplication) {
@@ -44,16 +45,16 @@ final class DuoAdaptationUITests: XCTestCase {
 
     func test_settingsDestinationSurvivesRotation() {
         let app = launchApp()
-        openDuoSettings(app)
+        openFlickEditor(app)
         for orientation in [UIDeviceOrientation.landscapeLeft, .landscapeRight, .portrait] {
             rotate(orientation, app: app)
-            let enabled = app.switches["duo-flick-enabled"]
-            XCTAssertTrue(enabled.waitForExistence(timeout: 5))
-            XCTAssertTrue(enabled.isHittable)
-            XCTAssertGreaterThan(enabled.frame.width, 0)
-            XCTAssertTrue(app.frame.contains(enabled.frame))
+            let direction = app.buttons["flick-editor-direction"]
+            XCTAssertTrue(direction.waitForExistence(timeout: 5))
+            XCTAssertTrue(direction.isHittable)
+            XCTAssertGreaterThan(direction.frame.width, 0)
+            XCTAssertTrue(app.frame.contains(direction.frame))
             let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
-            screenshot.name = "Duo-settings-\(orientation.rawValue)"
+            screenshot.name = "Duo-editor-\(orientation.rawValue)"
             screenshot.lifetime = .keepAlways
             add(screenshot)
         }

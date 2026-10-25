@@ -166,7 +166,6 @@ public struct TabManager {
 
     @MainActor mutating private func moveTab(to destination: KeyboardTab.ExistentialTab, variableStates: VariableStates) {
         // VariableStateの状態を遷移先のタブに合わせて適切に変更する
-        variableStates.setDuoFlickTab(destination)
         variableStates.setInputStyle(destination.inputStyle)
         if let language = destination.language {
             variableStates.keyboardLanguage = language
@@ -178,11 +177,10 @@ public struct TabManager {
         self.currentTab = .existential(destination)
     }
 
-    @MainActor private func updateVariableStates(_ variableStates: VariableStates, tab: KeyboardTab.ExistentialTab) {
+    @MainActor private func updateVariableStates(_ variableStates: VariableStates, inputStyle: InputStyle, language: KeyboardLanguage?) {
         // VariableStateの状態を遷移先のタブに合わせて適切に変更する
-        variableStates.setDuoFlickTab(tab)
-        variableStates.setInputStyle(tab.inputStyle)
-        if let language = tab.language {
+        variableStates.setInputStyle(inputStyle)
+        if let language {
             variableStates.keyboardLanguage = language
         }
         variableStates.updateResizingState()
@@ -196,11 +194,11 @@ public struct TabManager {
         let actualTab: KeyboardTab.ExistentialTab
         switch destination {
         case let .existential(tab):
-            self.updateVariableStates(variableStates, tab: tab)
+            self.updateVariableStates(variableStates, inputStyle: tab.inputStyle, language: tab.language)
             self.temporalTab = .existential(tab)
         case let .user_dependent(tab):
             actualTab = Self.actualTab(of: tab, config: config)
-            self.updateVariableStates(variableStates, tab: actualTab)
+            self.updateVariableStates(variableStates, inputStyle: actualTab.inputStyle, language: actualTab.language)
             self.temporalTab = .user_dependent(tab)
         case .last_tab:
             if let lastTab {
@@ -209,14 +207,14 @@ public struct TabManager {
             } else {
                 (actualTab, self.temporalTab) = Self.getDefaultTab(config: config)
             }
-            self.updateVariableStates(variableStates, tab: actualTab)
+            self.updateVariableStates(variableStates, inputStyle: actualTab.inputStyle, language: actualTab.language)
         }
     }
 
     @MainActor mutating func moveTab(to destination: KeyboardTab, variableStates: VariableStates) {
         switch destination {
         case let .existential(tab):
-            self.updateVariableStates(variableStates, tab: tab)
+            self.updateVariableStates(variableStates, inputStyle: tab.inputStyle, language: tab.language)
             self.lastTab = self.currentTab
             self.currentTab = .existential(tab)
         // Custard内の変数の初期化を実行
@@ -229,7 +227,7 @@ public struct TabManager {
         //            }
         case let .user_dependent(tab):
             let actualTab = Self.actualTab(of: tab, config: config)
-            self.updateVariableStates(variableStates, tab: actualTab)
+            self.updateVariableStates(variableStates, inputStyle: actualTab.inputStyle, language: actualTab.language)
             self.lastTab = self.currentTab
             self.currentTab = .user_dependent(tab)
 
@@ -243,7 +241,7 @@ public struct TabManager {
             } else {
                 (actualTab, self.currentTab) = Self.getDefaultTab(config: config)
             }
-            self.updateVariableStates(variableStates, tab: actualTab)
+            self.updateVariableStates(variableStates, inputStyle: actualTab.inputStyle, language: actualTab.language)
             self.lastTab = nil
         }
         self.temporalTab = nil

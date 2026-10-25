@@ -20,10 +20,6 @@ public struct TabDependentDesign {
 
     private var interfaceWidth: CGFloat
     private var interfaceHeight: CGFloat
-    /// A fixed, compact grid for Duo panels. Standard layouts retain their
-    /// existing spacing and width calculations when this is nil.
-    var keySpacing: CGFloat?
-    var keyAreaHeight: CGFloat?
 
     /// Keep the total key and spacing ratios at the standard QWERTY layout once
     /// the layout has more than ten horizontal keys.
@@ -61,9 +57,6 @@ public struct TabDependentDesign {
 
     /// screenWidthとhorizontalKeyCountに依存
     var keyViewWidth: CGFloat {
-        if let keySpacing {
-            return max(0, (interfaceWidth - keySpacing * (horizontalKeyCount - 1)) / horizontalKeyCount)
-        }
         let horizontalKeyCountForSizing = self.horizontalKeyCountForSizing
         let coefficient: CGFloat
         switch orientation {
@@ -87,7 +80,7 @@ public struct TabDependentDesign {
 
     // resultViewの幅を全体から引いたもの。キーを配置して良い部分の高さ。
     @MainActor var keysHeight: CGFloat {
-        keyAreaHeight ?? (interfaceHeight - (Design.keyboardBarHeight(interfaceHeight: interfaceHeight, context: layoutContext) + 12))
+        interfaceHeight - (Design.keyboardBarHeight(interfaceHeight: interfaceHeight, context: layoutContext) + 12)
     }
 
     /// This property is equivarent to `CGSize(width: keyViewWidth, height: keyViewHeight)`. if you want to use only either of two, call `keyViewWidth` or `keyViewHeight` directly.
@@ -96,9 +89,6 @@ public struct TabDependentDesign {
     }
 
     var verticalSpacing: CGFloat {
-        if let keySpacing {
-            return keySpacing
-        }
         let spacing = switch orientation {
         case .vertical:
             interfaceWidth / 50
@@ -115,9 +105,6 @@ public struct TabDependentDesign {
     var horizontalSpacing: CGFloat {
         if horizontalKeyCount <= 1 {
             return 0
-        }
-        if let keySpacing {
-            return keySpacing
         }
         let horizontalKeyCountForSizing = self.horizontalKeyCountForSizing
         let coefficient: CGFloat
@@ -199,12 +186,6 @@ public enum Design {
         } else {
             scale = 1
         }
-        if context.duoFlickEnabled {
-            let height = context.usesSplitFlick ? DuoFlickLayout.keyboardHeight : CompactFlickLayout.keyboardHeight(
-                containerWidth: context.containerWidth, orientation: context.orientation
-            )
-            return (height - 12) * scale + 12
-        }
         let width = max(0, context.containerWidth)
         switch layoutMode(context: context) {
         case .phoneVertical:
@@ -241,10 +222,6 @@ public enum Design {
         interfaceHeight: CGFloat,
         context: KeyboardLayoutContext
     ) -> CGFloat {
-        if context.duoFlickEnabled {
-            let height = context.usesSplitFlick ? 44 : CompactFlickLayout.barHeight(orientation: context.orientation)
-            return max(0, min(height, (interfaceHeight - 12) * 0.18))
-        }
         switch layoutMode(context: context) {
         case .phoneVertical:
             return (interfaceHeight - 12) * 37 / 204
