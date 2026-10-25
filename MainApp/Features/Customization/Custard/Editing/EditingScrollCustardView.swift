@@ -81,14 +81,17 @@ struct EditingScrollCustardView: CancelableEditor {
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     @State private var containerWidth: CGFloat = 320
 
-    private var interfaceSize: CGSize {
-        let context = MainAppDesign.keyboardLayoutContext(
+    private var layoutContext: KeyboardLayoutContext {
+        MainAppDesign.keyboardLayoutContext(
             containerWidth: containerWidth,
             orientation: verticalSizeClass == .compact ? .horizontal : MainAppDesign.keyboardOrientation
         )
-        return .init(
-            width: context.containerWidth,
-            height: Design.keyboardHeight(context: context)
+    }
+
+    private var interfaceSize: CGSize {
+        .init(
+            width: layoutContext.containerWidth,
+            height: Design.keyboardHeight(context: layoutContext)
         )
     }
 
@@ -97,9 +100,7 @@ struct EditingScrollCustardView: CancelableEditor {
             width: Double(editingItem.rowCount) ?? 4,
             height: Double(editingItem.columnCount) ?? 8,
             interfaceSize: interfaceSize,
-            layoutContext: MainAppDesign.keyboardLayoutContext(
-                containerWidth: interfaceSize.width
-            )
+            layoutContext: layoutContext
         )
     }
 
@@ -252,8 +253,11 @@ struct EditingScrollCustardView: CancelableEditor {
         .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
             if width > 0 {
                 containerWidth = width
-                variableStates.setContainerWidth(width, orientation: verticalSizeClass == .compact ? .horizontal : MainAppDesign.keyboardOrientation)
+                variableStates.setContainerWidth(width, orientation: layoutContext.orientation)
             }
+        }
+        .onChange(of: layoutContext.orientation) { _, orientation in
+            variableStates.setContainerWidth(containerWidth, orientation: orientation)
         }
         .navigationTitle(Text("カスタムタブを作る"))
         .navigationBarTitleDisplayMode(.inline)

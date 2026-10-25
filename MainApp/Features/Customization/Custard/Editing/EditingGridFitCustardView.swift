@@ -263,14 +263,17 @@ struct EditingGridFitCustardView: CancelableEditor {
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     @State private var containerWidth: CGFloat = 320
 
-    private var interfaceSize: CGSize {
-        let context = MainAppDesign.keyboardLayoutContext(
+    private var layoutContext: KeyboardLayoutContext {
+        MainAppDesign.keyboardLayoutContext(
             containerWidth: containerWidth,
             orientation: verticalSizeClass == .compact ? .horizontal : MainAppDesign.keyboardOrientation
         )
-        return .init(
-            width: context.containerWidth,
-            height: Design.keyboardHeight(context: context)
+    }
+
+    private var interfaceSize: CGSize {
+        .init(
+            width: layoutContext.containerWidth,
+            height: Design.keyboardHeight(context: layoutContext)
         )
     }
 
@@ -341,9 +344,8 @@ struct EditingGridFitCustardView: CancelableEditor {
                     width: layout.rowCount,
                     height: layout.columnCount,
                     interfaceSize: interfaceSize,
-                    layoutContext: MainAppDesign.keyboardLayoutContext(
-                        containerWidth: interfaceSize.width
-                    )
+                    // 全体の高さとキーの幅・間隔を同じ向きで計算する。
+                    layoutContext: layoutContext
                 )
                 let unifiedModels = editingInterface.unifiedKeyModels(extension: AzooKeyKeyboardViewExtension.self)
                 UnifiedKeysView(models: unifiedModels, tabDesign: design) { (view: UnifiedGenericKeyView<AzooKeyKeyboardViewExtension>, pos: UnifiedPositionSpecifier) in
@@ -446,8 +448,11 @@ struct EditingGridFitCustardView: CancelableEditor {
         .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
             if width > 0 {
                 containerWidth = width
-                variableStates.setContainerWidth(width, orientation: verticalSizeClass == .compact ? .horizontal : MainAppDesign.keyboardOrientation)
+                variableStates.setContainerWidth(width, orientation: layoutContext.orientation)
             }
+        }
+        .onChange(of: layoutContext.orientation) { _, orientation in
+            variableStates.setContainerWidth(containerWidth, orientation: orientation)
         }
         .navigationTitle(Text("カスタムタブを作る"))
         .navigationBarTitleDisplayMode(.inline)
@@ -488,7 +493,7 @@ struct EditingGridFitCustardView: CancelableEditor {
         .onAppear {
             variableStates.setContainerWidth(
                 containerWidth,
-                orientation: verticalSizeClass == .compact ? .horizontal : MainAppDesign.keyboardOrientation
+                orientation: layoutContext.orientation
             )
             normalizeEmptyKeys()
             if !self.baseSelectionSheetState.hasShown {

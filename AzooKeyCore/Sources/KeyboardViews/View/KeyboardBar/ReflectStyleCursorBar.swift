@@ -86,6 +86,7 @@ struct ReflectStyleCursorBar<Extension: ApplicationSpecificKeyboardViewExtension
     @State private var swipeGestureState: SwipeGestureState = .inactive
     @State private var cursorBarState = CursorBarState()
     @State private var longPressTask: Task<(), any Error>?
+    @State private var availableWidth: CGFloat = 0
 
     @MainActor
     private var fontSize: CGFloat {
@@ -99,12 +100,17 @@ struct ReflectStyleCursorBar<Extension: ApplicationSpecificKeyboardViewExtension
 
     @MainActor
     fileprivate var viewWidth: CGFloat {
-        variableStates.interfaceSize.width * 0.85
+        (availableWidth > 0 ? availableWidth : variableStates.interfaceSize.width) * 0.85
+    }
+
+    static func cursorOffset(at localX: CGFloat, width: CGFloat, itemWidth: CGFloat) -> Int {
+        Int(((localX - width / 2) / itemWidth).rounded(.toNearestOrAwayFromZero))
     }
 
     @MainActor
     var swipeGesture: some Gesture {
-        DragGesture(minimumDistance: 0, coordinateSpace: .global)
+        // 折り目を避けてバーが移動しても、表示中の文字とタップ位置を揃える。
+        DragGesture(minimumDistance: 0, coordinateSpace: .local)
             .onChanged {value in
                 switch swipeGestureState {
                 case .inactive:
@@ -159,17 +165,11 @@ struct ReflectStyleCursorBar<Extension: ApplicationSpecificKeyboardViewExtension
                 case .inactive:
                     break
                 case .tap:
-                    // offsetを計算する
-                    // タップした位置を理解する
-                    // 左端がx=0の座標系で考える。
-                    let center_x = variableStates.interfacePosition.x + variableStates.containerWidth / 2
-                    let x = value.startLocation.x
-                    // あpい|う え
-                    // pの位置をタップした場合、このdiffは-1*itemWidthに近い値になる
-                    let diff_from_center = x - center_x
-                    let offset_double = diff_from_center / itemWidth
-                    // center indexからのoffsetになる
-                    let offset = Int(offset_double.rounded(.toNearestOrAwayFromZero))
+                    let offset = Self.cursorOffset(
+                        at: value.startLocation.x,
+                        width: availableWidth > 0 ? availableWidth : variableStates.interfaceSize.width,
+                        itemWidth: itemWidth
+                    )
                     let index = cursorBarState.centerIndex + offset
                     withAnimation(.easeOut(duration: 0.1)) {
                         cursorBarState.tap(at: index, actionManager: self.action, variableStates: variableStates)
@@ -298,7 +298,10 @@ struct ReflectStyleCursorBar<Extension: ApplicationSpecificKeyboardViewExtension
             .overlay {
                 foregroundButtons
             }
-            .onAppear {
+            .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
+                if width > 0 { availableWidth = width }
+            }
+            .onChange(of: viewWidth, initial: true) { _, _ in
                 cursorBarState.updateItemCount(viewWidth: viewWidth, itemWidth: itemWidth)
                 let surroundingText = variableStates.surroundingText
                 cursorBarState.updateLine(leftText: surroundingText.leftSideText + surroundingText.centerText, rightText: surroundingText.rightSideText)

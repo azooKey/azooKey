@@ -39,6 +39,7 @@ public struct UnifiedKeysView<Extension: ApplicationSpecificKeyboardViewExtensio
         let contentHeight = height + tabDesign.verticalSpacing
         let keyFrame = CGRect(x: dx - width / 2, y: dy - height / 2, width: width, height: height)
         let gridBounds = CGRect(x: 0, y: 0, width: tabDesign.keysWidth, height: tabDesign.keysHeight)
+        // キーのタップ範囲が候補バーへはみ出さないよう、キー領域内に収める。
         let hitFrame = keyFrame
             .insetBy(dx: -tabDesign.horizontalSpacing / 2, dy: -tabDesign.verticalSpacing / 2)
             .intersection(gridBounds)

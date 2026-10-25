@@ -40,6 +40,45 @@ final class KeyboardLayoutInteractionTests: XCTestCase {
         }
     }
 
+    func test_candidateHitAreaDoesNotExpandOtherBars() async throws {
+        for (tab, barState) in [
+            (KeyboardTab.ExistentialTab.flick_abc, BarState.cursor),
+            (.flick_abc, .tab),
+            (.special(.emoji), .none),
+        ] {
+            let states = makeStates()
+            states.setTabForPreview(tab)
+            states.barState = barState
+            let height = Design.keyboardBarHeight(interfaceHeight: states.interfaceSize.height, context: states.layoutContext)
+            var measuredHeight: CGFloat?
+            let content = KeyboardBarView<AzooKeyKeyboardViewExtension>(isResultViewExpanded: .constant(false))
+                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { measuredHeight = $0 }
+                .frame(width: 760, height: height + 12)
+                .environmentObject(states)
+                .themeEnvironment(AzooKeyTheme.base)
+            let controller = UIHostingController(rootView: content)
+            let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 760, height: height + 12))
+            window.rootViewController = controller
+            window.isHidden = false
+            defer { window.isHidden = true }
+            controller.view.frame = window.bounds
+            controller.view.setNeedsLayout()
+            controller.view.layoutIfNeeded()
+            await Task.yield()
+            controller.view.layoutIfNeeded()
+            XCTAssertEqual(try XCTUnwrap(measuredHeight), height, accuracy: 1 / window.screen.scale)
+        }
+    }
+
+    func test_cursorTapTracksTheCenterOfItsAvailableRegion() {
+        for width: CGFloat in [360, 390, 760] {
+            let center = width / 2
+            XCTAssertEqual(ReflectStyleCursorBar<AzooKeyKeyboardViewExtension>.cursorOffset(at: center, width: width, itemWidth: 26), 0)
+            XCTAssertEqual(ReflectStyleCursorBar<AzooKeyKeyboardViewExtension>.cursorOffset(at: center - 26, width: width, itemWidth: 26), -1)
+            XCTAssertEqual(ReflectStyleCursorBar<AzooKeyKeyboardViewExtension>.cursorOffset(at: center + 52, width: width, itemWidth: 26), 2)
+        }
+    }
+
     func test_candidateHitAreasFillGapsWithoutMovingTheLabels() async throws {
         var frames: [Int: CGRect] = [:]
         var labels: [Bool: [Int: CGRect]] = [:]

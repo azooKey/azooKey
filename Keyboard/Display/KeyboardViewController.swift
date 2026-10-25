@@ -274,8 +274,17 @@ final class KeyboardViewController: UIInputViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        let size = self.currentKeyboardViewSize()
-        self.applySizeUpdate(size: size)
+        if #available(iOS 26, *) {
+            let size = self.currentKeyboardViewSize()
+            self.applySizeUpdate(size: size)
+        } else {
+            let size = self.rootParentViewController.view.bounds.size
+            SemiStaticStates.shared.setScreenWidth(size.width)
+            KeyboardViewController.variableStates.setContainerWidth(
+                size.width,
+                orientation: UIScreen.main.bounds.width < UIScreen.main.bounds.height ? .vertical : .horizontal
+            )
+        }
         // キーボードのセットアップはこの段階で行う
         self.setupKeyboardView()
     }
@@ -284,10 +293,23 @@ final class KeyboardViewController: UIInputViewController {
         super.viewDidAppear(animated)
         self.updateStates()
 
-        // The input window and scene are available after presentation.
-        let size = self.currentKeyboardViewSize()
-        self.applySizeUpdate(size: size, shouldUpdateHeight: true)
-        debug(#function, size)
+        // 旧OSのFloating Keyboardの処理は従来のまま残す。
+        if #available(iOS 26, *) {
+            let size = self.currentKeyboardViewSize()
+            self.applySizeUpdate(size: size, shouldUpdateHeight: true)
+            debug(#function, size)
+        } else {
+            let size = self.rootParentViewController.view.bounds.size
+            if size.width < SemiStaticStates.shared.screenWidth {
+                SemiStaticStates.shared.setScreenWidth(size.width)
+                KeyboardViewController.variableStates.setContainerWidth(
+                    size.width,
+                    orientation: UIScreen.main.bounds.size.width < UIScreen.main.bounds.size.height ? .vertical : .horizontal
+                )
+                self.updateScreenHeight()
+                debug(#function, size)
+            }
+        }
 
         let window = self.view.window!
         let gr0 = window.gestureRecognizers![0] as UIGestureRecognizer
@@ -298,6 +320,9 @@ final class KeyboardViewController: UIInputViewController {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        guard #available(iOS 26, *) else {
+            return
+        }
         let size = self.currentKeyboardViewSize()
         let orientation = currentKeyboardOrientation()
         let reservedFrames = currentReservedFrames()
@@ -416,13 +441,29 @@ final class KeyboardViewController: UIInputViewController {
 
     override func viewWillTransition(to size: CGSize, with coordinator: any UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        coordinator.animate(alongsideTransition: nil) { [weak self] _ in
-            guard let self else {
-                return
+        if #available(iOS 26, *) {
+            coordinator.animate(alongsideTransition: nil) { [weak self] _ in
+                guard let self else {
+                    return
+                }
+                let updatedSize = self.currentKeyboardViewSize()
+                self.applySizeUpdate(size: updatedSize, shouldUpdateHeight: true)
             }
-            let updatedSize = self.currentKeyboardViewSize()
-            self.applySizeUpdate(size: updatedSize, shouldUpdateHeight: true)
+            return
         }
+        SemiStaticStates.shared.setScreenWidth(size.width)
+        if #available(iOS 18, *), UIDevice.current.userInterfaceIdiom == .phone {
+            KeyboardViewController.variableStates.setContainerWidth(
+                size.width,
+                orientation: UIScreen.main.bounds.width < UIScreen.main.bounds.height ? .vertical : .horizontal
+            )
+        } else {
+            KeyboardViewController.variableStates.setContainerWidth(
+                size.width,
+                orientation: UIScreen.main.bounds.width < UIScreen.main.bounds.height ? .horizontal : .vertical
+            )
+        }
+        self.updateScreenHeight()
     }
 
     var rootParentViewController: UIViewController {
