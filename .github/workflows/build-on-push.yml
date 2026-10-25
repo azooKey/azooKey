@@ -83,14 +83,23 @@ jobs:
             -only-testing:KeyboardViewsTests \
             -only-testing:AzooKeyUtilsTests/KeyboardLayoutInteractionTests \
             -only-testing:AzooKeyUtilsTests/ResolvedKeyboardSizeTests \
+            -parallel-testing-enabled NO \
             CODE_SIGNING_ALLOWED=NO | tee TestResults/keyboard.log
 
       - name: Run compact and wide app UI tests
         run: |
           devices=('iPhone 18 Pro' 'iPad mini (A17 Pro)')
+          trap 'xcrun simctl shutdown all || true' EXIT
           for index in "${!devices[@]}"; do
+            device_id=$(xcrun simctl list devices available --json | python3 -c '
+          import json, sys
+          devices = json.load(sys.stdin)["devices"]["com.apple.CoreSimulator.SimRuntime.iOS-27-0"]
+          print(next(device["udid"] for device in devices if device["name"] == sys.argv[1]))
+          ' "${devices[$index]}")
+            xcrun simctl shutdown all
+            xcrun simctl bootstatus "$device_id" -b
             xcodebuild test -project azooKey.xcodeproj -scheme DuoAppTests \
-              -destination "platform=iOS Simulator,name=${devices[$index]},OS=27.0" \
+              -destination "platform=iOS Simulator,id=$device_id" \
               -resultBundlePath "TestResults/app-$index.xcresult" \
               -only-testing:azooKeyUITests/DuoAdaptationUITests \
               -parallel-testing-enabled NO \
