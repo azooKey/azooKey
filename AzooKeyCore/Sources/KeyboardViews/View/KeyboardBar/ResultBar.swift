@@ -296,7 +296,7 @@ struct ResultButtonStyle<Extension: ApplicationSpecificKeyboardViewExtension>: B
             .background(AnyShapeStyle(background(configuration: configuration)))
             .cornerRadius(5.0)
             .compositingGroup()
-            // 候補の位置と間隔を保ち、候補間の余白もタップできるようにする。
+            // 候補の見た目はそのままで、間の余白もタップできるようにしています。
             .padding(.horizontal, hitHeight == nil ? 0 : 5)
             .frame(minHeight: hitHeight)
             .contentShape(Rectangle())

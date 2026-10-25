@@ -1,4 +1,4 @@
-# GitHub公式のプレビューイメージがactionlintに未登録のため、ラベルを追加する。
+# このプレビューイメージはactionlintにまだ登録されていないので、ラベルを追加しています。
 # https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md
 self-hosted-runner:
   labels:

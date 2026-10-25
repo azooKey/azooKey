@@ -1,6 +1,6 @@
 import UIKit
 
-/// キーボードのウィンドウは高さが低くなるため、その縦横比では画面の向きを判定できない。
+/// キーボードのウィンドウは高さが低いので、その縦横比だけでは画面の向きが分かりません。
 public struct KeyboardPresentation: Equatable, Sendable {
     public let orientation: KeyboardOrientation
 

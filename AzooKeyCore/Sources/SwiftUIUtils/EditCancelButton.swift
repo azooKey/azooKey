@@ -105,7 +105,7 @@ private struct VerticalBarLabelStyle: ViewModifier {
     @Environment(\.toolbarVerticalEdge) private var toolbarVerticalEdge
 
     func body(content: Content) -> some View {
-        // 通常のバーは文字表示を保ち、縦に並ぶバーだけアイコンを使う。
+        // バーが縦に並ぶと文字だけの項目は表示されなくなるので、その場合だけアイコンを使っています。
         if toolbarVerticalEdge != nil {
             content.labelStyle(.iconOnly)
         } else {

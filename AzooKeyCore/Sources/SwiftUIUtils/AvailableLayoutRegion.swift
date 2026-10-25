@@ -1,8 +1,8 @@
 import Foundation
 import SwiftUI
 
-/// 折り目やカメラなどの予約領域を避けて配置できる、最大の矩形を返す。
-/// 予約領域のフレームには、システムが確保する余白も含まれる。
+/// 折り目やカメラを避けて、いちばん広く使える範囲を探しています。
+/// 予約領域には周囲の余白も含まれているので、ここでは追加していません。
 public enum AvailableLayoutRegion {
     public static func largest(in bounds: CGRect, avoiding obstacles: [CGRect]) -> CGRect {
         guard isUsable(bounds) else {
@@ -22,7 +22,7 @@ public enum AvailableLayoutRegion {
                     CGRect(x: rect.minX, y: overlap.maxY, width: rect.width, height: rect.maxY - overlap.maxY),
                 ].filter(isUsable)
             }
-            // 重複や他の矩形に含まれる候補を除き、次の探索対象を減らす。
+            // 同じ範囲を何度も調べないよう、重複した候補や他の候補に収まるものを外しています。
             candidates = candidates.enumerated().filter { index, rect in
                 !candidates.enumerated().contains { otherIndex, other in
                     otherIndex != index && other.contains(rect) && (other != rect || otherIndex < index)
@@ -48,10 +48,10 @@ public enum AvailableLayoutRegion {
 
     @MainActor
     public static func obstacles(in geometry: GeometryProxy) -> [CGRect] {
-        // 旧SDKには予約領域のAPIがないため、コンパイル時にも分岐する。
+        // 古いSDKでもビルドできるよう、APIの有無で分けています。
         #if os(iOS) && compiler(>=6.4) && canImport(SwiftUI, _version: 8.0.85.29)
         if #available(iOS 27.1, *) {
-            // 右から左のUIでも、ローカル座標の左右を反転させない。
+            // 言語の向きに合わせて座標まで反転すると、カメラなどを避ける位置がずれてしまいます。
             return geometry.reservedRegions(kind: .division, layoutDirectionBehavior: .fixed).map(\.frame)
                 + geometry.reservedRegions(kind: .occlusion, layoutDirectionBehavior: .fixed).map(\.frame)
         }
@@ -60,7 +60,7 @@ public enum AvailableLayoutRegion {
     }
 }
 
-/// 予約領域を避けて、操作バーを一つの矩形内に配置する。
+/// 折り目やカメラに操作バーが重ならないようにしています。
 public struct ReservedRegionAvoidingContent<Content: View>: View {
     private let content: Content
 

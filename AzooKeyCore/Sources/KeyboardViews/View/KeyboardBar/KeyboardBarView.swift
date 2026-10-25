@@ -58,7 +58,7 @@ struct KeyboardBarView<Extension: ApplicationSpecificKeyboardViewExtension>: Vie
                     SliderStyleCursorBar<Extension>()
                 }
             }
-            // 候補のタップ範囲を広げても、カーソルバーの見た目は変えない。
+            // 候補のタップ範囲を広げた分で、カーソルバーまで高くならないようにしています。
             .frame(height: barHeight)
             .onAppear {
                 // 表示したタイミングでdismissTaskを開始

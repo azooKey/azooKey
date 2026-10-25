@@ -293,7 +293,7 @@ final class KeyboardViewController: UIInputViewController {
         super.viewDidAppear(animated)
         self.updateStates()
 
-        // 旧OSのFloating Keyboardの処理は従来のまま残す。
+        // iOS 26より前は、元のFloating Keyboardの処理を使っています。
         if #available(iOS 26, *) {
             let size = self.currentKeyboardViewSize()
             self.applySizeUpdate(size: size, shouldUpdateHeight: true)

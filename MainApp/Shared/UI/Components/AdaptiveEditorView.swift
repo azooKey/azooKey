@@ -51,8 +51,8 @@ private struct FoldAwareEditorLayout<Editor: View, Preview: View, Legacy: View>:
     let compactHeight: Bool
 
     var body: some View {
-        // 折り目や縦向きバーがなく、高さも足りる画面では従来の配置を使う。
-        // 完全に開いて折り目が非アクティブになっても、編集画面の配置を保つ。
+        // 普通のiPhoneやiPadの配置まで変わらないよう、必要な画面だけ切り替えています。
+        // 開ききると折り目が非アクティブになるので、その場合も含めて見ています。
         if hasDivision || toolbarVerticalEdge != nil || compactHeight {
             ArrangementView {
                 editor.splitArrangementLayoutRatio(0.6)

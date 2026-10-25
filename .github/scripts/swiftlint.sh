@@ -1,6 +1,6 @@
 #!/bin/bash
-# ローカルとCIでSwiftLintのバージョンを揃える。
-# Xcode側の自動整形を避けるため、一時フォルダ内のバイナリを直接使う。
+# 手元とCIで同じSwiftLintを使っています。
+# Xcodeのビルドで自動整形が走らないよう、PATHには追加していません。
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "$0")/../.." && pwd)"

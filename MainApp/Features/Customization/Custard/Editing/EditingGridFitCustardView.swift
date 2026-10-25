@@ -344,7 +344,7 @@ struct EditingGridFitCustardView: CancelableEditor {
                     width: layout.rowCount,
                     height: layout.columnCount,
                     interfaceSize: interfaceSize,
-                    // 全体の高さとキーの幅・間隔を同じ向きで計算する。
+                    // キーの幅と高さで別々の向きを使うとサイズがずれるので、同じ向きで計算しています。
                     layoutContext: layoutContext
                 )
                 let unifiedModels = editingInterface.unifiedKeyModels(extension: AzooKeyKeyboardViewExtension.self)

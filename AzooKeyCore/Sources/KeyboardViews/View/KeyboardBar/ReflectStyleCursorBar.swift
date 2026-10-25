@@ -109,7 +109,7 @@ struct ReflectStyleCursorBar<Extension: ApplicationSpecificKeyboardViewExtension
 
     @MainActor
     var swipeGesture: some Gesture {
-        // 折り目を避けてバーが移動しても、表示中の文字とタップ位置を揃える。
+        // 折り目を避けるとバーの位置が変わるので、タップ位置もバー内の座標で見ています。
         DragGesture(minimumDistance: 0, coordinateSpace: .local)
             .onChanged {value in
                 switch swipeGestureState {

@@ -150,7 +150,7 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
                                     context: variableStates.layoutContext
                                 ) + 12
                             )
-                            // 上下の余白6ptずつも、候補バーのタップ範囲に含める。
+                            // 上下の余白もタップできるよう、6ptずつ候補バーに含めています。
                             .contentShape(Rectangle())
                         keyboardView(tab: defaultTab ?? variableStates.tabManager.existentialTab())
                             .zIndex(1)

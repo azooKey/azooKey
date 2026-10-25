@@ -64,7 +64,7 @@ enum KeyboardPreviewSizing: Equatable {
         let context = MainAppDesign.keyboardLayoutContext(
             containerWidth: fallbackWidth, orientation: orientation
         )
-        // 開閉で幅が変わった場合は、以前の画面の寸法を流用しない。
+        // 開閉前のサイズが残ることがあるので、今の幅と合うものだけ使っています。
         if let size = SharedStore.resolvedKeyboardSize(
             orientation: orientation
         ), abs(size.width - fallbackWidth) < 1 {
