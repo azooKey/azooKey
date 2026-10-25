@@ -67,8 +67,10 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                 HStack {
                     if displayTabBarButton {
                         tabBarButton
+                        if undoButtonAction != nil {
+                            Spacer()
+                        }
                     }
-                    Spacer(minLength: 0)
                 }
                 .overlay {
                     if let undoButtonAction {
@@ -176,7 +178,8 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                                     .frame(height: 18)
                             }
                         }
-                        .buttonStyle(ResultButtonStyle<Extension>(height: buttonHeight, hitHeight: hitHeight))
+                        .buttonStyle(ResultButtonStyle<Extension>(height: buttonHeight))
+                        .padding(.trailing, 10)
                     }
                 }
             }
@@ -293,10 +296,9 @@ struct ResultButtonStyle<Extension: ApplicationSpecificKeyboardViewExtension>: B
             .background(AnyShapeStyle(background(configuration: configuration)))
             .cornerRadius(5.0)
             .compositingGroup()
-            // Keep visual separation inside each button's hit area, so there
-            // are no dead gaps between adjacent scrollable candidates.
+            // 候補の位置と間隔を保ち、候補間の余白もタップできるようにする。
             .padding(.horizontal, hitHeight == nil ? 0 : 5)
-            .frame(minWidth: hitHeight == nil ? nil : 44, minHeight: hitHeight)
+            .frame(minHeight: hitHeight)
             .contentShape(Rectangle())
             .animation(nil, value: configuration.isPressed)
     }

@@ -40,23 +40,32 @@ final class KeyboardLayoutInteractionTests: XCTestCase {
         }
     }
 
-    func test_shortCandidatesFillTheBarAndLeaveNoDeadGapsBetweenButtons() async throws {
+    func test_candidateHitAreasFillGapsWithoutMovingTheLabels() async throws {
         var frames: [Int: CGRect] = [:]
-        let content = HStack(spacing: 0) {
-            ForEach(0..<3) { index in
-                Button("日") {}
-                    .buttonStyle(ResultButtonStyle<AzooKeyKeyboardViewExtension>(height: 26.4, hitHeight: 56))
-                    .onGeometryChange(for: CGRect.self) { proxy in
-                        proxy.frame(in: .global)
-                    } action: { frame in
-                        frames[index] = frame
+        var labels: [Bool: [Int: CGRect]] = [:]
+        let content = VStack(spacing: 0) {
+            ForEach([false, true], id: \.self) { expandsHitArea in
+                HStack(spacing: expandsHitArea ? 0 : 10) {
+                    ForEach(0..<3) { index in
+                        Button {} label: {
+                            Text("日")
+                                .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { frame in
+                                    labels[expandsHitArea, default: [:]][index] = frame
+                                }
+                        }
+                        .buttonStyle(ResultButtonStyle<AzooKeyKeyboardViewExtension>(height: 26.4, hitHeight: expandsHitArea ? 56 : nil))
+                        .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { frame in
+                            if expandsHitArea { frames[index] = frame }
+                        }
                     }
+                }
+                .padding(.horizontal, expandsHitArea ? 0 : 5)
+                .frame(width: 240, height: 56, alignment: .leading)
             }
         }
-        .frame(width: 240, height: 56, alignment: .leading)
         .themeEnvironment(AzooKeyTheme.base)
         let controller = UIHostingController(rootView: content)
-        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 240, height: 56))
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 240, height: 112))
         window.rootViewController = controller
         window.isHidden = false
         defer { window.isHidden = true }
@@ -68,7 +77,11 @@ final class KeyboardLayoutInteractionTests: XCTestCase {
 
         for index in 0..<3 {
             let frame = try XCTUnwrap(frames[index])
-            XCTAssertGreaterThanOrEqual(frame.width, 44)
+            XCTAssertGreaterThan(frame.width, 0)
+            let before = try XCTUnwrap(labels[false]?[index])
+            let after = try XCTUnwrap(labels[true]?[index])
+            XCTAssertEqual(after.minX, before.minX, accuracy: 1 / window.screen.scale)
+            XCTAssertEqual(after.width, before.width, accuracy: 1 / window.screen.scale)
             XCTAssertEqual(frame.height, 56, accuracy: 1 / window.screen.scale)
             if index > 0 {
                 XCTAssertEqual(frame.minX, try XCTUnwrap(frames[index - 1]).maxX, accuracy: 1 / window.screen.scale)

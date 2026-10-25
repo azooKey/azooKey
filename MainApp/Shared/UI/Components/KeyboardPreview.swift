@@ -58,8 +58,9 @@ enum KeyboardPreviewSizing: Equatable {
     @MainActor
     static func resolvedExtensionSize(
         fallbackWidth: CGFloat,
-        orientation: KeyboardOrientation = .vertical
+        orientation: KeyboardOrientation? = nil
     ) -> CGSize {
+        let orientation = orientation ?? MainAppDesign.keyboardOrientation
         let context = MainAppDesign.keyboardLayoutContext(
             containerWidth: fallbackWidth, orientation: orientation
         )
@@ -123,7 +124,7 @@ struct KeyboardPreview: View {
 
         let variableStates = VariableStates(
             interfaceWidth: sizing.initialResolvedSize?.width,
-            orientation: orientation ?? .vertical,
+            orientation: orientation ?? MainAppDesign.keyboardOrientation,
             clipboardHistoryManagerConfig: ClipboardHistoryManagerConfig(),
             tabManagerConfig: TabManagerConfig(),
             userDefaults: UserDefaults.standard
@@ -192,6 +193,9 @@ struct KeyboardPreview: View {
                     resolvedKeyboardHeight: resolvedSize.height
                 )
             }
+            .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
+                updateCurrentLayout()
+            }
             .onChange(of: verticalSizeClass) { _, _ in
                 updateCurrentLayout()
             }
@@ -204,7 +208,7 @@ struct KeyboardPreview: View {
     }
 
     private var previewOrientation: KeyboardOrientation {
-        orientationOverride ?? (verticalSizeClass == .compact ? .horizontal : .vertical)
+        orientationOverride ?? (verticalSizeClass == .compact ? .horizontal : MainAppDesign.keyboardOrientation)
     }
 
     private var keyboardHeight: CGFloat {

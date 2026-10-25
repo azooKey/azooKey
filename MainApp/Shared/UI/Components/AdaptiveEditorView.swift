@@ -1,45 +1,68 @@
 import SwiftUI
 
-/// Primary contains every editing action, so compact presentations never lose
-/// features when the system hides the optional visual preview.
-struct AdaptiveEditorView<Editor: View, Preview: View>: View {
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+struct AdaptiveEditorView<Editor: View, Preview: View, Legacy: View>: View {
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     private let editor: Editor
     private let preview: Preview
+    private let legacy: Legacy
 
-    init(@ViewBuilder editor: () -> Editor, @ViewBuilder preview: () -> Preview) {
+    init(@ViewBuilder editor: () -> Editor, @ViewBuilder preview: () -> Preview, @ViewBuilder legacy: () -> Legacy) {
         self.editor = editor()
         self.preview = preview()
+        self.legacy = legacy()
     }
 
     var body: some View {
-        #if compiler(>=6.4) && canImport(SwiftUI, _version: 8.0.85.29)
-        if #available(iOS 27.1, *) {
+        GeometryReader { geometry in
+            #if compiler(>=6.4) && canImport(SwiftUI, _version: 8.0.85.29)
+            if #available(iOS 27.1, *) {
+                FoldAwareEditorLayout(
+                    editor: editor, preview: preview, legacy: legacy,
+                    hasDivision: !geometry.reservedRegions(kind: .division, options: .includeInactive).isEmpty,
+                    compactHeight: verticalSizeClass == .compact
+                )
+            } else {
+                fallback
+            }
+            #else
+            fallback
+            #endif
+        }
+    }
+
+    @ViewBuilder
+    private var fallback: some View {
+        if verticalSizeClass == .compact {
+            editor
+        } else {
+            legacy
+        }
+    }
+}
+
+#if compiler(>=6.4) && canImport(SwiftUI, _version: 8.0.85.29)
+@available(iOS 27.1, *)
+private struct FoldAwareEditorLayout<Editor: View, Preview: View, Legacy: View>: View {
+    @Environment(\.toolbarVerticalEdge) private var toolbarVerticalEdge
+    let editor: Editor
+    let preview: Preview
+    let legacy: Legacy
+    let hasDivision: Bool
+    let compactHeight: Bool
+
+    var body: some View {
+        // 折り目や縦向きバーがなく、高さも足りる画面では従来の配置を使う。
+        // 開閉中も同じ配置を使うため、完全に開いた状態の折り目も確認する。
+        if hasDivision || toolbarVerticalEdge != nil || compactHeight {
             ArrangementView {
-                editor
-                    .splitArrangementLayoutRatio(0.6)
+                editor.splitArrangementLayoutRatio(0.6)
             } secondary: {
                 preview
             }
             .arrangementViewStyle(.split)
         } else {
-            fallback
-        }
-        #else
-        fallback
-        #endif
-    }
-
-    private var fallback: some View {
-        GeometryReader { geometry in
-            if horizontalSizeClass == .regular && geometry.size.width >= 700 {
-                HStack(spacing: 0) {
-                    editor
-                    preview
-                }
-            } else {
-                editor
-            }
+            legacy
         }
     }
 }
+#endif

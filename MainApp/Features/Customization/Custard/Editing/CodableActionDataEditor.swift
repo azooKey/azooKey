@@ -66,6 +66,7 @@ struct CodableActionDataEditor: View {
             Button("削除と順番", systemImage: "list.bullet") {
                 state.editMode = .active
             }
+            .verticalBarLabelStyle()
         case .active, .transient:
             EditConfirmButton(.done) {
                 state.editMode = .inactive
@@ -175,6 +176,7 @@ struct CodableLongpressActionDataEditor: View {
             Button("編集", systemImage: "pencil") {
                 state.editMode = .active
             }
+            .verticalBarLabelStyle()
         case .active, .transient:
             EditConfirmButton(.done) {
                 state.editMode = .inactive

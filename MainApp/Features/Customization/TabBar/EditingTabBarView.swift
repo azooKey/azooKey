@@ -203,6 +203,7 @@ struct EditingTabBarView: View {
             Button("編集", systemImage: "pencil") {
                 editMode = .active
             }
+            .verticalBarLabelStyle()
         case .active, .transient:
             EditConfirmButton(.done) {
                 editMode = .inactive

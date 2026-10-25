@@ -266,11 +266,11 @@ struct EditingGridFitCustardView: CancelableEditor {
     private var interfaceSize: CGSize {
         let context = MainAppDesign.keyboardLayoutContext(
             containerWidth: containerWidth,
-            orientation: verticalSizeClass == .compact ? .horizontal : .vertical
+            orientation: verticalSizeClass == .compact ? .horizontal : MainAppDesign.keyboardOrientation
         )
         return .init(
             width: context.containerWidth,
-            height: min(320, Design.keyboardHeight(context: context))
+            height: Design.keyboardHeight(context: context)
         )
     }
 
@@ -446,7 +446,7 @@ struct EditingGridFitCustardView: CancelableEditor {
         .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
             if width > 0 {
                 containerWidth = width
-                variableStates.setContainerWidth(width, orientation: verticalSizeClass == .compact ? .horizontal : .vertical)
+                variableStates.setContainerWidth(width, orientation: verticalSizeClass == .compact ? .horizontal : MainAppDesign.keyboardOrientation)
             }
         }
         .navigationTitle(Text("カスタムタブを作る"))
@@ -488,7 +488,7 @@ struct EditingGridFitCustardView: CancelableEditor {
         .onAppear {
             variableStates.setContainerWidth(
                 containerWidth,
-                orientation: verticalSizeClass == .compact ? .horizontal : .vertical
+                orientation: verticalSizeClass == .compact ? .horizontal : MainAppDesign.keyboardOrientation
             )
             normalizeEmptyKeys()
             if !self.baseSelectionSheetState.hasShown {

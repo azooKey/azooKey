@@ -260,7 +260,7 @@ struct ThemeEditView: CancelableEditor {
             .navigationDestination(isPresented: $isTrimmingViewPresented) {
                 let context = MainAppDesign.keyboardLayoutContext(
                     containerWidth: containerWidth,
-                    orientation: verticalSizeClass == .compact ? .horizontal : .vertical
+                    orientation: verticalSizeClass == .compact ? .horizontal : MainAppDesign.keyboardOrientation
                 )
                 Group {
                     TrimmingView(

@@ -29,7 +29,11 @@ final class DuoAdaptationUITests: XCTestCase {
         for _ in 0..<8 where !configure.isHittable { app.swipeUp() }
         XCTAssertTrue(configure.isHittable)
         configure.tap()
-        XCTAssertTrue(app.buttons["flick-editor-direction"].waitForExistence(timeout: 5))
+        let leftKey = app.descendants(matching: .any)["flick-key-left"].firstMatch
+        XCTAssertTrue(leftKey.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["flick-editor-direction"].exists)
+        leftKey.tap()
+        XCTAssertTrue(app.textFields["flick-editor-label"].waitForExistence(timeout: 5))
     }
 
     private func rotate(_ orientation: UIDeviceOrientation, app: XCUIApplication) {
@@ -48,11 +52,10 @@ final class DuoAdaptationUITests: XCTestCase {
         openFlickEditor(app)
         for orientation in [UIDeviceOrientation.landscapeLeft, .landscapeRight, .portrait] {
             rotate(orientation, app: app)
-            let direction = app.buttons["flick-editor-direction"]
-            XCTAssertTrue(direction.waitForExistence(timeout: 5))
-            XCTAssertTrue(direction.isHittable)
-            XCTAssertGreaterThan(direction.frame.width, 0)
-            XCTAssertTrue(app.frame.contains(direction.frame))
+            let label = app.textFields["flick-editor-label"]
+            scrollToLabel(label, app: app)
+            XCTAssertGreaterThan(label.frame.width, 0)
+            XCTAssertTrue(app.frame.contains(label.frame))
             let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
             screenshot.name = "Duo-editor-\(orientation.rawValue)"
             screenshot.lifetime = .keepAlways
@@ -62,28 +65,34 @@ final class DuoAdaptationUITests: XCTestCase {
 
     func test_flickEditorKeepsSelectionAndTextAcrossRotation() {
         let app = launchApp()
-        app.descendants(matching: .any)["設定"].firstMatch.tap()
-        let configure = app.buttons["flick-custom-key-settings"]
-        for _ in 0..<8 where !configure.isHittable { app.swipeUp() }
-        XCTAssertTrue(configure.isHittable)
-        configure.tap()
-        let direction = app.buttons["flick-editor-direction"]
-        XCTAssertTrue(direction.waitForExistence(timeout: 5))
-        direction.tap()
-        app.buttons["左"].tap()
+        openFlickEditor(app)
         let label = app.textFields["flick-editor-label"]
-        for _ in 0..<5 where !label.isHittable { app.swipeUp() }
-        XCTAssertTrue(label.isHittable)
+        scrollToLabel(label, app: app)
         let initialValue = fieldText(label)
-        replaceText(label, with: "duo-layout-check")
-        XCTAssertEqual(fieldText(label), "duo-layout-check")
+        let editedValue = initialValue == "duo-layout-check" ? "duo-layout-check-2" : "duo-layout-check"
+        replaceText(label, with: editedValue)
+        XCTAssertEqual(fieldText(label), editedValue)
+        label.typeText("\n")
+        XCTAssertEqual(fieldText(label), editedValue)
         rotate(.landscapeLeft, app: app)
-        XCTAssertTrue(label.waitForExistence(timeout: 5))
-        XCTAssertEqual(fieldText(label), "duo-layout-check")
+        scrollToLabel(label, app: app)
+        XCTAssertEqual(fieldText(label), editedValue)
         rotate(.portrait, app: app)
-        XCTAssertEqual(fieldText(label), "duo-layout-check")
+        scrollToLabel(label, app: app)
+        XCTAssertEqual(fieldText(label), editedValue)
         replaceText(label, with: initialValue)
         XCTAssertEqual(fieldText(label), initialValue)
+    }
+
+    private func scrollToLabel(_ label: XCUIElement, app: XCUIApplication) {
+        let form = app.descendants(matching: .any)["flick-editor-form"].firstMatch
+        for _ in 0..<8 where !(label.exists && label.isHittable) {
+            let start = form.coordinate(withNormalizedOffset: CGVector(dx: 0.75, dy: 0.7))
+            let end = form.coordinate(withNormalizedOffset: CGVector(dx: 0.75, dy: 0.45))
+            start.press(forDuration: 0.1, thenDragTo: end)
+        }
+        XCTAssertTrue(label.waitForExistence(timeout: 5))
+        XCTAssertTrue(label.isHittable)
     }
 
     private func fieldText(_ field: XCUIElement) -> String {

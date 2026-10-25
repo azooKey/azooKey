@@ -17,5 +17,6 @@ final class KeyboardConfigurationState: ObservableObject {
         self.custardManager = CustardManager.load()
 
         SemiStaticStates.shared.setHapticsAvailable()
+        SemiStaticStates.shared.setScreenWidth(UIScreen.main.bounds.width)
     }
 }

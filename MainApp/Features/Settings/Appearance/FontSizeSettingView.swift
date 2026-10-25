@@ -73,19 +73,24 @@ private struct KeyView: View {
         self.fontSize = fontSize
     }
 
-    var body: some View {
-        GeometryReader { geometry in
-            let referenceWidth = min(geometry.size.width, 560)
-            let width = keyboardConfiguration.japaneseLayout == .qwerty
-                ? max(44, referenceWidth / 12.2) : max(44, referenceWidth / 5.6)
-            RoundedRectangle(cornerRadius: 5)
-                .stroke()
-                .frame(width: width, height: min(70, max(44, referenceWidth / 8)))
-                .overlay {
-                    Text(verbatim: "あ").font(.system(size: fontSize))
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+    private var size: CGSize {
+        let screenWidth = UIScreen.main.bounds.width
+        switch keyboardConfiguration.japaneseLayout {
+        case .flick:
+            return CGSize(width: screenWidth / 5.6, height: screenWidth / 8)
+        case .qwerty:
+            return CGSize(width: screenWidth / 12.2, height: screenWidth / 9)
+        case .custard:
+            return CGSize(width: screenWidth / 5.6, height: screenWidth / 8)
         }
-        .frame(height: 88)
+    }
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: 5)
+            .stroke()
+            .frame(width: size.width, height: size.height)
+            .overlay {
+                Text(verbatim: "あ").font(.system(size: fontSize))
+            }
     }
 }

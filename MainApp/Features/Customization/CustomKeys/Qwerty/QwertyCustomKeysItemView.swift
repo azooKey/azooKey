@@ -111,20 +111,20 @@ struct QwertyCustomKeysSettingView<SettingKey: QwertyCustomKeyKeyboardSetting>: 
         spacing / 2
     }
 
-    @State private var containerWidth: CGFloat = 320
+    @State private var containerWidth: CGFloat = UIScreen.main.bounds.width
 
-    private var screenWidth: CGFloat { min(containerWidth, 560) }
+    private var screenWidth: CGFloat { containerWidth }
 
     private var keySize: CGSize {
-        CGSize(width: max(44, min(72, screenWidth / 12.2)), height: max(44, min(64, screenWidth / 9)))
+        CGSize(width: screenWidth / 12.2, height: screenWidth / 9)
     }
     private var spacing: CGFloat {
-        max(4, (screenWidth - keySize.width * 10) / (9 + 0.5))
+        (screenWidth - keySize.width * 10) / (9 + 0.5)
     }
     private func romanScaledKeyWidth(normal: Int, for count: Int) -> CGFloat {
         let width = keySize.width * CGFloat(normal) + spacing * CGFloat(normal - 1)
         let necessarySpacing = spacing * CGFloat(count - 1)
-        return max(44, (width - necessarySpacing) / CGFloat(max(1, count)))
+        return (width - necessarySpacing) / CGFloat(max(1, count))
     }
     private var width: CGFloat {
         romanScaledKeyWidth(normal: 7, for: setting.value.keys.count)
@@ -137,188 +137,194 @@ struct QwertyCustomKeysSettingView<SettingKey: QwertyCustomKeyKeyboardSetting>: 
 
     var body: some View {
         AdaptiveEditorView {
-            Form {
-                Section("編集するキー") {
-                    Picker("キー", selection: $selection.selectIndex) {
-                        Text("選択してください").tag(-1)
-                        ForEach(setting.value.keys.indices, id: \.self) { index in
-                            Text(setting.value.keys[index].name.isEmpty ? "キー \(index + 1)" : setting.value.keys[index].name).tag(index)
-                        }
-                    }
-                    if setting.value.keys.indices.contains(selection.selectIndex) {
-                        Picker("長押し候補", selection: $selection.longpressSelectIndex) {
-                            Text("通常のキー").tag(-1)
-                            ForEach(setting.value.keys[selection.selectIndex].longpresses.indices, id: \.self) { index in
-                                Text(setting.value.keys[selection.selectIndex].longpresses[index].name).tag(index)
-                            }
-                        }
-                    }
-                }
-
-                if setting.value.keys.indices ~= selection.selectIndex {
-                    let binded = Binding(
-                        get: { setting.value },
-                        set: { setting.value = $0 }
-                    )
-                    Section(header: Text("移動・追加")) {
-                        Button("左へ移動", systemImage: "arrow.left") {
-                            moveSelectedKey(by: -1)
-                        }
-                        .disabled(!canMoveSelection(by: -1))
-                        Button("右へ移動", systemImage: "arrow.right") {
-                            moveSelectedKey(by: 1)
-                        }
-                        .disabled(!canMoveSelection(by: 1))
-                        Button("キーを追加する") {
-                            self.addPressKey()
-                        }
-                        Button("このキーに長押しキーを追加する") {
-                            self.addLongpressKey(sIndex: selection.selectIndex)
-                        }
-                    }
-                    Section(header: Text("入力")) {
-                        if self.isInputTextEditable {
-                            Text("キーを押して入力される文字を設定します。")
-                            TextField("入力", text: binded[.input, selection])
-                                .textFieldStyle(.roundedBorder)
-                                .submitLabel(.done)
-                        } else {
-                            Text("このキーには入力以外のアクションが設定されています。現在のアクションを消去して入力する文字を設定するには「入力を設定する」を押してください")
-                            Button("入力を設定する") {
-                                setting.value[.input, selection] = ""
-                            }
-                            .foregroundStyle(.accentColor)
-                        }
-                    }
-                    Section(header: Text("ラベル")) {
-                        Text("キーに表示される文字を設定します。")
-                        TextField("ラベル", text: binded[selection].name)
-                            .textFieldStyle(.roundedBorder)
-                            .submitLabel(.done)
-                    }
-                    Section(header: Text("アクション")) {
-                        Text("キーを押したときの動作をより詳しく設定します。")
-                        NavigationLink("アクションを編集する") {
-                            CodableActionDataEditor(binded[selection].actions, availableCustards: CustardManager.load().availableCustards)
-                        }
-                        .foregroundStyle(.accentColor)
-                    }
-                    Button("削除", role: .destructive) {
-                        if editState.state == .none {
-                            let sIndex = selection.selectIndex
-                            let lpsIndex = selection.longpressSelectIndex
-                            if lpsIndex == -1 && sIndex != -1 {
-                                selection.selectIndex = -1
-                                // FIXME: 場当たり的な対処。`selection.selectIndex = -1`がViewに反映されてから削除を行う。
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                                    setting.value.keys.remove(at: sIndex)
-                                }
-                            } else {
-                                selection.longpressSelectIndex = -1
-                                setting.value.keys[sIndex].longpresses.remove(at: lpsIndex)
-                            }
-                        }
-                    }
-                } else {
-                    Button("キーを追加する") {
-                        self.addPressKey()
-                    }
-                    if setting.value.keys.isEmpty {
-                        Button("デフォルトに戻す") {
-                            setting.value.keys = QwertyCustomKeysValue.defaultValue.keys
-                            selection.selectIndex = -1
-                        }
-                    }
-                }
-            }
-            .onAppear {
-                self.setting.value = SettingKey.value  // Stateの状態が元に戻ってしまう問題への応急処置
-            }
-            .onChange(of: selection) { (_, _) in
-                editState.state = .none
-            }
+            Form { editorSections(adaptive: true) }
         } preview: {
             ScrollView {
-                VStack {
-                    Spacer(minLength: 10)
-                        .fixedSize()
-                    Button("並び替え", systemImage: "arrow.left.arrow.right") {
-                        editState.toggle(.drag)
+                keyPreview(adaptive: true)
+                    .frame(maxWidth: .infinity)
+                    .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
+                        if width > 0 { containerWidth = width }
                     }
-                    if editState.allowDrag {
-                        Text("キーをドラッグして移動してください。")
-                            .padding(.vertical)
-                    } else {
-                        Text("編集したいキーを選択してください。")
-                            .padding(.vertical)
+            }
+            .background(Color.secondarySystemBackground)
+        } legacy: {
+            VStack(spacing: 0) {
+                Color.secondarySystemBackground
+                    .overlay { keyPreview(adaptive: false) }
+                Form { editorSections(adaptive: false) }
+            }
+            .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
+                if width > 0 { containerWidth = width }
+            }
+        }
+        .navigationTitle("カスタムキーの設定")
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            self.setting.value = SettingKey.value
+        }
+        .onChange(of: selection) { _, _ in
+            editState.state = .none
+        }
+    }
+
+    private func keyPreview(adaptive: Bool) -> some View {
+        VStack {
+            Spacer(minLength: 10)
+                .fixedSize()
+            if editState.allowDrag {
+                Text("キーをドラッグして移動してください。")
+                    .padding(.vertical)
+            } else {
+                Text("編集したいキーを選択してください。")
+                    .padding(.vertical)
+            }
+            if setting.value.keys.isEmpty {
+                Button("デフォルトに戻す") {
+                    setting.value.keys = QwertyCustomKeysValue.defaultValue.keys
+                    selection.longpressSelectIndex = -1
+                }
+            }
+            DraggableView(items: $setting.value.keys, selection: $selection.selectIndex, enabled: selection.enabled && editState.allowDrag, width: width, height: keySize.height, padding: padding, scrollsHorizontally: adaptive) {item, isSelected in
+                let strokeColor: Color = {
+                    if !isSelected {
+                        return .primary
                     }
-                    if setting.value.keys.isEmpty {
-                        Button("デフォルトに戻す") {
-                            setting.value.keys = QwertyCustomKeysValue.defaultValue.keys
-                            selection.longpressSelectIndex = -1
-                        }
+                    if selection.longpressSelectIndex != -1 {
+                        return .systemGray
                     }
-                    DraggableView(
-                        items: $setting.value.keys, selection: $selection.selectIndex, enabled: selection.enabled && editState.allowDrag, width: width, height: keySize.height,
-                        padding: padding
-                    ) { item, isSelected in
-                        let strokeColor: Color = {
-                            if !isSelected {
-                                return .primary
-                            }
-                            if selection.longpressSelectIndex != -1 {
-                                return .systemGray
-                            }
-                            return .accentColor
-                        }()
+                    return .accentColor
+                }()
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(strokeColor)
+                    .background {
+                        RoundedRectangle(cornerRadius: 10).fill(Color.background)
+                    }
+                    .compositingGroup()
+                    .focus(.accentColor, focused: isSelected && selection.longpressSelectIndex == -1)
+                    .focus(.systemGray, focused: isSelected && selection.longpressSelectIndex != -1)
+                    .overlay {
+                        Text(item.name)
+                    }
+            }
+            if setting.value.keys.indices ~= selection.selectIndex {
+                Spacer(minLength: 50)
+                    .fixedSize()
+                Text("長押しした時の候補")
+                    .padding(.vertical)
+                HStack {
+                    DraggableView(items: $setting.value.keys[selection.selectIndex].longpresses, selection: $selection.longpressSelectIndex, enabled: selection.longpressEnabled && editState.allowDrag, width: variationWidth, height: keySize.height, padding: padding, scrollsHorizontally: adaptive) {item, isSelected in
                         RoundedRectangle(cornerRadius: 10)
-                            .stroke(strokeColor)
+                            .stroke(isSelected ? Color.accentColor : .primary)
                             .background {
                                 RoundedRectangle(cornerRadius: 10).fill(Color.background)
                             }
                             .compositingGroup()
-                            .focus(.accentColor, focused: isSelected && selection.longpressSelectIndex == -1)
-                            .focus(.systemGray, focused: isSelected && selection.longpressSelectIndex != -1)
+                            .focus(.accentColor, focused: isSelected)
                             .overlay {
                                 Text(item.name)
                             }
                     }
-                    if setting.value.keys.indices ~= selection.selectIndex {
-                        Spacer(minLength: 50)
-                            .fixedSize()
-                        Text("長押しした時の候補")
-                            .padding(.vertical)
-                        HStack {
-                            DraggableView(
-                                items: $setting.value.keys[selection.selectIndex].longpresses, selection: $selection.longpressSelectIndex,
-                                enabled: selection.longpressEnabled && editState.allowDrag, width: variationWidth, height: keySize.height, padding: padding
-                            ) { item, isSelected in
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(isSelected ? Color.accentColor : .primary)
-                                    .background {
-                                        RoundedRectangle(cornerRadius: 10).fill(Color.background)
-                                    }
-                                    .compositingGroup()
-                                    .focus(.accentColor, focused: isSelected)
-                                    .overlay {
-                                        Text(item.name)
-                                    }
-                            }
-                        }
-                    }
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity)
-                .onGeometryChange(for: CGFloat.self) {
-                    $0.size.width
-                } action: { width in
-                    if width > 0 { containerWidth = width }
                 }
             }
-            .background(Color.secondarySystemBackground)
+            Spacer()
         }
-        .navigationTitle("カスタムキーの設定")
-        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    @ViewBuilder private func editorSections(adaptive: Bool) -> some View {
+        if adaptive {
+            Section("編集するキー") {
+                Picker("キー", selection: $selection.selectIndex) {
+                    Text("選択してください").tag(-1)
+                    ForEach(setting.value.keys.indices, id: \.self) { index in
+                        Text(setting.value.keys[index].name.isEmpty ? "キー \(index + 1)" : setting.value.keys[index].name).tag(index)
+                    }
+                }
+                if setting.value.keys.indices.contains(selection.selectIndex) {
+                    Picker("長押し候補", selection: $selection.longpressSelectIndex) {
+                        Text("通常のキー").tag(-1)
+                        ForEach(setting.value.keys[selection.selectIndex].longpresses.indices, id: \.self) { index in
+                            Text(setting.value.keys[selection.selectIndex].longpresses[index].name).tag(index)
+                        }
+                    }
+                }
+            }
+        }
+        if setting.value.keys.indices ~= selection.selectIndex {
+            let binded = Binding(
+                get: { setting.value },
+                set: { setting.value = $0 }
+            )
+            Section(header: Text("移動・追加")) {
+                if adaptive {
+                    Button("左へ移動", systemImage: "arrow.left") { moveSelectedKey(by: -1) }
+                        .disabled(!canMoveSelection(by: -1))
+                    Button("右へ移動", systemImage: "arrow.right") { moveSelectedKey(by: 1) }
+                        .disabled(!canMoveSelection(by: 1))
+                }
+                Button("このキーを並び替える") {
+                    editState.toggle(.drag)
+                }
+                Button("キーを追加する") {
+                    self.addPressKey()
+                }
+                Button("このキーに長押しキーを追加する") {
+                    self.addLongpressKey(sIndex: selection.selectIndex)
+                }
+            }
+            Section(header: Text("入力")) {
+                if self.isInputTextEditable {
+                    Text("キーを押して入力される文字を設定します。")
+                    TextField("入力", text: binded[.input, selection])
+                        .textFieldStyle(.roundedBorder)
+                        .submitLabel(.done)
+                } else {
+                    Text("このキーには入力以外のアクションが設定されています。現在のアクションを消去して入力する文字を設定するには「入力を設定する」を押してください")
+                    Button("入力を設定する") {
+                        setting.value[.input, selection] = ""
+                    }
+                    .foregroundStyle(.accentColor)
+                }
+            }
+            Section(header: Text("ラベル")) {
+                Text("キーに表示される文字を設定します。")
+                TextField("ラベル", text: binded[selection].name)
+                    .textFieldStyle(.roundedBorder)
+                    .submitLabel(.done)
+            }
+            Section(header: Text("アクション")) {
+                Text("キーを押したときの動作をより詳しく設定します。")
+                NavigationLink("アクションを編集する") {
+                    CodableActionDataEditor(binded[selection].actions, availableCustards: CustardManager.load().availableCustards)
+                }
+                .foregroundStyle(.accentColor)
+            }
+            Button("削除", role: .destructive) {
+                if editState.state == .none {
+                    let sIndex = selection.selectIndex
+                    let lpsIndex = selection.longpressSelectIndex
+                    if lpsIndex == -1 && sIndex != -1 {
+                        selection.selectIndex = -1
+                        // FIXME: 場当たり的な対処。`selection.selectIndex = -1`がViewに反映されてから削除を行う。
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                            setting.value.keys.remove(at: sIndex)
+                        }
+                    } else {
+                        selection.longpressSelectIndex = -1
+                        setting.value.keys[sIndex].longpresses.remove(at: lpsIndex)
+                    }
+                }
+            }
+        } else {
+            Button("キーを追加する") {
+                self.addPressKey()
+            }
+            if adaptive && setting.value.keys.isEmpty {
+                Button("デフォルトに戻す") {
+                    setting.value.keys = QwertyCustomKeysValue.defaultValue.keys
+                    selection.selectIndex = -1
+                }
+            }
+        }
     }
 
     private var isInputTextEditable: Bool {

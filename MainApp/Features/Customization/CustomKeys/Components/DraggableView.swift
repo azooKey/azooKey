@@ -19,8 +19,9 @@ struct DraggableView<Content: View, Collection: BidirectionalCollection & Random
     @Binding private var selectedIndex: Int
     @State private var targetIndex: Int = -1
     private let enabled: Bool
+    private let scrollsHorizontally: Bool
 
-    init(items: Binding<Collection>, selection: Binding<Int>, enabled: Bool = true, width: CGFloat, height: CGFloat, padding: CGFloat = 5, @ViewBuilder content: @escaping (Collection.Element, Bool) -> Content) {
+    init(items: Binding<Collection>, selection: Binding<Int>, enabled: Bool = true, width: CGFloat, height: CGFloat, padding: CGFloat = 5, scrollsHorizontally: Bool = false, @ViewBuilder content: @escaping (Collection.Element, Bool) -> Content) {
         self._items = items
         self._selectedIndex = selection
         self.width = width
@@ -28,6 +29,7 @@ struct DraggableView<Content: View, Collection: BidirectionalCollection & Random
         self.padding = padding
         self.contentConverter = content
         self.enabled = enabled
+        self.scrollsHorizontally = scrollsHorizontally
     }
 
     private var separator: some View {
@@ -37,26 +39,33 @@ struct DraggableView<Content: View, Collection: BidirectionalCollection & Random
     }
 
     var body: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: 0) {
-                ForEach(items.indices, id: \.self) {i in
-                    if targetIndex == i {
-                        separator
-                            .focus(.accentColor, focused: true)
-                    }
-                    DraggableItem(selectedIndex: $selectedIndex, index: i, update: { self.update(index: $0, delta: $1) }, onEnd: onEnd, enabled: enabled) {
-                        contentConverter(items[i], selectedIndex == i)
-                    }
-                    .frame(width: width, height: height)
-                    .padding(padding)
-                    .zIndex(selectedIndex == i ? 1 : 0)
-                }
-                if targetIndex == items.endIndex {
+        if scrollsHorizontally {
+            ScrollView(.horizontal) {
+                itemsRow.padding(.vertical, 4)
+            }
+        } else {
+            VStack { itemsRow.scaledToFit() }
+        }
+    }
+
+    private var itemsRow: some View {
+        HStack(spacing: 0) {
+            ForEach(items.indices, id: \.self) {i in
+                if targetIndex == i {
                     separator
                         .focus(.accentColor, focused: true)
                 }
+                DraggableItem(selectedIndex: $selectedIndex, index: i, update: { self.update(index: $0, delta: $1) }, onEnd: onEnd, enabled: enabled) {
+                    contentConverter(items[i], selectedIndex == i)
+                }
+                .frame(width: width, height: height)
+                .padding(padding)
+                .zIndex(selectedIndex == i ? 1 : 0)
             }
-                .padding(.vertical, 4)
+            if targetIndex == items.endIndex {
+                separator
+                    .focus(.accentColor, focused: true)
+            }
         }
     }
 

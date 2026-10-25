@@ -37,11 +37,13 @@ struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: 
 
     var body: some View {
         GeometryReader { geometry in
+            let bounds = CGRect(origin: .zero, size: geometry.size)
             let frame = AvailableLayoutRegion.largest(
-                in: CGRect(origin: .zero, size: geometry.size),
+                in: bounds,
                 avoiding: AvailableLayoutRegion.obstacles(in: geometry)
             )
-            content(availableWidth: frame.width)
+            let rowWidth = frame == bounds ? variableStates.interfaceSize.width : max(0, frame.width - 30)
+            content(availableWidth: rowWidth)
                 .frame(width: frame.width, height: frame.height)
                 .clipped()
                 .allowsHitTesting(!frame.isEmpty)
@@ -68,16 +70,16 @@ struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: 
                             .frame(height: 18)
                     }
                 }
-                .buttonStyle(ResultButtonStyle<Extension>(height: buttonHeight, hitHeight: 44))
+                .buttonStyle(ResultButtonStyle<Extension>(height: buttonHeight))
                 .accessibilityLabel("変換候補を閉じる")
                 .padding(.trailing, 10)
             }
             .padding(.top, 10)
             ScrollView {
                 LazyVStack(alignment: .leading) {
-                    ForEach(Self.registerResults(results: variableStates.resultModel.results, interfaceWidth: max(0, availableWidth - 30)), id: \.id) {results in
+                    ForEach(Self.registerResults(results: variableStates.resultModel.results, interfaceWidth: availableWidth), id: \.id) {results in
                         Divider()
-                        HStack(spacing: 0) {
+                        HStack {
                             ForEach(results.results, id: \.id) {datum in
                                 Button {
                                     self.pressed(data: datum)
@@ -90,8 +92,7 @@ struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: 
                                             .accessibilityLabel(accessibilityLabel ?? name)
                                     }
                                 }
-                                .buttonStyle(ResultButtonStyle<Extension>(height: 18, hitHeight: 44))
-                                .lineLimit(1)
+                                .buttonStyle(ResultButtonStyle<Extension>(height: 18))
                                 .contextMenu {
                                     ResultContextMenuView(candidate: datum.candidate, displayResetLearningButton: Extension.SettingProvider.canResetLearningForCandidate)
                                 }
@@ -125,7 +126,7 @@ struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: 
             let width: CGFloat
             switch datum.candidate.label {
             case .text(let value):
-                width = max(44, value.size(withAttributes: [.font: font]).width + 20)
+                width = value.size(withAttributes: [.font: font]).width + 20
             case .systemImage:
                 width = 44
             }

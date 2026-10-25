@@ -29,7 +29,7 @@ public struct EditConfirmButton: View {
             }
             .labelStyle(.iconOnly)
         } else {
-            Button(self.confirmationType.label, systemImage: "checkmark") {
+            Button(self.confirmationType.label) {
                 self.action()
             }
         }
@@ -70,11 +70,11 @@ public struct EditCancelButton: View {
                 Button("編集を中止する", role: .destructive, action: self.cancel)
             }
         } else {
-            Button("キャンセル", systemImage: "xmark", role: .cancel) {
+            Button("キャンセル", role: .cancel) {
                 if confirmationRequired {
                     self.showCancellationAlert = true
                 } else {
-                    self.cancel()
+                    self.dismiss()
                 }
             }
             .alert("編集を中止します。変更はすべて失われます。", isPresented: $showCancellationAlert) {
@@ -83,3 +83,34 @@ public struct EditCancelButton: View {
         }
     }
 }
+
+public extension View {
+    @ViewBuilder
+    func verticalBarLabelStyle() -> some View {
+        #if os(iOS) && compiler(>=6.4) && canImport(SwiftUI, _version: 8.0.85.29)
+        if #available(iOS 27.1, *) {
+            modifier(VerticalBarLabelStyle())
+        } else {
+            labelStyle(.titleOnly)
+        }
+        #else
+        labelStyle(.titleOnly)
+        #endif
+    }
+}
+
+#if os(iOS) && compiler(>=6.4) && canImport(SwiftUI, _version: 8.0.85.29)
+@available(iOS 27.1, *)
+private struct VerticalBarLabelStyle: ViewModifier {
+    @Environment(\.toolbarVerticalEdge) private var toolbarVerticalEdge
+
+    func body(content: Content) -> some View {
+        // 通常のバーは文字表示を保ち、縦に並ぶバーだけアイコンを使う。
+        if toolbarVerticalEdge != nil {
+            content.labelStyle(.iconOnly)
+        } else {
+            content.labelStyle(.titleOnly)
+        }
+    }
+}
+#endif
