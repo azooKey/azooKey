@@ -150,8 +150,7 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
                                     context: variableStates.layoutContext
                                 ) + 12
                             )
-                            // Include the former vertical padding in the bar's
-                            // interactive area without changing keyboard height.
+                            // 上下の余白6ptずつも、候補バーのタップ範囲に含める。
                             .contentShape(Rectangle())
                         keyboardView(tab: defaultTab ?? variableStates.tabManager.existentialTab())
                             .zIndex(1)

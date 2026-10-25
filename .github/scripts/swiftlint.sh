@@ -1,6 +1,6 @@
 #!/bin/bash
-# Use the same official portable binary locally and in CI. Do not install it
-# into PATH: local Xcode build phases may auto-format sources.
+# ローカルとCIでSwiftLintのバージョンを揃える。
+# Xcode側の自動整形を避けるため、一時フォルダ内のバイナリを直接使う。
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "$0")/../.." && pwd)"

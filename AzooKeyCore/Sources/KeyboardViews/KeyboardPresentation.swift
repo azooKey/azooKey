@@ -1,7 +1,6 @@
 import UIKit
 
-/// The input window can be only as tall as the keyboard. Its aspect ratio and
-/// local size class therefore cannot identify the host screen's orientation.
+/// キーボードのウィンドウは高さが低くなるため、その縦横比では画面の向きを判定できない。
 public struct KeyboardPresentation: Equatable, Sendable {
     public let orientation: KeyboardOrientation
 

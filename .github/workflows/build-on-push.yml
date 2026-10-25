@@ -42,7 +42,7 @@ jobs:
 
   duo:
     name: Duo Build and Tests (Xcode 27.1)
-    # Official GitHub-hosted public preview image with the iOS 27.1 SDK.
+    # iOS 27.1 SDKを含むGitHub公式のプレビューイメージ。
     runs-on: xcode-27
     timeout-minutes: 90
     defaults:

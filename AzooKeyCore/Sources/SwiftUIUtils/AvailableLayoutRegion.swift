@@ -1,8 +1,8 @@
 import Foundation
 import SwiftUI
 
-/// Finds a rectangular interaction area without crossing an active fold or
-/// occlusion. Reserved-region frames already contain the system's margins.
+/// 折り目やカメラなどの予約領域を避けて配置できる、最大の矩形を返す。
+/// 予約領域のフレームには、システムが確保する余白も含まれる。
 public enum AvailableLayoutRegion {
     public static func largest(in bounds: CGRect, avoiding obstacles: [CGRect]) -> CGRect {
         guard isUsable(bounds) else {
@@ -22,7 +22,7 @@ public enum AvailableLayoutRegion {
                     CGRect(x: rect.minX, y: overlap.maxY, width: rect.width, height: rect.maxY - overlap.maxY),
                 ].filter(isUsable)
             }
-            // Remove duplicates and contained candidates to bound the search.
+            // 重複や他の矩形に含まれる候補を除き、次の探索対象を減らす。
             candidates = candidates.enumerated().filter { index, rect in
                 !candidates.enumerated().contains { otherIndex, other in
                     otherIndex != index && other.contains(rect) && (other != rect || otherIndex < index)
@@ -48,10 +48,10 @@ public enum AvailableLayoutRegion {
 
     @MainActor
     public static func obstacles(in geometry: GeometryProxy) -> [CGRect] {
-        // Xcode 27.1 SDK APIs must also be hidden from older SDK builds.
+        // 旧SDKには予約領域のAPIがないため、コンパイル時にも分岐する。
         #if os(iOS) && compiler(>=6.4) && canImport(SwiftUI, _version: 8.0.85.29)
         if #available(iOS 27.1, *) {
-            // Use physical local coordinates, including for right-to-left UI.
+            // 右から左のUIでも、ローカル座標の左右を反転させない。
             return geometry.reservedRegions(kind: .division, layoutDirectionBehavior: .fixed).map(\.frame)
                 + geometry.reservedRegions(kind: .occlusion, layoutDirectionBehavior: .fixed).map(\.frame)
         }
@@ -60,8 +60,7 @@ public enum AvailableLayoutRegion {
     }
 }
 
-/// For a single row of custom controls. Scrolling inside the content preserves
-/// access to all actions when the usable rectangle becomes narrower.
+/// 予約領域を避けて、操作バーを一つの矩形内に配置する。
 public struct ReservedRegionAvoidingContent<Content: View>: View {
     private let content: Content
 

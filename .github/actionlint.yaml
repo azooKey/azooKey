@@ -1,6 +1,5 @@
-# actionlint's label database does not yet include this official hosted preview
-# image: https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md
-# This is a validation allowlist, not a request to use self-hosted runners.
+# GitHub公式のプレビューイメージがactionlintに未登録のため、ラベルを追加する。
+# https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md
 self-hosted-runner:
   labels:
     - xcode-27

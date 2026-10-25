@@ -52,7 +52,7 @@ private struct FoldAwareEditorLayout<Editor: View, Preview: View, Legacy: View>:
 
     var body: some View {
         // 折り目や縦向きバーがなく、高さも足りる画面では従来の配置を使う。
-        // 開閉中も同じ配置を使うため、完全に開いた状態の折り目も確認する。
+        // 完全に開いて折り目が非アクティブになっても、編集画面の配置を保つ。
         if hasDivision || toolbarVerticalEdge != nil || compactHeight {
             ArrangementView {
                 editor.splitArrangementLayoutRatio(0.6)
