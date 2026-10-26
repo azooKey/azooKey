@@ -57,6 +57,38 @@ struct OneHandedVerticalResizeResult: Equatable {
     }
 }
 
+/// サイズ調整のハンドルのタップ領域。
+///
+/// ハンドルは太さ 3pt の線で描いているので、線そのものを当たり判定にすると指で掴みにくい。
+/// 線を描いている帯に余白を足し、厚みを最低 `minimumThickness` にする。
+enum ResizingHandleHitArea {
+    enum Edge: CaseIterable {
+        case left, right, top, bottom
+    }
+
+    /// タップ領域の最小の厚み（Human Interface Guidelines の最小タップ領域）
+    static let minimumThickness: CGFloat = 44
+    /// 線の帯の外側に足す余白
+    static let padding: CGFloat = 12
+
+    /// `size` はリサイズ枠の大きさ、`edgeRatio` はハンドルの線の長さの比率（`ResizingRect` と同じ値）
+    static func rect(for edge: Edge, in size: CGSize, edgeRatio: CGFloat) -> CGRect {
+        switch edge {
+        case .left, .right:
+            // 線は端から幅の 1/8 までに 4 本、縦方向は中央 ±(高さ × edgeRatio × 0.8)
+            let thickness = max(size.width / 8 + padding, minimumThickness)
+            let halfLength = size.height * edgeRatio * 0.8 + padding
+            let x = edge == .left ? 0 : size.width - thickness
+            return CGRect(x: x, y: size.height / 2 - halfLength, width: thickness, height: halfLength * 2)
+        case .top, .bottom:
+            let thickness = max(size.height / 8 + padding, minimumThickness)
+            let halfLength = size.width * edgeRatio * 0.8 + padding
+            let y = edge == .top ? 0 : size.height - thickness
+            return CGRect(x: size.width / 2 - halfLength, y: y, width: halfLength * 2, height: thickness)
+        }
+    }
+}
+
 @MainActor
 struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
     typealias Position = (current: CGPoint, initial: CGPoint)
@@ -192,6 +224,10 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
             }
     }
 
+    private func handleHitArea(_ edge: ResizingHandleHitArea.Edge) -> Path {
+        Path(ResizingHandleHitArea.rect(for: edge, in: size, edgeRatio: edgeRatio))
+    }
+
     var body: some View {
         ZStack {
             Path {path in
@@ -203,6 +239,7 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                 }
             }
             .stroke(Color.white, lineWidth: 3)
+            .contentShape(handleHitArea(.left))
             .gesture(xGesture(target: \.$top_left_edge))
             Path {path in
                 for i in 0..<4 {
@@ -213,6 +250,7 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                 }
             }
             .stroke(Color.white, lineWidth: 3)
+            .contentShape(handleHitArea(.top))
             .gesture(yGesture(target: \.$top_left_edge, isTopHandle: true))
             Path {path in
                 for i in 0..<4 {
@@ -223,6 +261,7 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                 }
             }
             .stroke(Color.white, lineWidth: 3)
+            .contentShape(handleHitArea(.right))
             .gesture(xGesture(target: \.$bottom_right_edge))
             Path {path in
                 for i in 0..<4 {
@@ -233,6 +272,7 @@ struct ResizingRect<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                 }
             }
             .stroke(Color.white, lineWidth: 3)
+            .contentShape(handleHitArea(.bottom))
             .gesture(yGesture(target: \.$bottom_right_edge, isTopHandle: false))
             HStack {
                 let cur = min(size.width, size.height) * 0.22
