@@ -8,15 +8,13 @@
 
 import Foundation
 import SwiftUI
+import SwiftUIUtils
 
 @MainActor
 struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: View {
     @EnvironmentObject private var variableStates: VariableStates
     @Binding private var isResultViewExpanded: Bool
 
-    private var splitedResults: [SplitedResultData] {
-        Self.registerResults(results: variableStates.resultModel.results, interfaceWidth: variableStates.interfaceSize.width)
-    }
     private var buttonWidth: CGFloat {
         Design.keyboardBarHeight(
             interfaceHeight: variableStates.interfaceSize.height,
@@ -38,6 +36,24 @@ struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: 
     }
 
     var body: some View {
+        GeometryReader { geometry in
+            let bounds = CGRect(origin: .zero, size: geometry.size)
+            let frame = AvailableLayoutRegion.largest(
+                in: bounds,
+                avoiding: AvailableLayoutRegion.obstacles(in: geometry)
+            )
+            let rowWidth = frame == bounds ? variableStates.interfaceSize.width : max(0, frame.width - 30)
+            content(availableWidth: rowWidth)
+                .frame(width: frame.width, height: frame.height)
+                .clipped()
+                .allowsHitTesting(!frame.isEmpty)
+                .accessibilityHidden(frame.isEmpty)
+                .position(x: frame.midX, y: frame.midY)
+        }
+        .frame(height: variableStates.interfaceSize.height)
+    }
+
+    private func content(availableWidth: CGFloat) -> some View {
         VStack {
             HStack(alignment: .center) {
                 Spacer()
@@ -55,12 +71,13 @@ struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: 
                     }
                 }
                 .buttonStyle(ResultButtonStyle<Extension>(height: buttonHeight))
+                .accessibilityLabel("変換候補を閉じる")
                 .padding(.trailing, 10)
             }
             .padding(.top, 10)
             ScrollView {
                 LazyVStack(alignment: .leading) {
-                    ForEach(splitedResults, id: \.id) {results in
+                    ForEach(Self.registerResults(results: variableStates.resultModel.results, interfaceWidth: availableWidth), id: \.id) {results in
                         Divider()
                         HStack {
                             ForEach(results.results, id: \.id) {datum in
@@ -87,7 +104,7 @@ struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: 
                 .padding(.leading, 15)
             }
         }
-        .frame(height: variableStates.interfaceSize.height, alignment: .bottom)
+        .frame(maxHeight: .infinity, alignment: .bottom)
     }
 
     private func pressed(data: ResultData) {
@@ -113,7 +130,7 @@ struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: 
             case .systemImage:
                 width = 44
             }
-            if (curSum + width) < interfaceWidth {
+            if curResult.isEmpty || (curSum + width) <= interfaceWidth {
                 curResult.append(datum)
                 curSum += width
             } else {

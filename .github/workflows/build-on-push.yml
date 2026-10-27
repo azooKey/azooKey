@@ -1,13 +1,17 @@
 name: Build on push
 
-on: 
+on:
   push:
   pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   build:
     name: Xcode Build
     runs-on: macos-15
+    timeout-minutes: 60
 
     steps:
       - name: Checkout
@@ -18,15 +22,15 @@ jobs:
       - name: Set up Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: "latest-stable"
+          xcode-version: "26.3"
 
       - name: Cache DerivedData
         uses: actions/cache@v5
         with:
           path: ~/Library/Developer/Xcode/DerivedData
-          key: ${{ runner.os }}-derived-data-${{ hashFiles('**/project.pbxproj', '**/Package.swift') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-xcode-26.3-derived-data-${{ hashFiles('**/project.pbxproj', '**/Package.swift', '**/Package.resolved') }}
           restore-keys: |
-            ${{ runner.os }}-derived-data-
+            ${{ runner.os }}-${{ runner.arch }}-xcode-26.3-derived-data-
 
       - name: Build Project
         run: |
@@ -35,3 +39,87 @@ jobs:
                      -sdk iphoneos \
                      -configuration Release \
                      CODE_SIGNING_ALLOWED=NO
+
+  duo:
+    name: Duo Build and Tests (Xcode 27.1)
+    # iOS 27.1 SDKが入っているGitHub公式のプレビューイメージを使っています。
+    runs-on: xcode-27
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: true
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "27.1"
+
+      - name: Cache DerivedData
+        uses: actions/cache@v5
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData
+          key: ${{ runner.os }}-${{ runner.arch }}-xcode-27.1-derived-data-${{ hashFiles('**/project.pbxproj', '**/Package.swift', '**/Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-xcode-27.1-derived-data-
+
+      - name: Build with Duo SDK
+        run: |
+          mkdir -p TestResults
+          xcodebuild build -project azooKey.xcodeproj \
+            -scheme MainApp -sdk iphoneos -configuration Release \
+            CODE_SIGNING_ALLOWED=NO | tee TestResults/build.log
+
+      - name: Run keyboard regression tests
+        run: |
+          xcodebuild test -project azooKey.xcodeproj -scheme DuoLayoutTests \
+            -destination 'platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0' \
+            -resultBundlePath TestResults/keyboard.xcresult \
+            -only-testing:KeyboardViewsTests \
+            -only-testing:AzooKeyUtilsTests/KeyboardLayoutInteractionTests \
+            -only-testing:AzooKeyUtilsTests/ResolvedKeyboardSizeTests \
+            -parallel-testing-enabled NO \
+            CODE_SIGNING_ALLOWED=NO | tee TestResults/keyboard.log
+
+      - name: Run compact and wide app UI tests
+        run: |
+          devices=('iPhone 18 Pro' 'iPad mini (A17 Pro)')
+          trap 'xcrun simctl shutdown all || true' EXIT
+          for index in "${!devices[@]}"; do
+            device_id=$(xcrun simctl list devices available --json | python3 -c '
+          import json, sys
+          devices = json.load(sys.stdin)["devices"]["com.apple.CoreSimulator.SimRuntime.iOS-27-0"]
+          print(next(device["udid"] for device in devices if device["name"] == sys.argv[1]))
+          ' "${devices[$index]}")
+            xcrun simctl shutdown all
+            xcrun simctl bootstatus "$device_id" -b
+            xcodebuild test -project azooKey.xcodeproj -scheme DuoAppTests \
+              -destination "platform=iOS Simulator,id=$device_id" \
+              -resultBundlePath "TestResults/app-$index.xcresult" \
+              -only-testing:azooKeyUITests/DuoAdaptationUITests \
+              -parallel-testing-enabled NO \
+              CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= \
+              | tee "TestResults/app-$index.log"
+          done
+
+      - name: Upload build and test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: duo-test-results
+          path: TestResults
+          if-no-files-found: warn
+          retention-days: 14
+
+  lint:
+    name: SwiftLint
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v6
+      - name: Lint without modifying source files
+        run: bash .github/scripts/swiftlint.sh

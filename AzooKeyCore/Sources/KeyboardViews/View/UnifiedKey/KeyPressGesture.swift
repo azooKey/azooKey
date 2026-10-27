@@ -27,6 +27,7 @@ struct KeyPressHandlers {
 @MainActor
 struct KeyPressGestureModifier: ViewModifier {
     var hitSize: CGSize
+    var hitOffset: CGSize = .zero
     var flick: KeyPressHandlers
     var linear: KeyPressHandlers
     var onCancelled: () -> Void
@@ -48,6 +49,7 @@ struct KeyPressGestureModifier: ViewModifier {
                     onCancelled: onCancelled
                 )
                 .frame(width: hitSize.width, height: hitSize.height)
+                .offset(hitOffset)
             }
         } else {
             legacyGesture(content: content)

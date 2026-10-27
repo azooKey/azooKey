@@ -78,13 +78,20 @@ struct EditingScrollCustardView: CancelableEditor {
         }
     }
 
-    private var interfaceSize: CGSize {
-        let context = MainAppDesign.keyboardLayoutContext(
-            containerWidth: UIScreen.main.bounds.width
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+    @State private var containerWidth: CGFloat = 320
+
+    private var layoutContext: KeyboardLayoutContext {
+        MainAppDesign.keyboardLayoutContext(
+            containerWidth: containerWidth,
+            orientation: verticalSizeClass == .compact ? .horizontal : MainAppDesign.keyboardOrientation
         )
-        return .init(
-            width: context.containerWidth,
-            height: Design.keyboardHeight(context: context)
+    }
+
+    private var interfaceSize: CGSize {
+        .init(
+            width: layoutContext.containerWidth,
+            height: Design.keyboardHeight(context: layoutContext)
         )
     }
 
@@ -93,9 +100,7 @@ struct EditingScrollCustardView: CancelableEditor {
             width: Double(editingItem.rowCount) ?? 4,
             height: Double(editingItem.columnCount) ?? 8,
             interfaceSize: interfaceSize,
-            layoutContext: MainAppDesign.keyboardLayoutContext(
-                containerWidth: interfaceSize.width
-            )
+            layoutContext: layoutContext
         )
     }
 
@@ -245,13 +250,22 @@ struct EditingScrollCustardView: CancelableEditor {
         }
         .background(Color.secondarySystemBackground)
         .navigationBarBackButtonHidden(true)
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
+            if width > 0 {
+                containerWidth = width
+                variableStates.setContainerWidth(width, orientation: layoutContext.orientation)
+            }
+        }
+        .onChange(of: layoutContext.orientation) { _, orientation in
+            variableStates.setContainerWidth(containerWidth, orientation: orientation)
+        }
         .navigationTitle(Text("カスタムタブを作る"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
+            ToolbarItem(placement: .cancellationAction) {
                 EditCancelButton()
             }
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .confirmationAction) {
                 EditConfirmButton {
                     if isNewItem && manager.availableCustards.contains(editingItem.tabName) {
                         showDuplicateAlert = true

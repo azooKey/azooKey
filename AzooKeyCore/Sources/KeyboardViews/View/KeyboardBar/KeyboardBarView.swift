@@ -26,6 +26,13 @@ struct KeyboardBarView<Extension: ApplicationSpecificKeyboardViewExtension>: Vie
         Extension.SettingProvider.displayCursorBarAutomatically
     }
 
+    private var barHeight: CGFloat {
+        Design.keyboardBarHeight(
+            interfaceHeight: variableStates.interfaceSize.height,
+            context: variableStates.layoutContext
+        )
+    }
+
     init(isResultViewExpanded: Binding<Bool>) {
         self._isResultViewExpanded = isResultViewExpanded
     }
@@ -51,6 +58,8 @@ struct KeyboardBarView<Extension: ApplicationSpecificKeyboardViewExtension>: Vie
                     SliderStyleCursorBar<Extension>()
                 }
             }
+            // 候補のタップ範囲を広げた分で、カーソルバーまで高くならないようにしています。
+            .frame(height: barHeight)
             .onAppear {
                 // 表示したタイミングでdismissTaskを開始
                 self.restartCursorBarDismissTask()
@@ -71,6 +80,7 @@ struct KeyboardBarView<Extension: ApplicationSpecificKeyboardViewExtension>: Vie
             switch variableStates.tabManager.tab {
             case let .existential(.special(tab)) where tab == .emoji:
                 EmojiTabResultBar<Extension>()
+                    .frame(height: barHeight)
             default:
                 ResultBar<Extension>(isResultViewExpanded: $isResultViewExpanded)
             }

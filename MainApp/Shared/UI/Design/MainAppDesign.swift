@@ -8,7 +8,6 @@
 
 import CoreGraphics
 import struct KeyboardViews.KeyboardLayoutContext
-import enum KeyboardViews.KeyboardLayoutIdiom
 import enum KeyboardViews.KeyboardOrientation
 import class UIKit.UIApplication
 import class UIKit.UIDevice
@@ -44,10 +43,10 @@ enum MainAppDesign {
     }
 
     @MainActor
-    static func keyboardLayoutContext(containerWidth: CGFloat) -> KeyboardLayoutContext {
+    static func keyboardLayoutContext(containerWidth: CGFloat, orientation: KeyboardOrientation? = nil) -> KeyboardLayoutContext {
         KeyboardLayoutContext(
             containerWidth: containerWidth,
-            orientation: keyboardOrientation,
+            orientation: orientation ?? keyboardOrientation,
             idiom: .current
         )
     }

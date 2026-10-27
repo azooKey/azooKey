@@ -154,6 +154,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				MainAppUITests.swift,
+				Info.plist,
 			);
 			target = 1A3DC1E22500D44E002CAA93 /* azooKeyUITests */;
 		};
@@ -381,6 +382,9 @@
 			dependencies = (
 				1A3DC1E52500D44E002CAA93 /* PBXTargetDependency */,
 			);
+			fileSystemSynchronizedGroups = (
+				559E90652CAC29EC00E016FA /* MainAppUITests */,
+			);
 			name = azooKeyUITests;
 			productName = MainAppUITests;
 			productReference = 1A3DC1E32500D44E002CAA93 /* azooKeyUITests.xctest */;
@@ -530,7 +534,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
-			shellScript = "PATH=/opt/homebrew/bin:$PATH\nif which swiftlint >/dev/null; then\n  swiftlint --fix --format\n  swiftlint\nelse\n  echo \"Warning: SwiftLint does not exist, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "PATH=/opt/homebrew/bin:$PATH\nif which swiftlint >/dev/null; then\n  if [ \"${CI:-}\" != \"true\" ]; then\n    swiftlint --fix --format\n  fi\n  swiftlint\nelse\n  echo \"Warning: SwiftLint does not exist, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 		1A4E1F4A261582E8009B6EB7 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -548,7 +552,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
-			shellScript = "PATH=/opt/homebrew/bin:$PATH\nif which swiftlint >/dev/null; then\n  swiftlint --fix --format\n  swiftlint\nelse\n  echo \"Warning: SwiftLint does not exist, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "PATH=/opt/homebrew/bin:$PATH\nif which swiftlint >/dev/null; then\n  if [ \"${CI:-}\" != \"true\" ]; then\n    swiftlint --fix --format\n  fi\n  swiftlint\nelse\n  echo \"Warning: SwiftLint does not exist, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -879,7 +883,7 @@
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = MainApp;
+				TEST_TARGET_NAME = azooKey;
 			};
 			name = Debug;
 		};
@@ -902,7 +906,7 @@
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = MainApp;
+				TEST_TARGET_NAME = azooKey;
 			};
 			name = Release;
 		};

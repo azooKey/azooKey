@@ -57,17 +57,19 @@ enum KeyboardPreviewSizing: Equatable {
 
     @MainActor
     static func resolvedExtensionSize(
-        fallbackWidth: CGFloat
+        fallbackWidth: CGFloat,
+        orientation: KeyboardOrientation? = nil
     ) -> CGSize {
-        let orientation = MainAppDesign.keyboardOrientation
+        let orientation = orientation ?? MainAppDesign.keyboardOrientation
+        let context = MainAppDesign.keyboardLayoutContext(
+            containerWidth: fallbackWidth, orientation: orientation
+        )
+        // 開閉前のサイズが残ることがあるので、今の幅と合うものだけ使っています。
         if let size = SharedStore.resolvedKeyboardSize(
             orientation: orientation
-        ) {
+        ), abs(size.width - fallbackWidth) < 1 {
             return size
         }
-        let context = MainAppDesign.keyboardLayoutContext(
-            containerWidth: fallbackWidth
-        )
         return CGSize(
             width: fallbackWidth,
             height: Design.keyboardHeight(
@@ -80,11 +82,14 @@ enum KeyboardPreviewSizing: Equatable {
 
     @MainActor
     fileprivate func resolvedContainerSize(
-        for measuredWidth: CGFloat
+        for measuredWidth: CGFloat,
+        orientation: KeyboardOrientation
     ) -> CGSize {
         switch self {
         case .fitToExtension:
-            Self.resolvedExtensionSize(fallbackWidth: measuredWidth)
+            Self.resolvedExtensionSize(
+                fallbackWidth: measuredWidth, orientation: orientation
+            )
         case let .render(resolvedSize, _):
             resolvedSize
         }
@@ -95,9 +100,11 @@ enum KeyboardPreviewSizing: Equatable {
 struct KeyboardPreview: View {
     private let theme: AzooKeyTheme
 
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     @Environment(\.scenePhase) private var scenePhase
     private let sizing: KeyboardPreviewSizing
     private let defaultTab: KeyboardTab.ExistentialTab?
+    private let orientationOverride: KeyboardOrientation?
     @State private var availableWidth: CGFloat
     @State private var measuredDisplayWidth: CGFloat = 0
     @StateObject private var variableStates: VariableStates
@@ -105,30 +112,32 @@ struct KeyboardPreview: View {
     init(
         theme: AzooKeyTheme? = nil,
         sizing: KeyboardPreviewSizing = .fitToExtension,
-        defaultTab: KeyboardTab.ExistentialTab? = nil
+        defaultTab: KeyboardTab.ExistentialTab? = nil,
+        orientation: KeyboardOrientation? = nil
     ) {
         self.theme = theme ?? AzooKeySpecificTheme.default
         self.sizing = sizing
         self.defaultTab = defaultTab
+        self.orientationOverride = orientation
         self._availableWidth = State(
             initialValue: sizing.initialResolvedSize?.width ?? 0
         )
 
         let variableStates = VariableStates(
             interfaceWidth: sizing.initialResolvedSize?.width,
-            orientation: MainAppDesign.keyboardOrientation,
+            orientation: orientation ?? MainAppDesign.keyboardOrientation,
             clipboardHistoryManagerConfig: ClipboardHistoryManagerConfig(),
             tabManagerConfig: TabManagerConfig(),
             userDefaults: UserDefaults.standard
         )
+        if let defaultTab {
+            variableStates.setTabForPreview(defaultTab)
+        }
         if let resolvedHeight = sizing.initialResolvedSize?.height {
             variableStates.interfaceSize.height = max(
                 0,
                 resolvedHeight - Design.keyboardScreenBottomPadding
             )
-        }
-        if let defaultTab {
-            variableStates.setTabForPreview(defaultTab)
         }
         variableStates.resultModel.setResults([
             CandidateMock(text: "azooKey"),
@@ -185,11 +194,10 @@ struct KeyboardPreview: View {
                     resolvedKeyboardHeight: resolvedSize.height
                 )
             }
-            .onReceive(
-                NotificationCenter.default.publisher(
-                    for: UIDevice.orientationDidChangeNotification
-                )
-            ) { _ in
+            .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
+                updateCurrentLayout()
+            }
+            .onChange(of: verticalSizeClass) { _, _ in
                 updateCurrentLayout()
             }
             .onChange(of: scenePhase) { _, scenePhase in
@@ -198,6 +206,10 @@ struct KeyboardPreview: View {
                 }
                 updateCurrentLayout()
             }
+    }
+
+    private var previewOrientation: KeyboardOrientation {
+        orientationOverride ?? (verticalSizeClass == .compact ? .horizontal : MainAppDesign.keyboardOrientation)
     }
 
     private var keyboardHeight: CGFloat {
@@ -223,7 +235,7 @@ struct KeyboardPreview: View {
 
     private func updateLayout(for displayWidth: CGFloat) {
         let resolvedSize = sizing.resolvedContainerSize(
-            for: displayWidth
+            for: displayWidth, orientation: previewOrientation
         )
         updateContainerWidth(
             resolvedSize.width,
@@ -256,7 +268,7 @@ struct KeyboardPreview: View {
         }
         variableStates.setContainerWidth(
             width,
-            orientation: MainAppDesign.keyboardOrientation
+            orientation: previewOrientation
         )
         if let resolvedKeyboardHeight {
             variableStates.interfaceSize.height = max(

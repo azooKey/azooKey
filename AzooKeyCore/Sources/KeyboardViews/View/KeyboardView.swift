@@ -9,6 +9,7 @@
 import CustardKit
 import Foundation
 import SwiftUI
+import SwiftUIUtils
 
 @MainActor
 public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>: View {
@@ -140,16 +141,17 @@ public struct KeyboardView<Extension: ApplicationSpecificKeyboardViewExtension>:
                     } else if isResultViewExpanded {
                         ExpandedResultView<Extension>(isResultViewExpanded: $isResultViewExpanded)
                     } else {
-                        KeyboardBarView<Extension>(isResultViewExpanded: $isResultViewExpanded)
+                        ReservedRegionAvoidingContent {
+                            KeyboardBarView<Extension>(isResultViewExpanded: $isResultViewExpanded)
+                        }
                             .frame(
                                 height: Design.keyboardBarHeight(
                                     interfaceHeight: variableStates.interfaceSize.height,
                                     context: variableStates.layoutContext
-                                )
+                                ) + 12
                             )
-                            // バーのタッチ判定領域はpaddingより前まで
+                            // 上下の余白もタップできるよう、6ptずつ候補バーに含めています。
                             .contentShape(Rectangle())
-                            .padding(.vertical, 6)
                         keyboardView(tab: defaultTab ?? variableStates.tabManager.existentialTab())
                             .zIndex(1)
                     }

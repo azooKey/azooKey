@@ -45,6 +45,13 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
         ) * 0.6
     }
 
+    private var hitHeight: CGFloat {
+        Design.keyboardBarHeight(
+            interfaceHeight: variableStates.interfaceSize.height,
+            context: variableStates.layoutContext
+        ) + 12
+    }
+
     init(isResultViewExpanded: Binding<Bool>) {
         self._isResultViewExpanded = isResultViewExpanded
     }
@@ -103,7 +110,7 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                     }
                     ScrollView(.horizontal, showsIndicators: false) {
                         ScrollViewReader {scrollViewProxy in
-                            LazyHStack(spacing: 10) {
+                            LazyHStack(spacing: 0) {
                                 ForEach(variableStates.resultModel.resultData, id: \.id) {(data: ResultData) in
                                     switch data.candidate.label {
                                     case .text(let value):
@@ -120,7 +127,8 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                                                     )
                                                 )
                                             })
-                                            .buttonStyle(ResultButtonStyle<Extension>(height: buttonHeight, selected: .init(selection: variableStates.resultModel.selection, index: data.id)))
+                                            .buttonStyle(ResultButtonStyle<Extension>(height: buttonHeight, hitHeight: hitHeight, selected: .init(selection: variableStates.resultModel.selection, index: data.id)))
+                                            .accessibilityIdentifier("keyboard-candidate-\(data.id)")
                                             .contextMenu {
                                                 ResultContextMenuView(candidate: data.candidate, displayResetLearningButton: Extension.SettingProvider.canResetLearningForCandidate, index: data.id)
                                             }
@@ -138,7 +146,8 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                                                 .accessibilityLabel(accessibilityLabel ?? name)
                                                 .font(Design.fonts.resultViewFont(theme: theme, userSizePrefrerence: Extension.SettingProvider.resultViewFontSize))
                                         }
-                                        .buttonStyle(ResultButtonStyle<Extension>(height: buttonHeight, selected: .init(selection: variableStates.resultModel.selection, index: data.id)))
+                                        .buttonStyle(ResultButtonStyle<Extension>(height: buttonHeight, hitHeight: hitHeight, selected: .init(selection: variableStates.resultModel.selection, index: data.id)))
+                                        .accessibilityIdentifier("keyboard-candidate-\(data.id)")
                                         .id(data.id)
                                     }
                                 }
@@ -154,7 +163,6 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                                 }
                             }
                         }
-                        .padding(.horizontal, 5)
                     }
                     .zIndex(0)
                     if variableStates.resultModel.displayState == .results {
@@ -254,14 +262,16 @@ struct ResultButtonStyle<Extension: ApplicationSpecificKeyboardViewExtension>: B
         }
     }
     private let height: CGFloat
+    private let hitHeight: CGFloat?
     private let userSizePreference: Double
     private let selected: SelectionState
 
     @Environment(Extension.Theme.self) private var theme
 
-    @MainActor init(height: CGFloat, selected: SelectionState = .nothing) {
+    @MainActor init(height: CGFloat, hitHeight: CGFloat? = nil, selected: SelectionState = .nothing) {
         self.userSizePreference = Extension.SettingProvider.resultViewFontSize
         self.height = height
+        self.hitHeight = hitHeight
         self.selected = selected
     }
 
@@ -286,6 +296,9 @@ struct ResultButtonStyle<Extension: ApplicationSpecificKeyboardViewExtension>: B
             .background(AnyShapeStyle(background(configuration: configuration)))
             .cornerRadius(5.0)
             .compositingGroup()
+            // 候補の見た目はそのままで、間の余白もタップできるようにしています。
+            .padding(.horizontal, hitHeight == nil ? 0 : 5)
+            .frame(minHeight: hitHeight)
             .contentShape(Rectangle())
             .animation(nil, value: configuration.isPressed)
     }

@@ -70,32 +70,45 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private var keyboardHeightConstraint: NSLayoutConstraint?
+    private var hostViewLeadingConstraint: NSLayoutConstraint?
     private var hostViewWidthConstraint: NSLayoutConstraint?
     private var hostViewHeightConstraint: NSLayoutConstraint?
     private var hostViewBottomConstraint: NSLayoutConstraint?
     private var cancellables = Set<AnyCancellable>()
     private var lastKnownContainerSize: CGSize = .zero
 
-    // 現在のデバイス向きをWindowSceneから判定（取得不能時はUIDeviceでフォールバック）
+    private var lastKnownSafeAreaInsets: UIEdgeInsets = .zero
+    private var lastKnownOrientation: KeyboardOrientation?
+    private var lastKnownReservedFrames: [CGRect] = []
+
+    private var keyboardPresentation: KeyboardPresentation {
+        guard let scene = view.window?.windowScene else {
+            return KeyboardPresentation(sceneSize: .zero, interfaceOrientation: .unknown,
+                                        fallbackOrientation: Self.variableStates.keyboardOrientation)
+        }
+        let geometry = scene.effectiveGeometry
+        let size: CGSize
+        if #available(iOS 26, *) {
+            size = geometry.coordinateSpace.bounds.size
+        } else {
+            size = scene.coordinateSpace.bounds.size
+        }
+        return KeyboardPresentation(sceneSize: size, interfaceOrientation: geometry.interfaceOrientation,
+                                    fallbackOrientation: Self.variableStates.keyboardOrientation)
+    }
+
     private func currentKeyboardOrientation() -> KeyboardOrientation {
-        if let orientation = self.view.window?.windowScene?.interfaceOrientation {
-            if orientation.isPortrait {
-                return .vertical
-            }
-            if orientation.isLandscape {
-                return .horizontal
-            }
+        keyboardPresentation.orientation
+    }
+
+    private func currentReservedFrames() -> [CGRect] {
+        #if compiler(>=6.4) && canImport(SwiftUI, _version: 8.0.85.29)
+        if #available(iOS 27.1, *) {
+            return view.reservedRegions(kind: .division).map(\.frame)
+                + view.reservedRegions(kind: .occlusion).map(\.frame)
         }
-        // Fallback: UIDeviceの向き
-        switch UIDevice.current.orientation {
-        case .landscapeLeft, .landscapeRight:
-            return .horizontal
-        case .portrait, .portraitUpsideDown:
-            return .vertical
-        default:
-            // 不明時は現在値を維持
-            return KeyboardViewController.variableStates.keyboardOrientation
-        }
+        #endif
+        return []
     }
 
     private func currentKeyboardViewSize() -> CGSize {
@@ -121,7 +134,9 @@ final class KeyboardViewController: UIInputViewController {
             orientation = baseOrientation
         }
         SemiStaticStates.shared.setScreenWidth(size.width)
-        KeyboardViewController.variableStates.setContainerWidth(size.width, orientation: orientation)
+        KeyboardViewController.variableStates.setContainerWidth(
+            size.width, orientation: orientation
+        )
         if shouldUpdateHeight {
             self.updateScreenHeight()
         }
@@ -221,11 +236,12 @@ final class KeyboardViewController: UIInputViewController {
         self.keyboardHeightConstraint = self.keyboardHeightConstraint ?? self.view.heightAnchor.constraint(equalToConstant: 0)
         self.keyboardHeightConstraint?.isActive = false
 
+        self.hostViewLeadingConstraint = self.hostViewLeadingConstraint ?? host.view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor)
         self.hostViewWidthConstraint = self.hostViewWidthConstraint ?? host.view.widthAnchor.constraint(equalTo: self.view.widthAnchor)
         self.hostViewHeightConstraint = self.hostViewHeightConstraint ?? host.view.heightAnchor.constraint(equalTo: self.view.heightAnchor)
         self.hostViewBottomConstraint = self.hostViewBottomConstraint ?? host.view.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
         NSLayoutConstraint.activate([
-            self.hostViewWidthConstraint!, self.hostViewHeightConstraint!, self.hostViewBottomConstraint!
+            self.hostViewLeadingConstraint!, self.hostViewWidthConstraint!, self.hostViewHeightConstraint!, self.hostViewBottomConstraint!
         ])
         KeyboardViewController.keyboardViewHost = host
         KeyboardViewController.action.setDelegateViewController(self)
@@ -258,7 +274,6 @@ final class KeyboardViewController: UIInputViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // サイズに関する情報はこのタイミングで設定する
         if #available(iOS 26, *) {
             let size = self.currentKeyboardViewSize()
             self.applySizeUpdate(size: size)
@@ -278,7 +293,7 @@ final class KeyboardViewController: UIInputViewController {
         super.viewDidAppear(animated)
         self.updateStates()
 
-        // Floating Keyboardなどの一部の処理に限り、このタイミングにならないとウィンドウ幅が不明なケースが存在する
+        // iOS 26より前は、元のFloating Keyboardの処理を使っています。
         if #available(iOS 26, *) {
             let size = self.currentKeyboardViewSize()
             self.applySizeUpdate(size: size, shouldUpdateHeight: true)
@@ -296,7 +311,6 @@ final class KeyboardViewController: UIInputViewController {
             }
         }
 
-        // viewDidAppearで実施する
         let window = self.view.window!
         let gr0 = window.gestureRecognizers![0] as UIGestureRecognizer
         let gr1 = window.gestureRecognizers![1] as UIGestureRecognizer
@@ -306,16 +320,22 @@ final class KeyboardViewController: UIInputViewController {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        // iOS 26以上で、レイアウト確定後に向き・サイズを反映
-        if #available(iOS 26, *) {
-            let size = self.currentKeyboardViewSize()
-            guard size != .zero, size != lastKnownContainerSize else {
-                return
-            }
-            lastKnownContainerSize = size
-            self.applySizeUpdate(size: size, shouldUpdateHeight: true)
-            debug(#function, "size updated:", size, "orientation:", currentKeyboardOrientation())
+        guard #available(iOS 26, *) else {
+            return
         }
+        let size = self.currentKeyboardViewSize()
+        let orientation = currentKeyboardOrientation()
+        let reservedFrames = currentReservedFrames()
+        guard size != .zero,
+              size != lastKnownContainerSize || orientation != lastKnownOrientation
+                || view.safeAreaInsets != lastKnownSafeAreaInsets || reservedFrames != lastKnownReservedFrames else {
+            return
+        }
+        lastKnownContainerSize = size
+        lastKnownOrientation = orientation
+        lastKnownSafeAreaInsets = view.safeAreaInsets
+        lastKnownReservedFrames = reservedFrames
+        self.applySizeUpdate(size: size, orientation: orientation, shouldUpdateHeight: true)
     }
 
     func updateStates() {
@@ -422,17 +442,15 @@ final class KeyboardViewController: UIInputViewController {
     override func viewWillTransition(to size: CGSize, with coordinator: any UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         if #available(iOS 26, *) {
-            // 幅は即時反映しておき、向きは完了時のWindowSceneから決定する
             coordinator.animate(alongsideTransition: nil) { [weak self] _ in
-                guard let self else { return }
+                guard let self else {
+                    return
+                }
                 let updatedSize = self.currentKeyboardViewSize()
-                let orientation = self.currentKeyboardOrientation()
-                self.applySizeUpdate(size: updatedSize, orientation: orientation, shouldUpdateHeight: true)
-                debug(#function, "completed with size:", updatedSize, "orientation:", orientation)
+                self.applySizeUpdate(size: updatedSize, shouldUpdateHeight: true)
             }
             return
         }
-        // 旧OS向けの従来の判定・更新ロジック
         SemiStaticStates.shared.setScreenWidth(size.width)
         if #available(iOS 18, *), UIDevice.current.userInterfaceIdiom == .phone {
             KeyboardViewController.variableStates.setContainerWidth(
