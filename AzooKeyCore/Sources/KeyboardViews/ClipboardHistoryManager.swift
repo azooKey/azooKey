@@ -118,7 +118,7 @@ public struct ClipboardHistoryManager {
                 self.items.insert(item, at: index)
             } else {
                 self.items.append(item)
-            }
+        
         }
         // 増えすぎないように削除する
         while self.items.count > config.maxCount {
