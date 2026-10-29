@@ -101,8 +101,11 @@ public struct ClipboardHistoryManager {
         }
         self.previousChangedCount = UIPasteboard.general.changeCount
 
-        if let string = UIPasteboard.general.string {
-            var item = ClipboardHistoryItem(content: .text(string), createdData: Date())
+        let text = (UIPasteboard.general.strings ?? []).joined(separator: "")
+        guard !text.isEmpty else {
+            return
+        }
+        var item = ClipboardHistoryItem(content: .text(text), createdData: Date())
             if let index = self.items.firstIndex(where: {item.content == $0.content}) {
                 let oldItem = self.items.remove(at: index)
                 if oldItem.pinnedDate != nil {
