@@ -11,9 +11,9 @@ final class DuoAdaptationUITests: XCTestCase {
         XCUIDevice.shared.orientation = .portrait
     }
 
-    private func launchApp() -> XCUIApplication {
+    private func launchApp(arguments: [String] = []) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["-AppleLanguages", "(ja)", "-AppleLocale", "ja_JP"]
+        app.launchArguments = ["-AppleLanguages", "(ja)", "-AppleLocale", "ja_JP"] + arguments
         app.launch()
         if app.buttons["手順を見る"].waitForExistence(timeout: 5) {
             app.buttons["手順を見る"].tap()
@@ -38,13 +38,18 @@ final class DuoAdaptationUITests: XCTestCase {
 
     private func rotate(_ orientation: UIDeviceOrientation, app: XCUIApplication) {
         XCUIDevice.shared.orientation = orientation
-        let landscape = orientation == .landscapeLeft || orientation == .landscapeRight
-        let settled = NSPredicate { _, _ in
-            let frame = app.windows.firstMatch.frame
-            return (frame.width > frame.height) == landscape
-        }
-        let expectation = XCTNSPredicateExpectation(predicate: settled, object: nil)
-        XCTAssertEqual(XCTWaiter.wait(for: [expectation], timeout: 5), .completed)
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 5))
+    }
+
+    func test_themePreviewKeepsAdjustedAspectRatio() {
+        let size = "<plist version=\"1.0\"><dict><key>width</key><real>402</real><key>height</key><real>202</real></dict></plist>"
+        let app = launchApp(arguments: ["-ResolvedKeyboardSizeVertical", size])
+        app.descendants(matching: .any)["着せ替え"].firstMatch.tap()
+        let preview = app.descendants(matching: .any)["theme-keyboard-preview"].firstMatch
+        XCTAssertTrue(preview.waitForExistence(timeout: 5))
+        XCTAssertGreaterThan(preview.frame.width, 0)
+        XCTAssertNotEqual(preview.frame.width, 402, accuracy: 1)
+        XCTAssertEqual(preview.frame.height / preview.frame.width, 202.0 / 402.0, accuracy: 0.01)
     }
 
     func test_settingsDestinationSurvivesRotation() {

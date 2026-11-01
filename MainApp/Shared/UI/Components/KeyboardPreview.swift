@@ -61,15 +61,15 @@ enum KeyboardPreviewSizing: Equatable {
         orientation: KeyboardOrientation? = nil
     ) -> CGSize {
         let orientation = orientation ?? MainAppDesign.keyboardOrientation
+        // プレビューは小さく表示することもあるので、表示幅が違っても保存したサイズを使っています。
+        if let size = SharedStore.resolvedKeyboardSize(
+            orientation: orientation
+        ) {
+            return size
+        }
         let context = MainAppDesign.keyboardLayoutContext(
             containerWidth: fallbackWidth, orientation: orientation
         )
-        // 開閉前のサイズが残ることがあるので、今の幅と合うものだけ使っています。
-        if let size = SharedStore.resolvedKeyboardSize(
-            orientation: orientation
-        ), abs(size.width - fallbackWidth) < 1 {
-            return size
-        }
         return CGSize(
             width: fallbackWidth,
             height: Design.keyboardHeight(
