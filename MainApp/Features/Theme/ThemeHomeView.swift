@@ -157,6 +157,7 @@ struct ThemeHomeView: View {
                             sizing: .fitToExtension,
                             defaultTab: tab
                         )
+                        .accessibilityElement(children: .contain)
                         .accessibilityIdentifier("theme-keyboard-preview")
                         .disabled(true)
                         .overlay {

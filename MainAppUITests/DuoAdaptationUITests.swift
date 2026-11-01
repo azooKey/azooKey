@@ -45,7 +45,7 @@ final class DuoAdaptationUITests: XCTestCase {
         let size = "<plist version=\"1.0\"><dict><key>width</key><real>402</real><key>height</key><real>202</real></dict></plist>"
         let app = launchApp(arguments: ["-ResolvedKeyboardSizeVertical", size])
         app.descendants(matching: .any)["着せ替え"].firstMatch.tap()
-        let preview = app.descendants(matching: .any)["theme-keyboard-preview"].firstMatch
+        let preview = app.otherElements["theme-keyboard-preview"].firstMatch
         XCTAssertTrue(preview.waitForExistence(timeout: 5))
         XCTAssertGreaterThan(preview.frame.width, 0)
         XCTAssertNotEqual(preview.frame.width, 402, accuracy: 1)
