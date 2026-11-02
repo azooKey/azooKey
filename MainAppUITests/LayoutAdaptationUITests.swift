@@ -1,7 +1,7 @@
 import XCTest
 
 @MainActor
-final class DuoAdaptationUITests: XCTestCase {
+final class LayoutAdaptationUITests: XCTestCase {
     override func setUp() async throws {
         continueAfterFailure = false
         XCUIDevice.shared.orientation = .portrait
@@ -62,7 +62,7 @@ final class DuoAdaptationUITests: XCTestCase {
             XCTAssertGreaterThan(label.frame.width, 0)
             XCTAssertTrue(app.frame.contains(label.frame))
             let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
-            screenshot.name = "Duo-editor-\(orientation.rawValue)"
+            screenshot.name = "layout-editor-\(orientation.rawValue)"
             screenshot.lifetime = .keepAlways
             add(screenshot)
         }
@@ -74,7 +74,7 @@ final class DuoAdaptationUITests: XCTestCase {
         let label = app.textFields["flick-editor-label"]
         scrollToLabel(label, app: app)
         let initialValue = fieldText(label)
-        let editedValue = initialValue == "duo-layout-check" ? "duo-layout-check-2" : "duo-layout-check"
+        let editedValue = initialValue == "layout-check" ? "layout-check-2" : "layout-check"
         replaceText(label, with: editedValue)
         XCTAssertEqual(fieldText(label), editedValue)
         label.typeText("\n")

@@ -40,8 +40,8 @@ jobs:
                      -configuration Release \
                      CODE_SIGNING_ALLOWED=NO
 
-  duo:
-    name: Duo Build and Tests (Xcode 27.1)
+  layout_tests:
+    name: Build and Layout Tests (Xcode 27.1)
     # iOS 27.1 SDKが入っているGitHub公式のプレビューイメージを使っています。
     runs-on: xcode-27
     timeout-minutes: 90
@@ -68,7 +68,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-xcode-27.1-derived-data-
 
-      - name: Build with Duo SDK
+      - name: Build with Xcode 27.1
         run: |
           mkdir -p TestResults
           xcodebuild build -project azooKey.xcodeproj \
@@ -77,7 +77,7 @@ jobs:
 
       - name: Run keyboard regression tests
         run: |
-          xcodebuild test -project azooKey.xcodeproj -scheme DuoLayoutTests \
+          xcodebuild test -project azooKey.xcodeproj -scheme KeyboardLayoutTests \
             -destination 'platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0' \
             -resultBundlePath TestResults/keyboard.xcresult \
             -only-testing:KeyboardViewsTests \
@@ -98,10 +98,10 @@ jobs:
           ' "${devices[$index]}")
             xcrun simctl shutdown all
             xcrun simctl bootstatus "$device_id" -b
-            xcodebuild test -project azooKey.xcodeproj -scheme DuoAppTests \
+            xcodebuild test -project azooKey.xcodeproj -scheme AppUITests \
               -destination "platform=iOS Simulator,id=$device_id" \
               -resultBundlePath "TestResults/app-$index.xcresult" \
-              -only-testing:azooKeyUITests/DuoAdaptationUITests \
+              -only-testing:azooKeyUITests/LayoutAdaptationUITests \
               -parallel-testing-enabled NO \
               CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= \
               | tee "TestResults/app-$index.log"
@@ -111,7 +111,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: duo-test-results
+          name: layout-test-results
           path: TestResults
           if-no-files-found: warn
           retention-days: 14
@@ -122,4 +122,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Lint without modifying source files
-        run: bash .github/scripts/swiftlint.sh
+        run: |
+          swiftlint version
+          swiftlint lint --config .swiftlint.yml --no-cache
