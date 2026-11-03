@@ -42,6 +42,8 @@ jobs:
 
   layout_tests:
     name: Build and Layout Tests (Xcode 27.1)
+    # 時間のかかるビルド・回帰・UIテストはmainへのマージ後に実行します。
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     # iOS 27.1 SDKが入っているGitHub公式のプレビューイメージを使っています。
     runs-on: xcode-27
     timeout-minutes: 90
