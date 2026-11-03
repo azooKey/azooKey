@@ -18,7 +18,7 @@ jobs:
     - name: Set up Xcode
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: "latest-stable"
+        xcode-version: "26.3"
 
     - uses: actions/checkout@v6
       with:
@@ -29,9 +29,9 @@ jobs:
         path: |
           AzooKeyCore/.build
           ~/Library/Caches/org.swift.swiftpm
-        key: ${{ runner.os }}-swift-${{ hashFiles('**/Package.swift') }}
+        key: ${{ runner.os }}-${{ runner.arch }}-xcode-26.3-swift-${{ hashFiles('**/Package.swift', '**/Package.resolved') }}
         restore-keys: |
-          ${{ runner.os }}-swift-
+          ${{ runner.os }}-${{ runner.arch }}-xcode-26.3-swift-
 
     - name: Build
       # TODO: add KeyboardViews

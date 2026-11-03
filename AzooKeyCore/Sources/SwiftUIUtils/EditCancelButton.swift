@@ -83,3 +83,34 @@ public struct EditCancelButton: View {
         }
     }
 }
+
+public extension View {
+    @ViewBuilder
+    func verticalBarLabelStyle() -> some View {
+        #if os(iOS) && compiler(>=6.4) && canImport(SwiftUI, _version: 8.0.85.29)
+        if #available(iOS 27.1, *) {
+            modifier(VerticalBarLabelStyle())
+        } else {
+            labelStyle(.titleOnly)
+        }
+        #else
+        labelStyle(.titleOnly)
+        #endif
+    }
+}
+
+#if os(iOS) && compiler(>=6.4) && canImport(SwiftUI, _version: 8.0.85.29)
+@available(iOS 27.1, *)
+private struct VerticalBarLabelStyle: ViewModifier {
+    @Environment(\.toolbarVerticalEdge) private var toolbarVerticalEdge
+
+    func body(content: Content) -> some View {
+        // バーが縦に並ぶと文字だけの項目は表示されなくなるので、その場合だけアイコンを使っています。
+        if toolbarVerticalEdge != nil {
+            content.labelStyle(.iconOnly)
+        } else {
+            content.labelStyle(.titleOnly)
+        }
+    }
+}
+#endif

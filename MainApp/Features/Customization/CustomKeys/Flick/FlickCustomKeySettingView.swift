@@ -74,17 +74,27 @@ private extension KeyFlickSetting {
 
 struct FlickCustomKeysSettingSelectView: View {
     @State private var selection: CustomizableFlickKey = .kogana
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+
+    private var keyPicker: some View {
+        Picker(selection: $selection) {
+            Text(verbatim: "小ﾞﾟ").tag(CustomizableFlickKey.kogana)
+            Text(verbatim: "､｡?!").tag(CustomizableFlickKey.kanaSymbols)
+            Text(verbatim: "あいう").tag(CustomizableFlickKey.hiraTab)
+            Text(verbatim: "ABC").tag(CustomizableFlickKey.abcTab)
+            Text(verbatim: "☆123").tag(CustomizableFlickKey.symbolsTab)
+        } label: {
+            Label("カスタムするキー", systemImage: "keyboard")
+        }
+    }
+
     var body: some View {
         VStack {
-            Picker(selection: $selection, label: Text("カスタムするキー")) {
-                Text(verbatim: "小ﾞﾟ").tag(CustomizableFlickKey.kogana)
-                Text(verbatim: "､｡?!").tag(CustomizableFlickKey.kanaSymbols)
-                Text(verbatim: "あいう").tag(CustomizableFlickKey.hiraTab)
-                Text(verbatim: "ABC").tag(CustomizableFlickKey.abcTab)
-                Text(verbatim: "☆123").tag(CustomizableFlickKey.symbolsTab)
+            if verticalSizeClass != .compact {
+                keyPicker
+                    .pickerStyle(.segmented)
+                    .padding()
             }
-            .pickerStyle(.segmented)
-            .padding()
 
             switch selection {
             case .kogana:
@@ -100,6 +110,11 @@ struct FlickCustomKeysSettingSelectView: View {
             }
         }
         .background(Color.secondarySystemBackground)
+        .toolbar {
+            if verticalSizeClass == .compact {
+                ToolbarItem(placement: .primaryAction) { keyPicker.pickerStyle(.menu) }
+            }
+        }
     }
 }
 
@@ -112,7 +127,9 @@ struct FlickCustomKeySettingView<SettingKey: FlickCustomKeyKeyboardSetting>: Vie
         self._setting = .init(initialValue: .init())
     }
 
-    @MainActor private var screenWidth: CGFloat { UIScreen.main.bounds.width }
+    @State private var containerWidth: CGFloat = UIScreen.main.bounds.width
+
+    private var screenWidth: CGFloat { containerWidth }
 
     @MainActor private var keySize: CGSize {
         CGSize(width: screenWidth / 5.6, height: screenWidth / 8)
@@ -178,121 +195,170 @@ struct FlickCustomKeySettingView<SettingKey: FlickCustomKeyKeyboardSetting>: Vie
     }
 
     var body: some View {
-        GeometryReader { geometry in
-            VStack {
-                Text("編集したい方向を選択してください。")
-                    .padding(.vertical)
-
+        AdaptiveEditorView {
+            Form {
+                Section("編集する方向") {
+                    Picker("方向", selection: $selectedPosition) {
+                        Text("中央").tag(FlickKeyPosition.center)
+                        Text("左").tag(FlickKeyPosition.left)
+                        Text("上").tag(FlickKeyPosition.top)
+                        Text("右").tag(FlickKeyPosition.right)
+                        Text("下").tag(FlickKeyPosition.bottom)
+                    }
+                    .accessibilityIdentifier("flick-editor-direction")
+                    presetPicker
+                }
+                editorSections
+            }
+            .accessibilityIdentifier("flick-editor-form")
+        } preview: {
+            ScrollView {
+                VStack { previewKeys }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
+                        if width > 0 { containerWidth = width }
+                    }
+            }
+            .background(Color.secondarySystemBackground)
+        } legacy: {
+            GeometryReader { geometry in
                 VStack {
-                    CustomKeySettingFlickKeyView(.top, label: setting.value[.label, .top], selectedPosition: $selectedPosition)
-                        .frame(width: keySize.width, height: keySize.height)
-                    HStack {
-                        CustomKeySettingFlickKeyView(.left, label: setting.value[.label, .left], selectedPosition: $selectedPosition)
-                            .frame(width: keySize.width, height: keySize.height)
-                        CustomKeySettingFlickKeyView(.center, label: setting.value[.label, .center], selectedPosition: $selectedPosition)
-                            .frame(width: keySize.width, height: keySize.height)
-                        CustomKeySettingFlickKeyView(.right, label: setting.value[.label, .right], selectedPosition: $selectedPosition)
-                            .frame(width: keySize.width, height: keySize.height)
-                    }
-                    CustomKeySettingFlickKeyView(.bottom, label: setting.value[.label, .bottom], selectedPosition: $selectedPosition)
-                        .frame(width: keySize.width, height: keySize.height)
+                    previewKeys
+                    presetPicker
+                    Spacer()
                 }
-                if !preset.isEmpty {
-                    Picker("プリセットから選ぶ", selection: $setting.value) {
-                        ForEach(preset, id: \.item) { (label, item) in
-                            Text(label).tag(item)
-                        }
-                        if !preset.map(\.item).contains(self.setting.value) {
-                            Text("カスタム")
-                                .tag(self.setting.value)
-                        }
-                    }
-                    .pickerStyle(.menu)
+                .onChange(of: selectedPosition) { _, _ in
+                    bottomSheetShown = true
                 }
-                Spacer()
+                .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+                BottomSheetView(isOpen: $bottomSheetShown, maxHeight: geometry.size.height * 0.7) {
+                    Form { editorSections }
+                        .foregroundStyle(.primary)
+                        .accessibilityIdentifier("flick-editor-form")
+                }
             }
-            .navigationBarTitle("カスタムキーの設定", displayMode: .inline)
-            .onChange(of: selectedPosition) { (_, _) in
-                bottomSheetShown = true
+            .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
+                if width > 0 { containerWidth = width }
             }
-            .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
-            BottomSheetView(
-                isOpen: self.$bottomSheetShown,
-                maxHeight: geometry.size.height * 0.7
-            ) {
-                Form {
-                    if isPossiblePosition(selectedPosition) {
-                        switch mainEditor {
-                        case .input:
-                            Section(header: Text("入力")) {
-                                if self.isInputActionEditable(actions: setting.value[keyPath: selectedPosition.keyPath].actions) {
-                                    Text("キーを押して入力される文字を設定します。")
-                                    TextField("入力", text: Binding(
-                                                get: {
-                                                    setting.value[.input, selectedPosition]
-                                                },
-                                                set: {
-                                                    setting.value[.input, selectedPosition] = $0
-                                                }))
-                                        .textFieldStyle(.roundedBorder)
-                                        .submitLabel(.done)
-                                } else {
-                                    Text("このキーには入力以外のアクションが設定されています。現在のアクションを消去して入力する文字を設定するには「入力を設定する」を押してください")
-                                    Button("入力を設定する") {
-                                        setting.value[.input, selectedPosition] = ""
-                                    }
-                                    .foregroundStyle(.accentColor)
-                                }
-                            }
-                        case .tab:
-                            Section(header: Text("タブ")) {
-                                let tab = self.getTab(actions: setting.value[keyPath: selectedPosition.keyPath].actions)
-                                if tab != nil || setting.value[keyPath: selectedPosition.keyPath].actions.isEmpty {
-                                    Text("キーを押して移動するタブを設定します。")
-                                    AvailableTabPicker(tab ?? .system(.user_japanese)) { (_, tabData) in
-                                        setting.value[keyPath: selectedPosition.keyPath].actions = [.moveTab(tabData)]
-                                    }
-                                } else {
-                                    tabSetter(keyPath: selectedPosition.keyPath)
-                                }
-                            }
-                        }
-                        Section(header: Text("ラベル")) {
-                            Text("キーに表示される文字を設定します。")
-                            TextField("ラベル", text: Binding(
-                                        get: {
-                                            setting.value[.label, selectedPosition]
-                                        },
-                                        set: {
-                                            setting.value[.label, selectedPosition] = $0
-                                        }))
-                                .textFieldStyle(.roundedBorder)
-                                .submitLabel(.done)
-                        }
-                        Section(header: Text("アクション")) {
-                            Text("キーを押したときの動作をより詳しく設定します。")
-                            NavigationLink("アクションを編集する") {
-                                CodableActionDataEditor($setting.value[keyPath: selectedPosition.bindedKeyPath].actions, availableCustards: CustardManager.load().availableCustards)
-                            }
-                            .foregroundStyle(.accentColor)
-                        }
-                        Section(header: Text("長押しアクション")) {
-                            Text("キーを長押ししたときの動作をより詳しく設定します。")
-                            NavigationLink("長押しアクションを編集する") {
-                                CodableLongpressActionDataEditor($setting.value[keyPath: selectedPosition.bindedKeyPath].longpressActions, availableCustards: CustardManager.load().availableCustards)
-                            }
-                            .foregroundStyle(.accentColor)
-                        }
-                        Button("リセット") {
-                            self.reload()
-                        }
-                        .foregroundStyle(.red)
+        }
+        .navigationTitle("カスタムキーの設定")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    @ViewBuilder private var previewKeys: some View {
+        Text("編集したい方向を選択してください。")
+            .padding(.vertical)
+
+        VStack {
+            CustomKeySettingFlickKeyView(.top, label: setting.value[.label, .top], selectedPosition: $selectedPosition)
+                .frame(width: keySize.width, height: keySize.height)
+            HStack {
+                CustomKeySettingFlickKeyView(.left, label: setting.value[.label, .left], selectedPosition: $selectedPosition)
+                    .frame(width: keySize.width, height: keySize.height)
+                    .accessibilityIdentifier("flick-key-left")
+                CustomKeySettingFlickKeyView(.center, label: setting.value[.label, .center], selectedPosition: $selectedPosition)
+                    .frame(width: keySize.width, height: keySize.height)
+                CustomKeySettingFlickKeyView(.right, label: setting.value[.label, .right], selectedPosition: $selectedPosition)
+                    .frame(width: keySize.width, height: keySize.height)
+            }
+            CustomKeySettingFlickKeyView(.bottom, label: setting.value[.label, .bottom], selectedPosition: $selectedPosition)
+                .frame(width: keySize.width, height: keySize.height)
+        }
+    }
+
+    @ViewBuilder private var presetPicker: some View {
+        if !preset.isEmpty {
+            Picker("プリセットから選ぶ", selection: $setting.value) {
+                ForEach(preset, id: \.item) { (label, item) in
+                    Text(label).tag(item)
+                }
+                if !preset.map(\.item).contains(self.setting.value) {
+                    Text("カスタム")
+                        .tag(self.setting.value)
+                }
+            }
+            .pickerStyle(.menu)
+        }
+    }
+
+    @ViewBuilder private var editorSections: some View {
+        if isPossiblePosition(selectedPosition) {
+            switch mainEditor {
+            case .input:
+                Section(header: Text("入力")) {
+                    if self.isInputActionEditable(actions: setting.value[keyPath: selectedPosition.keyPath].actions) {
+                        Text("キーを押して入力される文字を設定します。")
+                        TextField(
+                            "入力",
+                            text: Binding(
+                                get: {
+                                    setting.value[.input, selectedPosition]
+                                },
+                                set: {
+                                    setting.value[.input, selectedPosition] = $0
+                                })
+                        )
+                        .textFieldStyle(.roundedBorder)
+                        .submitLabel(.done)
                     } else {
-                        Text("このキーは編集できません")
+                        Text("このキーには入力以外のアクションが設定されています。現在のアクションを消去して入力する文字を設定するには「入力を設定する」を押してください")
+                        Button("入力を設定する") {
+                            setting.value[.input, selectedPosition] = ""
+                        }
+                        .foregroundStyle(.accentColor)
                     }
                 }
-                .foregroundStyle(.primary)
+            case .tab:
+                Section(header: Text("タブ")) {
+                    let tab = self.getTab(actions: setting.value[keyPath: selectedPosition.keyPath].actions)
+                    if tab != nil || setting.value[keyPath: selectedPosition.keyPath].actions.isEmpty {
+                        Text("キーを押して移動するタブを設定します。")
+                        AvailableTabPicker(tab ?? .system(.user_japanese)) { (_, tabData) in
+                            setting.value[keyPath: selectedPosition.keyPath].actions = [.moveTab(tabData)]
+                        }
+                    } else {
+                        tabSetter(keyPath: selectedPosition.keyPath)
+                    }
+                }
             }
+            Section(header: Text("ラベル")) {
+                Text("キーに表示される文字を設定します。")
+                TextField(
+                    "ラベル",
+                    text: Binding(
+                        get: {
+                            setting.value[.label, selectedPosition]
+                        },
+                        set: {
+                            setting.value[.label, selectedPosition] = $0
+                        })
+                )
+                .accessibilityIdentifier("flick-editor-label")
+                .textFieldStyle(.roundedBorder)
+                .submitLabel(.done)
+            }
+            Section(header: Text("アクション")) {
+                Text("キーを押したときの動作をより詳しく設定します。")
+                NavigationLink("アクションを編集する") {
+                    CodableActionDataEditor($setting.value[keyPath: selectedPosition.bindedKeyPath].actions, availableCustards: CustardManager.load().availableCustards)
+                }
+                .foregroundStyle(.accentColor)
+            }
+            Section(header: Text("長押しアクション")) {
+                Text("キーを長押ししたときの動作をより詳しく設定します。")
+                NavigationLink("長押しアクションを編集する") {
+                    CodableLongpressActionDataEditor(
+                        $setting.value[keyPath: selectedPosition.bindedKeyPath].longpressActions, availableCustards: CustardManager.load().availableCustards)
+                }
+                .foregroundStyle(.accentColor)
+            }
+            Button("リセット") {
+                self.reload()
+            }
+            .foregroundStyle(.red)
+        } else {
+            Text("このキーは編集できません")
         }
     }
 

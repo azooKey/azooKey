@@ -53,6 +53,7 @@ struct CustomKeysSettingView: View {
             NavigationLink("設定する") {
                 FlickCustomKeysSettingSelectView()
             }
+            .accessibilityIdentifier("flick-custom-key-settings")
             .foregroundStyle(.accentColor)
             .listRowSeparator(.visible, edges: .all)
         }

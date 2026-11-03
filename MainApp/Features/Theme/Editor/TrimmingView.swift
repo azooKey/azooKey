@@ -196,10 +196,14 @@ struct TrimmingView: View {
         }
         .navigationBarTitle(Text("画像をトリミング"), displayMode: .inline)
         .navigationBarBackButtonHidden(true)
-        .navigationBarItems(trailing: EditConfirmButton(.done) {
-            updateResult()
-            self.dismiss()
-        })
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                EditConfirmButton(.done) {
+                    updateResult()
+                    self.dismiss()
+                }
+            }
+        }
 
     }
 

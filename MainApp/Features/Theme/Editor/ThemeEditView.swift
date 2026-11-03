@@ -93,6 +93,8 @@ struct ThemeEditView: CancelableEditor {
     @State private var isTrimmingViewPresented = false
     @State private var pickedImage: UIImage?
     @State private var viewType = ViewType.editor
+    @State private var containerWidth: CGFloat = 320
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
 
     private let colorConverter = ThemeColorTranslator()
     private let normalColorConverter = ThemeNormalKeyColorTranslator()
@@ -235,22 +237,30 @@ struct ThemeEditView: CancelableEditor {
                     }
                 }
             }
+            .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
+                if width > 0 { containerWidth = width }
+            }
             .navigationBarTitle(Text(self.title), displayMode: .inline)
             .navigationBarBackButtonHidden(true)
-            .navigationBarItems(
-                leading: EditCancelButton(confirmationRequired: true),
-                trailing: EditConfirmButton {
-                    do {
-                        try self.save()
-                    } catch {
-                        debug(error)
-                    }
-                    self.viewType = .themeShareView
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    EditCancelButton(confirmationRequired: true)
                 }
-            )
+                ToolbarItem(placement: .confirmationAction) {
+                    EditConfirmButton {
+                        do {
+                            try self.save()
+                        } catch {
+                            debug(error)
+                        }
+                        self.viewType = .themeShareView
+                    }
+                }
+            }
             .navigationDestination(isPresented: $isTrimmingViewPresented) {
                 let context = MainAppDesign.keyboardLayoutContext(
-                    containerWidth: SemiStaticStates.shared.screenWidth
+                    containerWidth: containerWidth,
+                    orientation: verticalSizeClass == .compact ? .horizontal : MainAppDesign.keyboardOrientation
                 )
                 Group {
                     TrimmingView(
@@ -273,7 +283,7 @@ struct ThemeEditView: CancelableEditor {
                 reviewPrompt.shouldTryRequestReview = true
             }
             .navigationBarTitle(Text("完了"), displayMode: .inline)
-            .navigationBarItems(leading: EmptyView(), trailing: EmptyView())
+
         }
     }
 

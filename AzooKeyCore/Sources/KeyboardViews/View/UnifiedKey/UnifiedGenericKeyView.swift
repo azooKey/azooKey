@@ -131,6 +131,7 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
     private let model: any UnifiedKeyModelProtocol<Extension>
     private let tabDesign: TabDependentDesign
     private let size: CGSize
+    private let hitRect: CGRect?
     @Binding private var isSuggesting: Bool
     // サジェストの種類（View側の表示用）
     @State private var flickSuggestType: FlickSuggestType?
@@ -140,10 +141,11 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
     @Environment(Extension.Theme.self) private var theme
     @Environment(\.userActionManager) private var action
 
-    public init(model: any UnifiedKeyModelProtocol<Extension>, tabDesign: TabDependentDesign, size: CGSize, isSuggesting: Binding<Bool>) {
+    public init(model: any UnifiedKeyModelProtocol<Extension>, tabDesign: TabDependentDesign, size: CGSize, isSuggesting: Binding<Bool>, hitRect: CGRect? = nil) {
         self.model = model
         self.tabDesign = tabDesign
         self.size = size
+        self.hitRect = hitRect
         self._isSuggesting = isSuggesting
     }
 
@@ -610,6 +612,12 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
     }
 
     public var body: some View {
+        let hitRect = hitRect ?? CGRect(
+            x: -tabDesign.horizontalSpacing / 2,
+            y: -tabDesign.verticalSpacing / 2,
+            width: size.width + tabDesign.horizontalSpacing,
+            height: size.height + tabDesign.verticalSpacing
+        )
         KeyBackground(
             backgroundColor: keyBackgroundStyle.color,
             borderColor: theme.borderColor.color,
@@ -624,7 +632,8 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
             blendMode: keyBackgroundStyle.blendMode
         )
         .modifier(KeyPressGestureModifier(
-            hitSize: CGSize(width: size.width + tabDesign.horizontalSpacing, height: size.height + tabDesign.verticalSpacing),
+            hitSize: hitRect.size,
+            hitOffset: CGSize(width: hitRect.midX - size.width / 2, height: hitRect.midY - size.height / 2),
             flick: flickGesture,
             linear: qwertyGesture,
             onCancelled: cancelPress
