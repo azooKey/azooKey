@@ -15,7 +15,8 @@ on:
   push:
     branches: [ "main", "develop" ]
   pull_request:
-    branches: [ "main", "develop" ]
+    # mainはマージ後のpushで解析し、PRの待ち時間を増やさないようにします。
+    branches: [ "develop" ]
   schedule:
     - cron: '32 19 * * 4'
 
