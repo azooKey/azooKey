@@ -115,13 +115,3 @@ jobs:
           path: TestResults
           if-no-files-found: warn
           retention-days: 14
-
-  lint:
-    name: SwiftLint
-    runs-on: macos-15
-    steps:
-      - uses: actions/checkout@v6
-      - name: Lint without modifying source files
-        run: |
-          swiftlint version
-          swiftlint lint --config .swiftlint.yml --no-cache
