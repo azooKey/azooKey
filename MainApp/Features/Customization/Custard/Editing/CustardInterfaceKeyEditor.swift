@@ -586,6 +586,7 @@ struct CustardInterfaceKeyEditor: View {
                         )
                 }
             }
+            .id(id)
             CustardKeyPressActionSection(actions: variation[.pressAction])
             CustardKeyLongpressActionSection(
                 action: variation[.longpressAction],
