@@ -101,7 +101,7 @@ public struct ClipboardHistoryManager {
         }
         self.previousChangedCount = UIPasteboard.general.changeCount
 
-        let text = (UIPasteboard.general.strings ?? []).joined(separator: "")
+        let text = (UIPasteboard.general.strings ?? []).joined(separator: " ")
         guard !text.isEmpty else {
             return
         }
