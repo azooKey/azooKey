@@ -121,7 +121,7 @@ private struct UserDictionaryDataListView: View {
         }
         .navigationBarTitle(Text("ユーザ辞書"), displayMode: .inline)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
+            ToolbarItem(placement: .primaryAction) {
                 NavigationLink {
                     let id = variables.items.map { $0.id }.max()
                     UserDictionaryDataEditor(
@@ -296,18 +296,22 @@ private struct UserDictionaryDataEditor: CancelableEditor {
         .navigationTitle(Text("ユーザ辞書を編集"))
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
-        .navigationBarItems(
-            leading: EditCancelButton(confirmationRequired: false, action: cancel),
-            trailing: EditConfirmButton(.done) {
-                if item.error == nil {
-                    if self.shareThisWord {
-                        self.showConfirmationDialogue = true
-                    } else {
-                        self.saveAndDismiss()
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                EditCancelButton(confirmationRequired: false, action: cancel)
+            }
+            ToolbarItem(placement: .confirmationAction) {
+                EditConfirmButton(.done) {
+                    if item.error == nil {
+                        if self.shareThisWord {
+                            self.showConfirmationDialogue = true
+                        } else {
+                            self.saveAndDismiss()
+                        }
                     }
                 }
             }
-        )
+        }
         .onDisappear(perform: self.save)
         .onEnterBackground { _ in
             self.save()

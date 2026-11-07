@@ -13,8 +13,9 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "main", "develop" ]
   pull_request:
+    # mainはマージ後のpushで解析し、PRの待ち時間を増やさないようにします。
     branches: [ "develop" ]
   schedule:
     - cron: '32 19 * * 4'
@@ -27,7 +28,7 @@ jobs:
     #   - https://gh.io/supported-runners-and-hardware-resources
     #   - https://gh.io/using-larger-runners (GitHub.com only)
     # Consider using larger runners or machines with greater resources for possible analysis time improvements.
-    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+    runs-on: ${{ (matrix.language == 'swift' && 'macos-15') || 'ubuntu-latest' }}
     timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
     permissions:
       # required for all workflows
@@ -66,11 +67,12 @@ jobs:
       if: matrix.build-mode == 'manual'
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: "latest-stable"
+        # CodeQLがまだSwift 6.4に対応していないので、ここではXcode 26.3を使っています。
+        xcode-version: "26.3"
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v4.37.8
+      uses: github/codeql-action/init@v4.39.2
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
@@ -96,6 +98,6 @@ jobs:
                    CODE_SIGNING_ALLOWED=NO
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v4.37.8
+      uses: github/codeql-action/analyze@v4.39.2
       with:
         category: "/language:${{matrix.language}}"

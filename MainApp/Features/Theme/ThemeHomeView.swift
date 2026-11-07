@@ -157,6 +157,8 @@ struct ThemeHomeView: View {
                             sizing: .fitToExtension,
                             defaultTab: tab
                         )
+                        .accessibilityElement(children: .contain)
+                        .accessibilityIdentifier("theme-keyboard-preview")
                         .disabled(true)
                         .overlay {
                             if manager.selectedIndex == index || manager.selectedIndexInDarkMode == index {
