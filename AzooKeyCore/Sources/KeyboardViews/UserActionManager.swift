@@ -15,7 +15,8 @@ open class UserActionManager: @unchecked Sendable {
     public init() {}
     @MainActor open func registerAction(_ action: ActionType, variableStates: VariableStates) {}
     @MainActor open func registerActions(_ actions: [ActionType], variableStates: VariableStates) {}
-    @MainActor open func reserveLongPressAction(_ action: LongpressActionType, taskStartDuration: Double, variableStates: VariableStates) {}
+    /// 長押し成立時に状態を更新してから入力する。falseならstart/repeatのどちらも実行しない。
+    @MainActor open func reserveLongPressAction(_ action: LongpressActionType, taskStartDuration: Double, variableStates: VariableStates, onStart: @escaping @MainActor () -> Bool = { true }) {}
     @MainActor open func registerLongPressActionEnd(_ action: LongpressActionType) {}
     @MainActor open func setTextDocumentProxy(_ proxy: AnyTextDocumentProxy) {}
     @MainActor open func notifyComplete(_ candidate: any ResultViewItemData, variableStates: VariableStates) {}

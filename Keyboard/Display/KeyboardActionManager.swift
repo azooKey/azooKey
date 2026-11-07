@@ -505,27 +505,26 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
     /// 長押しを予約する関数。
     /// - Parameters:
     ///   - action: 長押しで起こる動作のタイプ。
-    override func reserveLongPressAction(_ action: LongpressActionType, taskStartDuration: Double, variableStates: VariableStates) {
+    override func reserveLongPressAction(_ action: LongpressActionType, taskStartDuration: Double, variableStates: VariableStates, onStart: @escaping @MainActor () -> Bool = { true }) {
         if tasks.contains(where: {$0.type == action}) {
             return
         }
         let nanoseconds = UInt64(taskStartDuration * 1_000_000_000)
-        let startTask = Task {
+        let task = Task { @MainActor in
             try await Task.sleep(nanoseconds: nanoseconds)
+            // 状態の確定と最初の入力の間に別のTaskやtouch-upを挟まない。
+            guard !Task.isCancelled, onStart() else {
+                return
+            }
             action.start.first?.feedback(variableStates: variableStates, extension: AzooKeyKeyboardViewExtension.self)
             self.registerActions(action.start, variableStates: variableStates)
-        }
-        self.tasks.append((type: action, task: startTask))
-
-        let repeatTask = Task {
-            try await Task.sleep(nanoseconds: nanoseconds)
-            while !Task.isCancelled {
+            while !Task.isCancelled, !action.repeat.isEmpty {
                 action.repeat.first?.feedback(variableStates: variableStates, extension: AzooKeyKeyboardViewExtension.self)
                 self.registerActions(action.repeat, variableStates: variableStates)
                 try await Task.sleep(nanoseconds: 0_100_000_000)
             }
         }
-        self.tasks.append((type: action, task: repeatTask))
+        self.tasks.append((type: action, task: task))
     }
 
     /// 長押しを終了する関数。継続的な動作、例えば連続的な文字削除を行っていたタイマーを停止する。
