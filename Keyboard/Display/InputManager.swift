@@ -770,7 +770,7 @@ final class InputManager {
 
     /// クリップボードの文字列をペーストする
     @MainActor func paste() {
-        let text = (UIPasteboard.general.strings ?? []).joined(separator: "")
+        let text = (UIPasteboard.general.strings ?? []).joined(separator: " ")
         guard !text.isEmpty else {
             return
         }
