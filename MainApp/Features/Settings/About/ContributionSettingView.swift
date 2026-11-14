@@ -9,7 +9,7 @@ struct ContributionSettingsSection: View {
             NavigationLink("azooKeyの開発に協力") {
                 ContributionDetailView()
             }
-            NavigationLink("変換候補の追加") {
+            NavigationLink("azooKeyに単語の追加を提案") {
                 ShareWordView()
             }
         }

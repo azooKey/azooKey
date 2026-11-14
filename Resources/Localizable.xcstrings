@@ -1004,6 +1004,38 @@
         }
       }
     },
+    "azooKeyに単語の追加を提案" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggest a word for the azooKey dictionary"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "azooKeyに単語の追加を提案"
+          }
+        }
+      }
+    },
+    "azooKeyの開発チームに単語を提案します。採用されると、他のユーザも変換候補として使えるようになります。\n個人情報を含む単語は送信しないでください。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggest a word to the azooKey team. If accepted, it will be available to other users as a conversion candidate.\nDo not submit words that contain personal information."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "azooKeyの開発チームに単語を提案します。採用されると、他のユーザも変換候補として使えるようになります。\n個人情報を含む単語は送信しないでください。"
+          }
+        }
+      }
+    },
     "azooKeyが使えます！" : {
       "localizations" : {
         "en" : {
@@ -7596,38 +7628,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Font size of candidates"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "変換候補の追加" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Request a Conversion Candidate"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "変換候補の追加申請" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Request to add a candidate for conversion"
           }
         },
         "ja" : {
