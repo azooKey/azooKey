@@ -50,16 +50,15 @@ struct ShareWordView: View {
 
             Section(footer: Text("azooKeyの開発チームに単語を提案します。採用されると、他のユーザも変換候補として使えるようになります。\n個人情報を含む単語は送信しないでください。")) {
                 Button("申請する") {
-                    Task {
-                        self.sending = true
+                    guard !sending else { return }
+                    sending = true
+                    Task { @MainActor in
                         _ = await SharedStore.sendSharedWord(word: word, ruby: ruby.toKatakana(), note: note, options: [])
-                        self.sending = false
-                        await MainActor.run {
-                            dismiss()
-                        }
+                        sending = false
+                        dismiss()
                     }
                 }
-                .disabled(word.isEmpty && ruby.isEmpty)
+                .disabled(sending || (word.isEmpty && ruby.isEmpty))
             }
         }
         .multilineTextAlignment(.leading)
