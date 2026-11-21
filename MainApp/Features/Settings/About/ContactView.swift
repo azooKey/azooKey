@@ -16,7 +16,7 @@ struct ContactView: View {
                 FallbackLink("機能の改善・追加", destination: URL(string: "https://forms.gle/4PrdgaC2mZEaYed76")!)
             }
             Section {
-                NavigationLink("変換候補の追加") {
+                NavigationLink("azooKeyに単語の追加を提案") {
                     ShareWordView()
                 }
             }

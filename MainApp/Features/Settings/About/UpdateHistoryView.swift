@@ -255,7 +255,7 @@ struct UpdateHistoryView: View {
                             "辞書に不足していた単語を複数追加しました"
                         }
                     }
-                    NavigationLink("変換候補の追加") {
+                    NavigationLink("azooKeyに単語の追加を提案") {
                         ShareWordView()
                     }
                     VersionView("2.1", releaseDate: "2023年04月09日") {

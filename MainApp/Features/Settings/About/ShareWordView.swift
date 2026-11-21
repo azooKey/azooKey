@@ -48,7 +48,7 @@ struct ShareWordView: View {
                     .padding(.horizontal, 5)
             }
 
-            Section(footer: Text("この単語を他のユーザにも共有することを申請します。\n個人情報を含む単語は申請しないでください。")) {
+            Section(footer: Text("azooKeyの開発チームに単語を提案します。採用されると、他のユーザも変換候補として使えるようになります。\n個人情報を含む単語は送信しないでください。")) {
                 Button("申請する") {
                     Task {
                         self.sending = true
@@ -63,7 +63,7 @@ struct ShareWordView: View {
             }
         }
         .multilineTextAlignment(.leading)
-        .navigationBarTitle(Text("変換候補の追加申請"), displayMode: .inline)
+        .navigationBarTitle(Text("azooKeyに単語の追加を提案"), displayMode: .inline)
 
     }
 }
