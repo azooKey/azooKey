@@ -108,6 +108,50 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
         variableStates.setEnterKeyState(self.inputManager.getEnterKeyState())
     }
 
+    @MainActor override func emojiSkinToneVariations(for candidate: any ResultViewItemData) -> (base: String, variations: [String])? {
+        guard let text = candidate.textualRepresentation else {
+            return nil
+        }
+        return self.inputManager.getEmojiSkinToneVariations(for: text)
+    }
+
+    /// スキントーンの絵文字を確定する。候補の種類ごとに既存の確定経路に合わせて入力し、絵文字タブの記憶にも反映する。
+    @MainActor override func notifyCompleteEmojiVariation(_ candidate: any ResultViewItemData, replacement: String, base: String, variableStates: VariableStates) {
+        if let candidate = candidate as? Candidate {
+            var modified = candidate
+            modified.text = replacement
+            // スキントーンの選択は学習対象にしない
+            modified.isLearningTarget = false
+            self.inputManager.complete(candidate: modified)
+            self.registerActions(modified.actions.map(\.action), variableStates: variableStates)
+        } else if let candidate = candidate as? ReplacementCandidate {
+            self.inputManager.replaceLastCharacters(table: [candidate.target: replacement], inputStyle: .direct)
+        } else if let candidate = candidate as? PostCompositionPredictionCandidate {
+            self.inputManager.input(text: replacement, simpleInsert: true, inputStyle: .direct)
+            if !candidate.isTerminal {
+                self.inputManager.postCompositionPredictionCandidateSelected(candidate: candidate)
+            } else {
+                self.inputManager.resetPostCompositionPredictionCandidates()
+            }
+        } else if candidate is TextReplacer.SearchResultItem {
+            // 絵文字検索の結果は通常、メインディスプレイへの直接入力で確定する
+            self.registerActions([.insertMainDisplay(replacement)], variableStates: variableStates)
+        } else {
+            debug("notifyCompleteEmojiVariation: 確定できません")
+            return
+        }
+        // 絵文字タブの記憶に反映する
+        variableStates.keyboardInternalSettingManager.update(\.tabCharacterPreference) { item in
+            item.setPreference(base: base, replace: replacement, for: .system(.emoji))
+        }
+        let (left, center, right) = self.inputManager.getSurroundingText()
+        let target = variableStates.tabManager.existentialTab().replacementTarget
+        if !target.isEmpty {
+            self.inputManager.updateTextReplacementCandidates(left: left, center: center, right: right, target: target)
+        }
+        variableStates.setEnterKeyState(self.inputManager.getEnterKeyState())
+    }
+
     override func notifyForgetCandidate(_ candidate: any ResultViewItemData, variableStates: VariableStates) {
         if let candidate = candidate as? Candidate {
             self.inputManager.forgetMemory(candidate)

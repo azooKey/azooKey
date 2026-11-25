@@ -203,14 +203,26 @@ struct ResultContextMenuView: View {
     private let candidate: any ResultViewItemData
     private let index: Int?
     private let displayResetLearningButton: Bool
+    private let onCompleted: (() -> Void)?
 
-    init(candidate: any ResultViewItemData, displayResetLearningButton: Bool, index: Int? = nil) {
+    init(candidate: any ResultViewItemData, displayResetLearningButton: Bool, index: Int? = nil, onCompleted: (() -> Void)? = nil) {
         self.candidate = candidate
         self.index = index
         self.displayResetLearningButton = displayResetLearningButton
+        self.onCompleted = onCompleted
     }
 
     var body: some View {
+        if let skinTone = action.emojiSkinToneVariations(for: candidate) {
+            // スキントーンを持つ絵文字だけ、メニューの最上段に選択用のサブメニューを置く
+            Menu("スキントーンを選択", systemImage: "hand.raised") {
+                ForEach(skinTone.variations, id: \.self) { variation in
+                    Button(variation) {
+                        self.completeEmojiVariation(variation, base: skinTone.base)
+                    }
+                }
+            }
+        }
         Button("大きな文字で表示", systemImage: "plus.magnifyingglass") {
             if let labelText = candidate.textualRepresentation {
                 variableStates.magnifyingText = labelText
@@ -241,6 +253,11 @@ struct ResultContextMenuView: View {
             debug(self.candidate.getDebugInformation())
         }
         #endif
+    }
+
+    private func completeEmojiVariation(_ variation: String, base: String) {
+        action.notifyCompleteEmojiVariation(candidate, replacement: variation, base: base, variableStates: variableStates)
+        onCompleted?()
     }
 }
 

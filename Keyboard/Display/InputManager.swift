@@ -282,6 +282,48 @@ final class InputManager {
         return results
     }
 
+    /// スキントーン検索の結果のキャッシュ。キーは候補の文字列で、値は基準の絵文字を先頭にした一覧。
+    /// 空配列は「スキントーンのバリエーションを持たない」ことを表す。絵文字辞書は起動後に変化しないため、破棄は不要。
+    private var emojiSkinToneVariationCache: [String: [String]] = [:]
+
+    /// 指定した絵文字のスキントーンバリエーションを取得する。
+    /// - Parameter text: 対象の文字列。1文字の絵文字のみを対象とする。
+    /// - Returns: 基準となる絵文字と、それに続くバリエーションの一覧。スキントーンを持たない場合は`nil`。
+    func getEmojiSkinToneVariations(for text: String) -> (base: String, variations: [String])? {
+        // 候補の描画のたびに呼ばれるため、絵文字以外は辞書を引かずに弾く
+        guard text.count == 1, text.unicodeScalars.first?.properties.isEmoji == true else {
+            return nil
+        }
+        let variations: [String]
+        if let cached = self.emojiSkinToneVariationCache[text] {
+            variations = cached
+        } else {
+            variations = self.computeEmojiSkinToneVariations(for: text)
+            self.emojiSkinToneVariationCache[text] = variations
+        }
+        guard let base = variations.first else {
+            return nil
+        }
+        return (base, variations)
+    }
+
+    /// 絵文字辞書を引いてスキントーンのバリエーションを求める
+    private func computeEmojiSkinToneVariations(for text: String) -> [String] {
+        // 置換候補は対象の文字列自身を除いて返されるため、まず基準の絵文字を求める
+        let initialResults = self.textReplacer.getReplacementCandidate(left: text, center: "", right: "", target: [.emoji])
+        guard let base = initialResults.first?.base else {
+            return []
+        }
+        // textがすでにバリエーションの場合、textを基準に引いた結果には自分自身が含まれない。
+        // 基準の絵文字を基準に引き直すことで、どのバリエーションから引いても辞書の定義順で揃える
+        let results = (text == base) ? initialResults : self.textReplacer.getReplacementCandidate(left: base, center: "", right: "", target: [.emoji])
+        var variations = [base]
+        for result in results where !variations.contains(result.replace) {
+            variations.append(result.replace)
+        }
+        return variations
+    }
+
     /// 絵文字候補のクリーニング
     @MainActor func cleaningEmojiPredictionCandidates(candidates: consuming [PostCompositionPredictionCandidate], denylist: Set<String>) -> [PostCompositionPredictionCandidate] {
         candidates.filter {
