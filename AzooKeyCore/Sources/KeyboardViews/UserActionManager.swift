@@ -27,6 +27,11 @@ open class UserActionManager: @unchecked Sendable {
     @MainActor open func presentReportDetail(_ content: ReportContent, variableStates: VariableStates) {}
     @MainActor open func dismissReportDetail(variableStates: VariableStates) {}
     @MainActor open func notifySomethingWillChange(left: String, center: String, right: String) {}
+    /// 絵文字候補のスキントーンバリエーションを返す。先頭は基準となる絵文字で、続けて他のバリエーションが並ぶ。
+    /// スキントーンを持たない候補では`nil`を返す。
+    @MainActor open func emojiSkinToneVariations(for candidate: any ResultViewItemData) -> (base: String, variations: [String])? { nil }
+    /// スキントーンの絵文字を候補として確定する。
+    @MainActor open func notifyCompleteEmojiVariation(_ candidate: any ResultViewItemData, replacement: String, base: String, variableStates: VariableStates) {}
     @MainActor open func notifySomethingDidChange(a_left: String, a_center: String, a_right: String, variableStates: VariableStates) {}
 
     @MainActor open func makeChangeKeyboardButtonView<Extension: ApplicationSpecificKeyboardViewExtension>() -> ChangeKeyboardButtonView<Extension> {

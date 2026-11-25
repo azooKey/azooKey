@@ -94,7 +94,7 @@ struct ExpandedResultView<Extension: ApplicationSpecificKeyboardViewExtension>: 
                                 }
                                 .buttonStyle(ResultButtonStyle<Extension>(height: 18))
                                 .contextMenu {
-                                    ResultContextMenuView(candidate: datum.candidate, displayResetLearningButton: Extension.SettingProvider.canResetLearningForCandidate)
+                                    ResultContextMenuView(candidate: datum.candidate, displayResetLearningButton: Extension.SettingProvider.canResetLearningForCandidate, onCompleted: { self.collapse() })
                                 }
                             }
                         }
