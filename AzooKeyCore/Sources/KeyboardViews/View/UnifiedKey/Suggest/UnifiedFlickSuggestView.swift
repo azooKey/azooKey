@@ -42,7 +42,10 @@ struct UnifiedFlickSuggestView<Extension: ApplicationSpecificKeyboardViewExtensi
         let defaultTheme = Extension.ThemeExtension.default
         let nativeTheme = Extension.ThemeExtension.native
         var pointedColor: Color {
-            switch (colorScheme, theme) {
+            if theme.style == .minimal, let color = theme.suggestKeyFillColor?.color {
+                return color
+            }
+            return switch (colorScheme, theme) {
             case
                 (.dark, defaultTheme):
                 .systemGray4
@@ -53,7 +56,10 @@ struct UnifiedFlickSuggestView<Extension: ApplicationSpecificKeyboardViewExtensi
             }
         }
         var unpointedColor: Color {
-            switch (colorScheme, theme) {
+            if theme.style == .minimal, let color = theme.suggestKeyFillColor?.color {
+                return color
+            }
+            return switch (colorScheme, theme) {
             case
                 (_, defaultTheme),
                 (.dark, nativeTheme):
@@ -126,7 +132,10 @@ struct UnifiedFlickSuggestView<Extension: ApplicationSpecificKeyboardViewExtensi
         let nativeTheme = Extension.ThemeExtension.native
         // ポインテッド時の色を定義
         var color: Color {
-            switch (colorScheme, theme) {
+            if theme.style == .minimal, let color = theme.suggestKeyFillColor?.color {
+                return color
+            }
+            return switch (colorScheme, theme) {
             case (.dark, defaultTheme):
                 .systemGray4
             case (.dark, nativeTheme):
@@ -215,6 +224,11 @@ struct UnifiedFlickSuggestView<Extension: ApplicationSpecificKeyboardViewExtensi
             .frame(width: size.width, height: size.height)
             .allowsHitTesting(false)
         case .flick(let targetDirection):
+            let centerFillColor = if theme.style == .minimal {
+                theme.pushedKeyFillColor
+            } else {
+                theme.specialKeyFillColor
+            }
             VStack(spacing: tabDesign.verticalSpacing) {
                 self.getPointedSuggestViewIfNecessary(direction: .top, targetDirection: targetDirection)
                     .offset(y: size.height / 2)
@@ -225,11 +239,16 @@ struct UnifiedFlickSuggestView<Extension: ApplicationSpecificKeyboardViewExtensi
                         .zIndex(1)
                     RoundedRectangle(cornerRadius: 5.0)
                         .strokeAndFill(
-                            fillContent: theme.specialKeyFillColor.color.blendMode(theme.specialKeyFillColor.blendMode),
+                            fillContent: centerFillColor.color.blendMode(centerFillColor.blendMode),
                             strokeContent: theme.borderColor.color,
                             lineWidth: theme.borderWidth
                         )
                         .frame(width: size.width, height: size.height)
+                        .overlay {
+                            if theme.style == .minimal {
+                                self.model.label(width: size.width, theme: theme, states: variableStates, color: nil)
+                            }
+                        }
                         .zIndex(0)
                     self.getPointedSuggestViewIfNecessary(direction: .right, targetDirection: targetDirection)
                         .offset(x: -size.width / 2)

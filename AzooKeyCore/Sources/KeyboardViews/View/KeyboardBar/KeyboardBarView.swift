@@ -111,6 +111,7 @@ struct KeyboardBarButton<Extension: ApplicationSpecificKeyboardViewExtension>: V
         case systemImage(String)
     }
     @Environment(Extension.Theme.self) private var theme
+    @Environment(\.colorScheme) private var colorScheme
     @EnvironmentObject private var variableStates: VariableStates
     private var action: () -> Void
     private let label: LabelType
@@ -121,7 +122,11 @@ struct KeyboardBarButton<Extension: ApplicationSpecificKeyboardViewExtension>: V
     }
 
     private var buttonBackgroundColor: Color {
-        theme.tabBarButtonBackgroundColor
+        if theme.style == .faceted && colorScheme == .light {
+            .white
+        } else {
+            theme.tabBarButtonBackgroundColor
+        }
     }
 
     private var buttonLabelColor: Color {
@@ -146,7 +151,11 @@ struct KeyboardBarButton<Extension: ApplicationSpecificKeyboardViewExtension>: V
         Button(action: self.action) {
             ZStack {
                 Circle()
-                    .strokeAndFill(fillContent: buttonBackgroundColor, strokeContent: theme.borderColor.color, lineWidth: theme.borderWidth)
+                    .strokeAndFill(
+                        fillContent: buttonBackgroundColor,
+                        strokeContent: theme.tabBarButtonBorderColor,
+                        lineWidth: theme.borderWidth
+                    )
                     .frame(width: circleSize, height: circleSize)
                 switch label {
                 case let .azooKeyIcon(looks):
